@@ -37,3 +37,14 @@ PNRRCN4NotebookTest >> testLoadingStops [
 
 	self assert: stops size equals: 2447
 ]
+
+{ #category : 'tests' }
+PNRRCN4NotebookTest >> testLoadingTrips [
+
+	| trips |
+	trips := PNRRCN4Trip onFileReference:
+		         '/home/mn/Downloads/48-urbanoareametropolitanafiorentina/trips.txt'
+			         asFileReference.
+
+	self assert: trips size equals: 44499
+]
