@@ -7,10 +7,12 @@ Class {
 		'departureTime',
 		'stopId',
 		'sequence',
-		'traveledDistance'
+		'traveledDistance',
+		'stop'
 	],
-	#category : 'PNRRCN4-UrbanMobility',
-	#package : 'PNRRCN4-UrbanMobility'
+	#category : 'PNRRCN4-UrbanMobility-Core',
+	#package : 'PNRRCN4-UrbanMobility',
+	#tag : 'Core'
 }
 
 { #category : 'parsing' }
@@ -72,6 +74,18 @@ PNRRCN4StopTime >> sequence [
 PNRRCN4StopTime >> sequence: anObject [
 
 	sequence := anObject
+]
+
+{ #category : 'accessing' }
+PNRRCN4StopTime >> stop [
+
+	^ stop
+]
+
+{ #category : 'accessing' }
+PNRRCN4StopTime >> stop: anObject [
+
+	stop := anObject
 ]
 
 { #category : 'accessing' }

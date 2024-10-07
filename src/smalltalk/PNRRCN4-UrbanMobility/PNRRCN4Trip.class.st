@@ -3,12 +3,13 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'routeId',
-		'tripId',
+		'id',
 		'head',
 		'direction'
 	],
-	#category : 'PNRRCN4-UrbanMobility',
-	#package : 'PNRRCN4-UrbanMobility'
+	#category : 'PNRRCN4-UrbanMobility-Core',
+	#package : 'PNRRCN4-UrbanMobility',
+	#tag : 'Core'
 }
 
 { #category : 'parsing' }
@@ -22,7 +23,7 @@ PNRRCN4Trip class >> onFileReference: fr [
 		  recordClass: self;
 		  addIntegerField: #routeId:;
 		  addIgnoredField;
-		  addField: #tripId:;
+		  addField: #id:;
 		  addField: #head:;
 		  addIgnoredField;
 		  addField: #direction:;
@@ -54,6 +55,18 @@ PNRRCN4Trip >> head: anObject [
 ]
 
 { #category : 'accessing' }
+PNRRCN4Trip >> id [
+
+	^ id
+]
+
+{ #category : 'accessing' }
+PNRRCN4Trip >> id: anObject [
+
+	id := anObject
+]
+
+{ #category : 'accessing' }
 PNRRCN4Trip >> routeId [
 
 	^ routeId
@@ -63,16 +76,4 @@ PNRRCN4Trip >> routeId [
 PNRRCN4Trip >> routeId: anObject [
 
 	routeId := anObject
-]
-
-{ #category : 'accessing' }
-PNRRCN4Trip >> tripId [
-
-	^ tripId
-]
-
-{ #category : 'accessing' }
-PNRRCN4Trip >> tripId: anObject [
-
-	tripId := anObject
 ]
