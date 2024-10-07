@@ -40,7 +40,9 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		each trip: (tripsMap at: each tripId) ].
 
 	tripsMap valuesDo: [ :each |
-		each route: (routesMap at: each routeId) ].
+		| route |
+		route := routesMap at: each routeId.
+		route trips add: each ].
 
 	^ self new
 		  routes: routesMap;

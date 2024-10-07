@@ -5,8 +5,7 @@ Class {
 		'routeId',
 		'id',
 		'head',
-		'direction',
-		'route'
+		'direction'
 	],
 	#category : 'PNRRCN4-UrbanMobility-Core',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -73,18 +72,6 @@ PNRRCN4Trip >> id [
 PNRRCN4Trip >> id: anObject [
 
 	id := anObject
-]
-
-{ #category : 'accessing' }
-PNRRCN4Trip >> route [
-
-	^ route
-]
-
-{ #category : 'accessing' }
-PNRRCN4Trip >> route: anObject [
-
-	route := anObject
 ]
 
 { #category : 'accessing' }
