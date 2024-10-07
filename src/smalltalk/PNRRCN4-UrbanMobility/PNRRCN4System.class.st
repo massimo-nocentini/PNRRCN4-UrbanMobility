@@ -92,9 +92,27 @@ PNRRCN4System >> temporalAssociations [
 
 	self routes do: [ :route |
 		route trips do: [ :trip |
-			trip times overlappingPairsDo: [ :r :s | r -> s ] ] ].
+			trip times overlappingPairsDo: [ :r :s | assocs add: r -> s ] ] ].
 
 	^ assocs
+]
+
+{ #category : 'accessing' }
+PNRRCN4System >> temporalMap [
+
+	| map |
+	map := IdentityDictionary new.
+
+	self routes do: [ :route |
+		route trips do: [ :trip |
+			trip times overlappingPairsDo: [ :r :s |
+				| col |
+				col := map at: r stop ifAbsentPut: [ OrderedCollection new ].
+				col add: s stop -> r departureTime ] ] ].
+
+	map valuesDo: [ :assocs | assocs sort: [ :a :b | a value < b value ] ].
+
+	^ map
 ]
 
 { #category : 'accessing' }
