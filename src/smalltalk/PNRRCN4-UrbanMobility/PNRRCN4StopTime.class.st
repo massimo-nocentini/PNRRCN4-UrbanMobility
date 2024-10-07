@@ -8,7 +8,8 @@ Class {
 		'stopId',
 		'sequence',
 		'traveledDistance',
-		'stop'
+		'stop',
+		'trip'
 	],
 	#category : 'PNRRCN4-UrbanMobility-Core',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -110,6 +111,18 @@ PNRRCN4StopTime >> traveledDistance [
 PNRRCN4StopTime >> traveledDistance: anObject [
 
 	traveledDistance := anObject
+]
+
+{ #category : 'accessing' }
+PNRRCN4StopTime >> trip [
+
+	^ trip
+]
+
+{ #category : 'accessing' }
+PNRRCN4StopTime >> trip: anObject [
+
+	trip := anObject
 ]
 
 { #category : 'accessing' }
