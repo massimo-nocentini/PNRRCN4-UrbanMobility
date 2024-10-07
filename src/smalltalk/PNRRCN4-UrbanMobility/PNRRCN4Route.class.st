@@ -36,6 +36,19 @@ PNRRCN4Route class >> onFileReference: fr [
 		  upToEnd
 ]
 
+{ #category : 'displaying' }
+PNRRCN4Route >> displayStringOn: aStream [
+
+	aStream
+		<< self longName;
+		space;
+		<< '('.
+		
+	self trips size displayStringOn: aStream.
+
+	aStream << ' trips)'
+]
+
 { #category : 'accessing' }
 PNRRCN4Route >> id [
 

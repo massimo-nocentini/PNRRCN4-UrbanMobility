@@ -85,6 +85,19 @@ PNRRCN4System >> stops: anObject [
 ]
 
 { #category : 'accessing' }
+PNRRCN4System >> temporalAssociations [
+
+	| assocs |
+	assocs := OrderedCollection new.
+
+	self routes do: [ :route |
+		route trips do: [ :trip |
+			trip times overlappingPairsDo: [ :r :s | r -> s ] ] ].
+
+	^ assocs
+]
+
+{ #category : 'accessing' }
 PNRRCN4System >> times [
 
 	^ times

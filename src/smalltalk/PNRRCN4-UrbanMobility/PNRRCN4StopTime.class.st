@@ -27,22 +27,23 @@ PNRRCN4StopTime class >> florence [
 { #category : 'parsing' }
 PNRRCN4StopTime class >> onFileReference: fr [
 
-	| reader |
-	reader := NeoCSVReader on: fr readStream.
+	| converter |
+	converter := [ :s |
+	             | triple |
+	             triple := s splitOn: $:.
 
-	^ reader
+	             Time
+		             hour: triple first asInteger % 24
+		             minute: triple second asInteger
+		             second: triple third asInteger ].
+
+
+	^ (NeoCSVReader on: fr readStream)
 		  skipHeader;
 		  recordClass: self;
 		  addField: #tripId:;
-		  addField: #arrivalTime: converter: [ :s |
-			  | triple |
-			  triple := s splitOn: $:.
-
-			  Time
-				  hour: triple first asInteger % 24
-				  minute: triple second asInteger
-				  second: triple third asInteger ];
-		  addField: #departureTime:;
+		  addField: #arrivalTime: converter: converter;
+		  addField: #departureTime: converter: converter;
 		  addField: #stopId:;
 		  addIntegerField: #sequence:;
 		  addField: #traveledDistance:;
@@ -71,6 +72,27 @@ PNRRCN4StopTime >> departureTime [
 PNRRCN4StopTime >> departureTime: anObject [
 
 	departureTime := anObject
+]
+
+{ #category : 'displaying' }
+PNRRCN4StopTime >> displayStringOn: aStream [
+
+	aStream
+		<< self stop name;
+		space;
+		<< ' ('.
+
+	self stop code displayStringOn: aStream.
+
+	aStream << ') at '.
+
+	self arrivalTime displayStringOn: aStream.
+
+	aStream << ' after '.
+
+	self traveledDistance displayStringOn: aStream.
+
+	aStream << 'km'
 ]
 
 { #category : 'accessing' }

@@ -51,6 +51,19 @@ PNRRCN4Stop >> code: anObject [
 	code := anObject
 ]
 
+{ #category : 'displaying' }
+PNRRCN4Stop >> displayStringOn: aStream [
+
+	aStream
+		<< self name;
+		space;
+		<< '('.
+
+	self times size displayStringOn: aStream.
+
+	aStream << ' times)'
+]
+
 { #category : 'accessing' }
 PNRRCN4Stop >> id [
 
