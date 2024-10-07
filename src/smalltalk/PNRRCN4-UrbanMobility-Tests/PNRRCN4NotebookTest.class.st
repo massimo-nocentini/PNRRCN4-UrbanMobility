@@ -10,7 +10,7 @@ PNRRCN4NotebookTest >> testLoadingRoutes [
 
 	| routes |
 	routes := PNRRCN4Route onFileReference:
-		          '/home/mn/Downloads/48-urbanoareametropolitanafiorentina/routes.txt'
+		          'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/routes.txt'
 			          asFileReference.
 
 	self assert: routes size equals: 92
@@ -21,7 +21,7 @@ PNRRCN4NotebookTest >> testLoadingStopTimes [
 
 	| stopTimes |
 	stopTimes := PNRRCN4StopTime onFileReference:
-		             '/home/mn/Downloads/48-urbanoareametropolitanafiorentina/stop_times.txt'
+		             'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/stop_times.txt'
 			             asFileReference.
 
 	self assert: stopTimes size equals: 1142816
@@ -32,7 +32,7 @@ PNRRCN4NotebookTest >> testLoadingStops [
 
 	| stops |
 	stops := PNRRCN4Stop onFileReference:
-		         '/home/mn/Downloads/48-urbanoareametropolitanafiorentina/stops.txt'
+		         'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/stops.txt'
 			         asFileReference.
 
 	self assert: stops size equals: 2447
@@ -43,7 +43,7 @@ PNRRCN4NotebookTest >> testLoadingTrips [
 
 	| trips |
 	trips := PNRRCN4Trip onFileReference:
-		         '/home/mn/Downloads/48-urbanoareametropolitanafiorentina/trips.txt'
+		         'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/trips.txt'
 			         asFileReference.
 
 	self assert: trips size equals: 44499
