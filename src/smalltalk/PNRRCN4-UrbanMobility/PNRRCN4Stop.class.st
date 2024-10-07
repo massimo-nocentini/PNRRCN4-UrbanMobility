@@ -6,7 +6,8 @@ Class {
 		'name',
 		'latitude',
 		'longitude',
-		'code'
+		'code',
+		'times'
 	],
 	#category : 'PNRRCN4-UrbanMobility-Core',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -62,6 +63,14 @@ PNRRCN4Stop >> id: anObject [
 	id := anObject
 ]
 
+{ #category : 'initialization' }
+PNRRCN4Stop >> initialize [
+
+	super initialize.
+
+	times := OrderedCollection new
+]
+
 { #category : 'accessing' }
 PNRRCN4Stop >> latitude [
 
@@ -96,4 +105,10 @@ PNRRCN4Stop >> name [
 PNRRCN4Stop >> name: anObject [
 
 	name := anObject
+]
+
+{ #category : 'accessing' }
+PNRRCN4Stop >> times [
+
+	^ times
 ]
