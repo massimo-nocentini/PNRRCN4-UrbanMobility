@@ -13,22 +13,29 @@ Class {
 }
 
 { #category : 'instance creation' }
+PNRRCN4System class >> florence [
+
+	^ self
+		  routes: PNRRCN4Route florence
+		  stops: PNRRCN4Stop florence
+		  times: PNRRCN4StopTime florence
+		  trips: PNRRCN4Trip florence
+]
+
+{ #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
-	| routesMap stopsMap timesMap tripsMap |
+	| routesMap stopsMap tripsMap |
 	routesMap := Dictionary new.
 	routes do: [ :each | routesMap at: each id put: each ].
 
 	stopsMap := Dictionary new.
 	stops do: [ :each | stopsMap at: each id put: each ].
 
-	timesMap := Dictionary new.
-	times do: [ :each | timesMap at: each id put: each ].
-
 	tripsMap := Dictionary new.
 	trips do: [ :each | tripsMap at: each id put: each ].
 
-	timesMap valuesDo: [ :each |
+	times do: [ :each |
 		each stop: (stopsMap at: each stopId).
 		each trip: (tripsMap at: each tripId) ].
 
@@ -38,7 +45,7 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 	^ self new
 		  routes: routesMap;
 		  stops: stopsMap;
-		  times: timesMap;
+		  times: times;
 		  trips: tripsMap;
 		  yourself
 ]

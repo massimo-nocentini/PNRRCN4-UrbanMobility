@@ -13,6 +13,14 @@ Class {
 	#tag : 'Core'
 }
 
+{ #category : 'instance creation' }
+PNRRCN4Trip class >> florence [
+
+	^ self onFileReference:
+		  'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/trips.txt'
+			  asFileReference
+]
+
 { #category : 'parsing' }
 PNRRCN4Trip class >> onFileReference: fr [
 
