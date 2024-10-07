@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone
+"888-48","Autolinee Toscane - Urbano Area Metropolitana Fiorentina","http://www.at-bus.it/","Europe/Rome","it","800142424"
