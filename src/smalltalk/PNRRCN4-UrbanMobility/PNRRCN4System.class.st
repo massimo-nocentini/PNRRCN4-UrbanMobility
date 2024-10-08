@@ -68,6 +68,46 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		  yourself
 ]
 
+{ #category : 'export' }
+PNRRCN4System >> asTemporalGraphInSexpString [
+
+	^ String streamContents: [ :aStream |
+		  self exportTemporalGraphInSexpFormatOnStream: aStream ]
+]
+
+{ #category : 'export' }
+PNRRCN4System >> exportTemporalGraphInSexpFormatOnStream: aStream [
+
+	aStream
+		<< '(define florenceTemporalGraph ''(';
+		lf.
+
+	self stops valuesDo: [ :stop |
+		aStream
+			<< '(';
+			<< stop code;
+			space.
+
+		stop temporalNeighborhood do: [ :assoc |
+			| destStop time |
+			destStop := assoc key.
+			time := assoc value.
+
+			aStream
+				<< '(';
+				<< destStop code;
+				space;
+				<< time asSeconds asString;
+				<< ')';
+				space ].
+
+		aStream
+			<< ')';
+			lf ].
+
+	aStream << '))'
+]
+
 { #category : 'accessing' }
 PNRRCN4System >> routes [
 
