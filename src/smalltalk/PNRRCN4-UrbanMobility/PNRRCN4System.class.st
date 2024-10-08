@@ -108,6 +108,16 @@ PNRRCN4System >> exportTemporalGraphInSexpFormatOnStream: aStream [
 	aStream << '))'
 ]
 
+{ #category : 'parsing' }
+PNRRCN4System >> requests: aCollection [
+
+	^ aCollection do: [ :request |
+		  request
+			  fromStop: (self stops at: request fromStopId);
+			  toStop: (self stops at: request toStopId);
+			  time: (DateAndTime fromUnixTime: request unixTime) asTime ]
+]
+
 { #category : 'accessing' }
 PNRRCN4System >> routes [
 

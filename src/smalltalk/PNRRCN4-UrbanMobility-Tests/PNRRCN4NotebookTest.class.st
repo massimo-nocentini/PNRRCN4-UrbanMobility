@@ -6,6 +6,14 @@ Class {
 }
 
 { #category : 'tests' }
+PNRRCN4NotebookTest >> testLoadingRequests [
+
+	self
+		assert: PNRRCN4TripRequest florence1 size equals: 10649;
+		assert: PNRRCN4TripRequest florence2 size equals: 30161
+]
+
+{ #category : 'tests' }
 PNRRCN4NotebookTest >> testLoadingRoutes [
 
 	| routes |
