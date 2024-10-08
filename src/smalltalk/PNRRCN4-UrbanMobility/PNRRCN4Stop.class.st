@@ -7,7 +7,8 @@ Class {
 		'latitude',
 		'longitude',
 		'code',
-		'times'
+		'times',
+		'temporalNeighborhood'
 	],
 	#category : 'PNRRCN4-UrbanMobility-Core',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -81,7 +82,8 @@ PNRRCN4Stop >> initialize [
 
 	super initialize.
 
-	times := OrderedCollection new
+	times := OrderedCollection new.
+	temporalNeighborhood := Set new
 ]
 
 { #category : 'accessing' }
@@ -118,6 +120,21 @@ PNRRCN4Stop >> name [
 PNRRCN4Stop >> name: anObject [
 
 	name := anObject
+]
+
+{ #category : 'accessing' }
+PNRRCN4Stop >> sortTemporalNeighborhood [
+
+	temporalNeighborhood := self temporalNeighborhood asArray sort: [
+		                        :assoc
+		                        :anotherAssoc |
+		                        assoc value < anotherAssoc value ]
+]
+
+{ #category : 'accessing' }
+PNRRCN4Stop >> temporalNeighborhood [
+
+	^ temporalNeighborhood
 ]
 
 { #category : 'accessing' }

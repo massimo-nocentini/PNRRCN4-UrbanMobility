@@ -84,9 +84,9 @@ PNRRCN4StopTime >> displayStringOn: aStream [
 
 	self stop code displayStringOn: aStream.
 
-	aStream << ') at '.
+	aStream << ') departs at '.
 
-	self arrivalTime displayStringOn: aStream.
+	self departureTime displayStringOn: aStream.
 
 	aStream << ' after '.
 

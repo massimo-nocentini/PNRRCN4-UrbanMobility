@@ -66,7 +66,7 @@ PNRRCN4Route >> initialize [
 
 	super initialize.
 
-	self trips: OrderedCollection new
+	trips := OrderedCollection new
 ]
 
 { #category : 'accessing' }
@@ -97,10 +97,4 @@ PNRRCN4Route >> shortName: anObject [
 PNRRCN4Route >> trips [
 
 	^ trips
-]
-
-{ #category : 'accessing' }
-PNRRCN4Route >> trips: anObject [
-
-	trips := anObject
 ]

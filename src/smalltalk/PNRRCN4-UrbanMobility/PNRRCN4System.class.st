@@ -33,7 +33,14 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 	stops do: [ :each | stopsMap at: each id put: each ].
 
 	tripsMap := Dictionary new.
-	trips do: [ :each | tripsMap at: each id put: each ].
+	trips do: [ :each |
+		| route |
+		"Tying the 1-to-many relation with the routes."
+		route := routesMap at: each routeId.
+		route trips add: each.
+		each route: route.
+
+		tripsMap at: each id put: each ].
 
 	times do: [ :each |
 		| trip stop |
@@ -46,11 +53,12 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		trip times add: each.
 		stop times add: each ].
 
-	tripsMap valuesDo: [ :each |
-		| route |
-		route := routesMap at: each routeId.
-		each route: route.
-		route trips add: each ].
+	routes do: [ :route |
+		route trips do: [ :trip |
+			trip times overlappingPairsDo: [ :r :s |
+				r stop temporalNeighborhood add: s stop -> r departureTime ] ] ].
+
+	stops do: [ :stop | stop sortTemporalNeighborhood ].
 
 	^ self new
 		  routes: routes;
