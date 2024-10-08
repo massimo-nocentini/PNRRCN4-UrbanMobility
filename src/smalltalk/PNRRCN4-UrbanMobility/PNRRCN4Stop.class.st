@@ -125,10 +125,13 @@ PNRRCN4Stop >> name: anObject [
 { #category : 'accessing' }
 PNRRCN4Stop >> sortTemporalNeighborhood [
 
-	temporalNeighborhood := self temporalNeighborhood asArray sort: [
-		                        :assoc
-		                        :anotherAssoc |
-		                        assoc value < anotherAssoc value ]
+	| sorted |
+	sorted := SortedCollection sortUsing: [ :assoc :anotherAssoc |
+		          assoc value < anotherAssoc value ].
+
+	self temporalNeighborhood do: [ :each | sorted add: each ].
+
+	temporalNeighborhood := sorted
 ]
 
 { #category : 'accessing' }
