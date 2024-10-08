@@ -126,8 +126,10 @@ PNRRCN4Stop >> name: anObject [
 PNRRCN4Stop >> sortTemporalNeighborhood [
 
 	| sorted |
-	sorted := SortedCollection sortUsing: [ :assoc :anotherAssoc |
-		          assoc value < anotherAssoc value ].
+	sorted := SortedCollection sortUsing: [ :triple :anotherTriple |
+		          triple second = anotherTriple second
+			          ifTrue: [ triple third < anotherTriple third ]
+			          ifFalse: [ triple second < anotherTriple second ] ].
 
 	self temporalNeighborhood do: [ :each | sorted add: each ].
 

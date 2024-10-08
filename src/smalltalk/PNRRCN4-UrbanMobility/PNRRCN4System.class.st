@@ -25,7 +25,7 @@ PNRRCN4System class >> florence [
 { #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
-	| routesMap stopsMap tripsMap |
+	| routesMap stopsMap tripsMap secondsPerDay |
 	routesMap := Dictionary new.
 	routes do: [ :each | routesMap at: each id put: each ].
 
@@ -53,10 +53,16 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		trip times add: each.
 		stop times add: each ].
 
+	secondsPerDay := 1 day asSeconds.
 	routes do: [ :route |
 		route trips do: [ :trip |
 			trip times overlappingPairsDo: [ :r :s |
-				r stop temporalNeighborhood add: s stop -> r departureTime ] ] ].
+				r stop temporalNeighborhood add: {
+						s stop.
+						r departureTime.
+						(Duration seconds:
+							 s arrivalTime asSeconds - r departureTime asSeconds
+							 % secondsPerDay) } ] ] ].
 
 	stops do: [ :stop | stop sortTemporalNeighborhood ].
 
@@ -73,6 +79,26 @@ PNRRCN4System >> asTemporalGraphInSexpString [
 
 	^ String streamContents: [ :aStream |
 		  self exportTemporalGraphInSexpFormatOnStream: aStream ]
+]
+
+{ #category : 'accessing' }
+PNRRCN4System >> edgesStream [
+
+	| triples |
+	triples := OrderedCollection new.
+
+	self stops do: [ :stop |
+		stop temporalNeighborhood do: [ :triple |
+			triples add: {
+					stop.
+					triple first.
+					triple second.
+					triple third } ] ].
+
+	^ triples sort: [ :quad :anotherQuad |
+		  quad third = anotherQuad third
+			  ifTrue: [ quad fourth = anotherQuad fourth ]
+			  ifFalse: [ quad third < anotherQuad third ] ]
 ]
 
 { #category : 'export' }
