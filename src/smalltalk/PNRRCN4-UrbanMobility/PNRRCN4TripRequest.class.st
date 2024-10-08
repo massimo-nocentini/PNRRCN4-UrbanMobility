@@ -45,6 +45,25 @@ PNRRCN4TripRequest class >> onFileReference: fr [
 		  upToEnd
 ]
 
+{ #category : 'displaying' }
+PNRRCN4TripRequest >> displayStringOn: aStream [
+
+	self fromStop displayStringOn: aStream.
+
+	aStream << ' -> '.
+
+	self toStop displayStringOn: aStream.
+
+
+	aStream << ', '.
+
+	self multiplicity displayStringOn: aStream.
+
+	aStream << ' people at '.
+
+	self time displayStringOn: aStream
+]
+
 { #category : 'accessing' }
 PNRRCN4TripRequest >> fromStop [
 

@@ -129,8 +129,9 @@ PNRRCN4System >> requests: aCollection [
 		       keep ].
 
 	^ col sort: [ :req :anotherReq |
-		  req time < anotherReq time or: [
-			  req multiplicity < anotherReq multiplicity ] ]
+		  req time = anotherReq time
+			  ifTrue: [ req multiplicity < anotherReq multiplicity ]
+			  ifFalse: [ req time < anotherReq time ] ]
 ]
 
 { #category : 'accessing' }
