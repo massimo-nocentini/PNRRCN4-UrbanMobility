@@ -73,37 +73,29 @@ PNRRCN4Stop >> earliestArrivalTimePaths [
 ]
 
 { #category : 'accessing' }
-PNRRCN4Stop >> earliestArrivalTimePathsFrom: u to: v at: t duration: d fromTime: fromTime [
+PNRRCN4Stop >> earliestArrivalTimePathsTemporalEdge: edge toTime: toTime [
 
-	u == self
-		ifTrue: [
-			earliestArrivalTimePaths at: self ifAbsentPut: [
-				| fromSeconds |
-				fromSeconds := fromTime asSeconds.
-				fromSeconds -> (OrderedCollection with: {
-						 self.
-						 self.
-						 fromTime asSeconds }) ] ]
-		ifFalse: [
-			| tu |
-			tu := earliestArrivalTimePaths
-				      at: u
-				      ifAbsentPut: [ Float infinity -> OrderedCollection new ].
+	| u v t d tu arrivalTime |
+	u := edge from.
+	v := edge to.
+	t := edge departureTime asNanoSeconds.
+	d := edge duration asNanoSeconds.
 
-			tu key <= t asSeconds ifTrue: [
-				| tv seconds |
-				tv := earliestArrivalTimePaths
-					      at: v
-					      ifAbsentPut: [ Float infinity -> OrderedCollection new ].
+	arrivalTime := t + d.
 
-				seconds := t asSeconds + d asSeconds.
+	tu := earliestArrivalTimePaths
+		      at: u
+		      ifAbsentPut: [ Float infinity -> OrderedCollection new ].
 
-				seconds < tv key ifTrue: [
-					tv key: seconds.
-					tv value add: {
-							u.
-							v.
-							t } ] ] ]
+	(arrivalTime < toTime and: [ tu key <= t ]) ifTrue: [
+		| tv |
+		tv := earliestArrivalTimePaths
+			      at: v
+			      ifAbsentPut: [ Float infinity -> OrderedCollection new ].
+
+		arrivalTime < tv key ifTrue: [
+			tv key: arrivalTime.
+			tv value add: edge ] ]
 ]
 
 { #category : 'accessing' }

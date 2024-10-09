@@ -106,15 +106,17 @@ PNRRCN4System >> earliestArrivalTimePath: edgesStream from: stop [
 	toTime := Time hour: 23 minute: 0 second: 0.
 
 	edgesStream do: [ :edge |
-		edge departureTime asNanoSeconds + edge duration asNanoSeconds
-		> toTime asNanoSeconds ifTrue: [ ^ self ].
+		toTime < edge departureTime ifTrue: [ ^ self ].
+
+		stop earliestArrivalTimePaths
+			at: stop
+			ifAbsentPut: [ fromTime asNanoSeconds -> OrderedCollection new ].
 
 		stop
-			earliestArrivalTimePathsFrom: edge from
-			to: edge to
-			at: edge departureTime
-			duration: edge duration
-			fromTime: fromTime ]
+			earliestArrivalTimePathsTemporalEdge: edge
+			toTime: toTime asNanoSeconds ].
+
+	^ stop
 ]
 
 { #category : 'accessing' }
@@ -130,17 +132,17 @@ PNRRCN4System >> earliestArrivalTimePaths: edgesStream [
 	fromTime := Time seconds: 0.
 	toTime := Time hour: 23 minute: 0 second: 0.
 
-	edgesStream do: [ :tuple |
-		tuple bind: [ :u :v :t :d |
-			t asSeconds + d asSeconds > toTime asSeconds ifTrue: [ ^ self ].
+	edgesStream do: [ :edge |
+		toTime < edge departureTime ifTrue: [ ^ self ].
 
-			self stops valuesDo: [ :stop |
-				stop
-					earliestArrivalTimePathsFrom: u
-					to: v
-					at: t
-					duration: d
-					fromTime: fromTime ] ] ]
+		self stops valuesDo: [ :stop |
+			stop earliestArrivalTimePaths
+				at: stop
+				ifAbsentPut: [ fromTime asNanoSeconds -> OrderedCollection new ].
+
+			stop
+				earliestArrivalTimePathsTemporalEdge: edge
+				toTime: toTime asNanoSeconds ] ]
 ]
 
 { #category : 'accessing' }
