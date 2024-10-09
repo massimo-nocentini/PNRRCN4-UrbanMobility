@@ -75,7 +75,7 @@ PNRRCN4Stop >> earliestArrivalTimePaths [
 { #category : 'accessing' }
 PNRRCN4Stop >> earliestArrivalTimePathsTemporalEdge: edge toTime: toTime [
 
-	| u v t d tu arrivalTime |
+	| u v t d tu arrivalTime tv |
 	u := edge from.
 	v := edge to.
 	t := edge departureTime asNanoSeconds.
@@ -87,15 +87,16 @@ PNRRCN4Stop >> earliestArrivalTimePathsTemporalEdge: edge toTime: toTime [
 		      at: u
 		      ifAbsentPut: [ Float infinity -> nil ].
 
-	(arrivalTime < toTime and: [ tu key <= t ]) ifTrue: [
-		| tv |
-		tv := earliestArrivalTimePaths
-			      at: v
-			      ifAbsentPut: [ Float infinity -> nil ].
+	(arrivalTime <= toTime and: [ tu key <= t ]) ifFalse: [ ^ self ].
 
-		arrivalTime < tv key ifTrue: [
-			tv key: arrivalTime.
-			tv value: edge ~~> (earliestArrivalTimePaths at: u) value ] ]
+	tv := earliestArrivalTimePaths
+		      at: v
+		      ifAbsentPut: [ Float infinity -> nil ].
+
+	arrivalTime < tv key ifFalse: [ ^ self ].
+
+	tv key: arrivalTime.
+	tv value: edge ~~> (earliestArrivalTimePaths at: u) value
 ]
 
 { #category : 'accessing' }
