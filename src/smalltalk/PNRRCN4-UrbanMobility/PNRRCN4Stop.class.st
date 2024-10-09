@@ -8,8 +8,7 @@ Class {
 		'longitude',
 		'code',
 		'times',
-		'temporalNeighborhood',
-		'earliestArrivalTimePaths'
+		'temporalNeighborhood'
 	],
 	#category : 'PNRRCN4-UrbanMobility-Core',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -66,37 +65,33 @@ PNRRCN4Stop >> displayStringOn: aStream [
 	aStream << ' times)'
 ]
 
-{ #category : 'accessing' }
-PNRRCN4Stop >> earliestArrivalTimePaths [
+{ #category : 'paths - earliest arrival time' }
+PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromTime toTime: maxTime [
 
-	^ earliestArrivalTimePaths
-]
+	| toTimeNanoSeconds paths reified |
+	toTimeNanoSeconds := maxTime asNanoSeconds.
 
-{ #category : 'accessing' }
-PNRRCN4Stop >> earliestArrivalTimePathsTemporalEdge: edge toTime: toTime [
+	paths := IdentityDictionary new
+		         at: self put: fromTime asNanoSeconds -> nil;
+		         yourself.
 
-	| u v t d tu arrivalTime tv |
-	u := edge from.
-	v := edge to.
-	t := edge departureTime asNanoSeconds.
-	d := edge duration asNanoSeconds.
+	edgesStream do: [ :edge |
+		edge earliestArrivalTimeMaxTime: toTimeNanoSeconds pathsSoFar: paths ].
 
-	arrivalTime := t + d.
+	reified := IdentityDictionary new.
 
-	tu := earliestArrivalTimePaths
-		      at: u
-		      ifAbsentPut: [ Float infinity -> nil ].
+	paths keysAndValuesDo: [ :key :assoc |
+		| edge path |
+		edge := assoc value.
+		path := OrderedCollection new.
 
-	(arrivalTime <= toTime and: [ tu key <= t ]) ifFalse: [ ^ self ].
+		[ edge ] whileNotNil: [
+			path addFirst: edge.
+			edge := (paths at: edge from) value ].
 
-	tv := earliestArrivalTimePaths
-		      at: v
-		      ifAbsentPut: [ Float infinity -> nil ].
+		reified at: key put: path ].
 
-	arrivalTime < tv key ifFalse: [ ^ self ].
-
-	tv key: arrivalTime.
-	tv value: edge ~~> (earliestArrivalTimePaths at: u) value
+	^ reified
 ]
 
 { #category : 'accessing' }
@@ -117,8 +112,7 @@ PNRRCN4Stop >> initialize [
 	super initialize.
 
 	times := OrderedCollection new.
-	temporalNeighborhood := OrderedCollection new.
-	earliestArrivalTimePaths := IdentityDictionary new
+	temporalNeighborhood := OrderedCollection new
 ]
 
 { #category : 'accessing' }

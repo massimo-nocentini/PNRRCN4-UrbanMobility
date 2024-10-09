@@ -99,55 +99,6 @@ PNRRCN4System >> asTemporalGraphInSexpString [
 ]
 
 { #category : 'accessing' }
-PNRRCN4System >> earliestArrivalTimePath: edgesStream from: stop [
-
-	| fromTime toTime toTimeNanoSeconds |
-	fromTime := Time seconds: 0.
-	toTime := Time hour: 23 minute: 0 second: 0.
-	toTimeNanoSeconds := toTime asNanoSeconds.
-
-	edgesStream do: [ :edge |
-		toTime < edge departureTime ifTrue: [ ^ self ].
-
-		stop earliestArrivalTimePaths
-			at: stop
-			ifAbsentPut: [ fromTime asNanoSeconds -> nil ].
-
-		stop
-			earliestArrivalTimePathsTemporalEdge: edge
-			toTime: toTimeNanoSeconds ].
-
-	^ stop
-]
-
-{ #category : 'accessing' }
-PNRRCN4System >> earliestArrivalTimePaths [
-
-	^ self earliestArrivalTimePaths: self edgesStream
-]
-
-{ #category : 'accessing' }
-PNRRCN4System >> earliestArrivalTimePaths: edgesStream [
-
-	| fromTime toTime toTimeNanoSeconds |
-	fromTime := Time seconds: 0.
-	toTime := Time hour: 23 minute: 0 second: 0.
-	toTimeNanoSeconds := toTime asNanoSeconds.
-
-	edgesStream do: [ :edge |
-		toTime < edge departureTime ifTrue: [ ^ self ].
-
-		self stops valuesDo: [ :stop |
-			stop earliestArrivalTimePaths
-				at: stop
-				ifAbsentPut: [ fromTime asNanoSeconds -> nil ].
-
-			stop
-				earliestArrivalTimePathsTemporalEdge: edge
-				toTime: toTimeNanoSeconds ] ]
-]
-
-{ #category : 'accessing' }
 PNRRCN4System >> edgesStream [
 
 	| collection |
