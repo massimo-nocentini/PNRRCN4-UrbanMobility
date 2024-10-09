@@ -67,6 +67,12 @@ PNRRCN4Stop >> displayStringOn: aStream [
 ]
 
 { #category : 'accessing' }
+PNRRCN4Stop >> earliestArrivalTimePaths [
+
+	^ earliestArrivalTimePaths
+]
+
+{ #category : 'accessing' }
 PNRRCN4Stop >> earliestArrivalTimePathsFrom: u to: v at: t duration: d fromTime: fromTime [
 
 	u == self
@@ -118,7 +124,7 @@ PNRRCN4Stop >> initialize [
 	super initialize.
 
 	times := OrderedCollection new.
-	temporalNeighborhood := Set new.
+	temporalNeighborhood := OrderedCollection new.
 	earliestArrivalTimePaths := IdentityDictionary new
 ]
 
@@ -156,20 +162,6 @@ PNRRCN4Stop >> name [
 PNRRCN4Stop >> name: anObject [
 
 	name := anObject
-]
-
-{ #category : 'accessing' }
-PNRRCN4Stop >> sortTemporalNeighborhood [
-
-	| sorted |
-	sorted := SortedCollection sortUsing: [ :triple :anotherTriple |
-		          triple second = anotherTriple second
-			          ifTrue: [ triple third < anotherTriple third ]
-			          ifFalse: [ triple second < anotherTriple second ] ].
-
-	self temporalNeighborhood do: [ :each | sorted add: each ].
-
-	temporalNeighborhood := sorted
 ]
 
 { #category : 'accessing' }

@@ -59,16 +59,32 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 	routes do: [ :route |
 		route trips do: [ :trip |
 			trip times overlappingPairsDo: [ :r :s |
-				r stop temporalNeighborhood add: {
-						s stop.
-						r departureTime.
-						(Duration
-							 seconds:
-							 s arrivalTime asSeconds - r departureTime asSeconds
-							 % secondsPerDay
-							 nanoSeconds: (random next * 1000000000) ceiling) } ] ] ].
+				| edge d |
+				d := Duration
+					     seconds:
+					     s arrivalTime asSeconds - r departureTime asSeconds
+					     % secondsPerDay
+					     nanoSeconds: (random next * 1000000000) ceiling.
 
-	stops do: [ :stop | stop sortTemporalNeighborhood ].
+				edge := PNRRCN4TemporalEdge new
+					        from: r stop;
+					        to: s stop;
+					        departureTime: r departureTime;
+					        duration: d;
+					        yourself.
+
+				r stop temporalNeighborhood add: edge ] ] ].
+
+	stops do: [ :stop |
+		stop temporalNeighborhood sort: [ :edge :anotherEdge |
+			| t1 t2 |
+			t1 := edge departureTime.
+			t2 := anotherEdge departureTime.
+
+			t1 = t2
+				ifTrue: [ "wrt to the duration"
+				edge duration < anotherEdge duration ]
+				ifFalse: [ "wrt to the departure time" t1 < t2 ] ] ].
 
 	^ self new
 		  routes: routes;
