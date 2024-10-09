@@ -164,6 +164,14 @@ PNRRCN4Stop >> name: anObject [
 	name := anObject
 ]
 
+{ #category : 'sorting' }
+PNRRCN4Stop >> sortTemporalNeighborhoodFromSystem: client [
+
+	temporalNeighborhood := temporalNeighborhood timsort: [ :edge |
+		                        client timsortKeyFunctionOnTemporalEdge:
+			                        edge ]
+]
+
 { #category : 'accessing' }
 PNRRCN4Stop >> temporalNeighborhood [
 

@@ -22,19 +22,6 @@ PNRRCN4System class >> florence [
 		  trips: PNRRCN4Trip florence
 ]
 
-{ #category : 'sorting' }
-PNRRCN4System class >> isEdge: edge lessThanEdge: anotherEdge [
-
-	| t1 t2 |
-	t1 := edge departureTime.
-	t2 := anotherEdge departureTime.
-
-	^ t1 = t2
-		  ifTrue: [ "wrt to the duration"
-		  edge duration < anotherEdge duration ]
-		  ifFalse: [ "wrt to the departure time" t1 < t2 ]
-]
-
 { #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
@@ -88,9 +75,7 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
 				r stop temporalNeighborhood add: edge ] ] ].
 
-	stops do: [ :stop |
-		stop temporalNeighborhood sort: [ :edge :anotherEdge |
-			self isEdge: edge lessThanEdge: anotherEdge ] ].
+	stops do: [ :stop | stop sortTemporalNeighborhoodFromSystem: self ].
 
 	^ self new
 		  routes: routes;
@@ -98,6 +83,12 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		  times: times;
 		  trips: tripsMap;
 		  yourself
+]
+
+{ #category : 'sorting' }
+PNRRCN4System class >> timsortKeyFunctionOnTemporalEdge: edge [
+
+	^ edge departureTime asNanoSeconds + edge duration asNanoSeconds
 ]
 
 { #category : 'export' }
@@ -142,8 +133,8 @@ PNRRCN4System >> edgesStream [
 	self stops do: [ :stop |
 		collection addAll: stop temporalNeighborhood ].
 
-	^ collection sort: [ :edge :anotherEdge |
-		  self class isEdge: edge lessThanEdge: anotherEdge ]
+	^ collection timsort: [ :edge |
+		  self class timsortKeyFunctionOnTemporalEdge: edge ]
 ]
 
 { #category : 'export' }
