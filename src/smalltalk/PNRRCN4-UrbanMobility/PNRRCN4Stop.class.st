@@ -85,17 +85,17 @@ PNRRCN4Stop >> earliestArrivalTimePathsTemporalEdge: edge toTime: toTime [
 
 	tu := earliestArrivalTimePaths
 		      at: u
-		      ifAbsentPut: [ Float infinity -> OrderedCollection new ].
+		      ifAbsentPut: [ Float infinity -> nil ].
 
 	(arrivalTime < toTime and: [ tu key <= t ]) ifTrue: [
 		| tv |
 		tv := earliestArrivalTimePaths
 			      at: v
-			      ifAbsentPut: [ Float infinity -> OrderedCollection new ].
+			      ifAbsentPut: [ Float infinity -> nil ].
 
 		arrivalTime < tv key ifTrue: [
 			tv key: arrivalTime.
-			tv value add: edge ] ]
+			tv value: edge ~~> (earliestArrivalTimePaths at: u) value ] ]
 ]
 
 { #category : 'accessing' }

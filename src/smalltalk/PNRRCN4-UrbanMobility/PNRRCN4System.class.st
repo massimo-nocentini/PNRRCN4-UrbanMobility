@@ -110,7 +110,7 @@ PNRRCN4System >> earliestArrivalTimePath: edgesStream from: stop [
 
 		stop earliestArrivalTimePaths
 			at: stop
-			ifAbsentPut: [ fromTime asNanoSeconds -> OrderedCollection new ].
+			ifAbsentPut: [ fromTime asNanoSeconds -> nil ].
 
 		stop
 			earliestArrivalTimePathsTemporalEdge: edge
@@ -138,7 +138,7 @@ PNRRCN4System >> earliestArrivalTimePaths: edgesStream [
 		self stops valuesDo: [ :stop |
 			stop earliestArrivalTimePaths
 				at: stop
-				ifAbsentPut: [ fromTime asNanoSeconds -> OrderedCollection new ].
+				ifAbsentPut: [ fromTime asNanoSeconds -> nil ].
 
 			stop
 				earliestArrivalTimePathsTemporalEdge: edge
