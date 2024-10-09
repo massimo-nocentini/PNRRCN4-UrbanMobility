@@ -25,7 +25,9 @@ PNRRCN4System class >> florence [
 { #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
-	| routesMap stopsMap tripsMap secondsPerDay |
+	| routesMap stopsMap tripsMap secondsPerDay random |
+	random := RSRandom seed: Float firstCarmichaelNumber.
+
 	routesMap := Dictionary new.
 	routes do: [ :each | routesMap at: each id put: each ].
 
@@ -60,9 +62,11 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 				r stop temporalNeighborhood add: {
 						s stop.
 						r departureTime.
-						(Duration seconds:
+						(Duration
+							 seconds:
 							 s arrivalTime asSeconds - r departureTime asSeconds
-							 % secondsPerDay) } ] ] ].
+							 % secondsPerDay
+							 nanoSeconds: (random next * 1000000000) ceiling) } ] ] ].
 
 	stops do: [ :stop | stop sortTemporalNeighborhood ].
 
@@ -84,21 +88,27 @@ PNRRCN4System >> asTemporalGraphInSexpString [
 { #category : 'accessing' }
 PNRRCN4System >> earliestArrivalTimePaths [
 
+	^ self earliestArrivalTimePaths: self edgesStream
+]
+
+{ #category : 'accessing' }
+PNRRCN4System >> earliestArrivalTimePaths: edgesStream [
+
 	| fromTime toTime |
 	fromTime := Time seconds: 0.
 	toTime := Time hour: 23 minute: 0 second: 0.
 
-	self edgesStream do: [ :tuple |
+	edgesStream do: [ :tuple |
 		tuple bind: [ :u :v :t :d |
+			t asSeconds + d asSeconds > toTime asSeconds ifTrue: [ ^ self ].
+
 			self stops valuesDo: [ :stop |
 				stop
 					earliestArrivalTimePathsFrom: u
 					to: v
 					at: t
 					duration: d
-					fromTime: fromTime
-					toTime: toTime.
-				^ self ] ] ]
+					fromTime: fromTime ] ] ]
 ]
 
 { #category : 'accessing' }

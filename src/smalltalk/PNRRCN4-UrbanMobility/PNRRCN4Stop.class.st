@@ -67,30 +67,37 @@ PNRRCN4Stop >> displayStringOn: aStream [
 ]
 
 { #category : 'accessing' }
-PNRRCN4Stop >> earliestArrivalTimePathsFrom: u to: v at: t duration: d fromTime: fromTime toTime: toTime [
+PNRRCN4Stop >> earliestArrivalTimePathsFrom: u to: v at: t duration: d fromTime: fromTime [
 
-	| seconds |
-	earliestArrivalTimePaths
-		at: self
-		ifAbsentPut: [ fromTime asSeconds -> OrderedCollection new ].
+	u == self
+		ifTrue: [
+			earliestArrivalTimePaths at: self ifAbsentPut: [
+				| fromSeconds |
+				fromSeconds := fromTime asSeconds.
+				fromSeconds -> (OrderedCollection with: {
+						 self.
+						 self.
+						 fromTime asSeconds }) ] ]
+		ifFalse: [
+			| tu |
+			tu := earliestArrivalTimePaths
+				      at: u
+				      ifAbsentPut: [ Float infinity -> OrderedCollection new ].
 
-	seconds := t asSeconds + d asSeconds.
-	(seconds <= toTime asSeconds and: [
-		 | tu |
-		 tu := earliestArrivalTimePaths
-			       at: u
-			       ifAbsentPut: [ Float infinity -> OrderedCollection new ].
-		 tu key < t asSeconds ]) ifTrue: [
-		| tv |
-		tv := earliestArrivalTimePaths
-			      at: v
-			      ifAbsentPut: [ Float infinity -> OrderedCollection new ].
-		seconds < tv key ifTrue: [
-			tv key: seconds.
-			tv value add: {
-					u.
-					v.
-					t } ] ]
+			tu key <= t asSeconds ifTrue: [
+				| tv seconds |
+				tv := earliestArrivalTimePaths
+					      at: v
+					      ifAbsentPut: [ Float infinity -> OrderedCollection new ].
+
+				seconds := t asSeconds + d asSeconds.
+
+				seconds < tv key ifTrue: [
+					tv key: seconds.
+					tv value add: {
+							u.
+							v.
+							t } ] ] ]
 ]
 
 { #category : 'accessing' }
