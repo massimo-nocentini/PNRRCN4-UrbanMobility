@@ -101,13 +101,13 @@ PNRRCN4System >> asTemporalGraphInSexpString [
 { #category : 'accessing' }
 PNRRCN4System >> edgesStream [
 
-	| collection |
-	collection := OrderedCollection new.
+	| neighborhood |
+	neighborhood := OrderedCollection new.
 
 	self stops do: [ :stop |
-		collection addAll: stop temporalNeighborhood ].
+		neighborhood addAll: stop temporalNeighborhood ].
 
-	^ collection timsort: [ :edge |
+	^ neighborhood timsort: [ :edge |
 		  self class timsortKeyFunctionOnTemporalEdge: edge ]
 ]
 
