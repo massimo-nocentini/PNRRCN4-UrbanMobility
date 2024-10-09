@@ -22,6 +22,19 @@ PNRRCN4System class >> florence [
 		  trips: PNRRCN4Trip florence
 ]
 
+{ #category : 'sorting' }
+PNRRCN4System class >> isEdge: edge lessThanEdge: anotherEdge [
+
+	| t1 t2 |
+	t1 := edge departureTime.
+	t2 := anotherEdge departureTime.
+
+	^ t1 = t2
+		  ifTrue: [ "wrt to the duration"
+		  edge duration < anotherEdge duration ]
+		  ifFalse: [ "wrt to the departure time" t1 < t2 ]
+]
+
 { #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
@@ -77,14 +90,7 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
 	stops do: [ :stop |
 		stop temporalNeighborhood sort: [ :edge :anotherEdge |
-			| t1 t2 |
-			t1 := edge departureTime.
-			t2 := anotherEdge departureTime.
-
-			t1 = t2
-				ifTrue: [ "wrt to the duration"
-				edge duration < anotherEdge duration ]
-				ifFalse: [ "wrt to the departure time" t1 < t2 ] ] ].
+			self isEdge: edge lessThanEdge: anotherEdge ] ].
 
 	^ self new
 		  routes: routes;
@@ -134,17 +140,10 @@ PNRRCN4System >> edgesStream [
 	collection := OrderedCollection new.
 
 	self stops do: [ :stop |
-		stop temporalNeighborhood do: [ :triple |
-			collection add: {
-					stop.
-					triple first.
-					triple second.
-					triple third } ] ].
+		collection addAll: stop temporalNeighborhood ].
 
-	^ collection sort: [ :quad :anotherQuad |
-		  quad third = anotherQuad third
-			  ifTrue: [ quad fourth < anotherQuad fourth ]
-			  ifFalse: [ quad third < anotherQuad third ] ]
+	^ collection sort: [ :edge :anotherEdge |
+		  self class isEdge: edge lessThanEdge: anotherEdge ]
 ]
 
 { #category : 'export' }
