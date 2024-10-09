@@ -82,22 +82,42 @@ PNRRCN4System >> asTemporalGraphInSexpString [
 ]
 
 { #category : 'accessing' }
+PNRRCN4System >> earliestArrivalTimePaths [
+
+	| fromTime toTime |
+	fromTime := Time seconds: 0.
+	toTime := Time hour: 23 minute: 0 second: 0.
+
+	self edgesStream do: [ :tuple |
+		tuple bind: [ :u :v :t :d |
+			self stops valuesDo: [ :stop |
+				stop
+					earliestArrivalTimePathsFrom: u
+					to: v
+					at: t
+					duration: d
+					fromTime: fromTime
+					toTime: toTime.
+				^ self ] ] ]
+]
+
+{ #category : 'accessing' }
 PNRRCN4System >> edgesStream [
 
-	| triples |
-	triples := OrderedCollection new.
+	| collection |
+	collection := OrderedCollection new.
 
 	self stops do: [ :stop |
 		stop temporalNeighborhood do: [ :triple |
-			triples add: {
+			collection add: {
 					stop.
 					triple first.
 					triple second.
 					triple third } ] ].
 
-	^ triples sort: [ :quad :anotherQuad |
+	^ collection sort: [ :quad :anotherQuad |
 		  quad third = anotherQuad third
-			  ifTrue: [ quad fourth = anotherQuad fourth ]
+			  ifTrue: [ quad fourth < anotherQuad fourth ]
 			  ifFalse: [ quad third < anotherQuad third ] ]
 ]
 

@@ -8,7 +8,8 @@ Class {
 		'longitude',
 		'code',
 		'times',
-		'temporalNeighborhood'
+		'temporalNeighborhood',
+		'earliestArrivalTimePaths'
 	],
 	#category : 'PNRRCN4-UrbanMobility-Core',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -66,6 +67,33 @@ PNRRCN4Stop >> displayStringOn: aStream [
 ]
 
 { #category : 'accessing' }
+PNRRCN4Stop >> earliestArrivalTimePathsFrom: u to: v at: t duration: d fromTime: fromTime toTime: toTime [
+
+	| seconds |
+	earliestArrivalTimePaths
+		at: self
+		ifAbsentPut: [ fromTime asSeconds -> OrderedCollection new ].
+
+	seconds := t asSeconds + d asSeconds.
+	(seconds <= toTime asSeconds and: [
+		 | tu |
+		 tu := earliestArrivalTimePaths
+			       at: u
+			       ifAbsentPut: [ Float infinity -> OrderedCollection new ].
+		 tu key < t asSeconds ]) ifTrue: [
+		| tv |
+		tv := earliestArrivalTimePaths
+			      at: v
+			      ifAbsentPut: [ Float infinity -> OrderedCollection new ].
+		seconds < tv key ifTrue: [
+			tv key: seconds.
+			tv value add: {
+					u.
+					v.
+					t } ] ]
+]
+
+{ #category : 'accessing' }
 PNRRCN4Stop >> id [
 
 	^ id
@@ -83,7 +111,8 @@ PNRRCN4Stop >> initialize [
 	super initialize.
 
 	times := OrderedCollection new.
-	temporalNeighborhood := Set new
+	temporalNeighborhood := Set new.
+	earliestArrivalTimePaths := IdentityDictionary new
 ]
 
 { #category : 'accessing' }
