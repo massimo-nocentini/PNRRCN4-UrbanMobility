@@ -27,7 +27,10 @@ PNRRCN4RequestsSample >> requests [
 { #category : 'accessing' }
 PNRRCN4RequestsSample >> requests: anObject [
 
-	requests := anObject
+	requests := anObject sorted: [ :req :anotherReq |
+		            self class
+			            defaultIsRequest: req
+			            lessThanRequest: anotherReq ]
 ]
 
 { #category : 'accessing' }
@@ -45,7 +48,7 @@ PNRRCN4RequestsSample >> totalCount: anObject [
 { #category : 'initialization' }
 PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 
-	| random remaining pool sample attempts |
+	| random remaining pool sample attempts count |
 	random := RSRandom seed: Number firstCarmichaelNumber.
 
 	pool := OrderedCollection new
@@ -54,6 +57,7 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 
 	remaining := aSize min: pool size.
 	attempts := 0.
+	count := 0.
 
 	sample := Array streamContents: [ :aStream |
 		          [ remaining > 0 ] whileTrue: [
@@ -65,12 +69,13 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 			          random next <= prob ifTrue: [
 				          aStream nextPut: req.
 				          pool removeAt: i.
+				          count := count + req multiplicity.
 				          remaining := remaining - 1 ] ] ].
 
 	self traceCr: 'Attempts for sampling: ' , attempts asString.
 
-	^ sample
-		  sort: [ :req :anotherReq |
-			  self class defaultIsRequest: req lessThanRequest: anotherReq ];
+	^ self class new
+		  requests: sample;
+		  totalCount: count;
 		  yourself
 ]
