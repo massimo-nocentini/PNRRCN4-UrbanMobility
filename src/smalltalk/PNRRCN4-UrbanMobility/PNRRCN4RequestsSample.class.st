@@ -72,16 +72,17 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 
 	sample := Array streamContents: [ :aStream |
 		          [ remaining > 0 ] whileTrue: [
-			          | i req prob |
-			          attempts := attempts + 1.
-			          i := random nextInteger: pool size.
-			          req := pool at: i.
-			          prob := (req multiplicity / totalCount) asFloat.
+			          | i req prob multiplicity |
+			          attempts := attempts + 1. "one more attempt, just for debugging."
+			          i := random nextInteger: pool size. "try an index."
+			          req := pool at: i. "retrive the actual request."
+			          multiplicity := req multiplicity. "bind its multiplicity"
+			          prob := (multiplicity / totalCount) asFloat. "compute its frequence, aka probability mass."
 			          random next <= prob ifTrue: [
-				          aStream nextPut: req.
-				          pool removeAt: i.
-				          count := count + req multiplicity.
-				          remaining := remaining - 1 ] ] ].
+				          aStream nextPut: req. "take it!"
+				          pool removeAt: i. "remove from the remaining possibilities."
+				          count := count + multiplicity. "accumulate the number of people."
+				          remaining := remaining - 1 "one less to do" ] ] ].
 
 	self traceCr: 'Attempts for sampling: ' , attempts asString.
 
