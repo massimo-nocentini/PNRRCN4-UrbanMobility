@@ -7,8 +7,9 @@ Class {
 		'duration',
 		'departureTime'
 	],
-	#category : 'PNRRCN4-UrbanMobility',
-	#package : 'PNRRCN4-UrbanMobility'
+	#category : 'PNRRCN4-UrbanMobility-Core',
+	#package : 'PNRRCN4-UrbanMobility',
+	#tag : 'Core'
 }
 
 { #category : 'accessing' }
