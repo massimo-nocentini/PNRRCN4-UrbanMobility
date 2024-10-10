@@ -54,7 +54,6 @@ PNRRCN4TripRequest >> displayStringOn: aStream [
 
 	self toStop displayStringOn: aStream.
 
-
 	aStream << ', '.
 
 	self multiplicity displayStringOn: aStream.
@@ -62,6 +61,18 @@ PNRRCN4TripRequest >> displayStringOn: aStream [
 	aStream << ' people at '.
 
 	self time displayStringOn: aStream
+]
+
+{ #category : 'paths - earliest arrival time' }
+PNRRCN4TripRequest >> earliestArrivalTimePathOnEdgeStream: edgesStream [
+
+	| paths |
+	paths := self fromStop
+		         earliestArrivalTimePathsOnEdgeStream: edgesStream
+		         fromTime: self time
+		         toTime: edgesStream last departureTime.
+
+	^ paths at: self toStop
 ]
 
 { #category : 'accessing' }
