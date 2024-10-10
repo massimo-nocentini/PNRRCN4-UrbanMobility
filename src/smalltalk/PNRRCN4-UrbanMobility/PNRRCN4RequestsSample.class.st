@@ -18,6 +18,17 @@ PNRRCN4RequestsSample class >> defaultIsRequest: req lessThanRequest: anotherReq
 		  ifFalse: [ req time < anotherReq time ]
 ]
 
+{ #category : 'displaying' }
+PNRRCN4RequestsSample >> displayStringOn: aStream [
+
+	aStream
+		<< 'Sample of ';
+		<< self requests size asString;
+		<< ' requests by ';
+		<< self totalCount asString;
+		<< ' people'
+]
+
 { #category : 'accessing' }
 PNRRCN4RequestsSample >> requests [
 
