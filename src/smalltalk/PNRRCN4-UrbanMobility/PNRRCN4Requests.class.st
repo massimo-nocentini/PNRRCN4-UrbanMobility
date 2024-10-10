@@ -43,7 +43,7 @@ PNRRCN4Requests >> totalCount: anObject [
 ]
 
 { #category : 'initialization' }
-PNRRCN4Requests >> weightedSampleOfSize: s [
+PNRRCN4Requests >> weightedSampleOfSize: aSize [
 
 	| random remaining pool sample |
 	random := RSRandom seed: Number firstCarmichaelNumber.
@@ -52,9 +52,9 @@ PNRRCN4Requests >> weightedSampleOfSize: s [
 		        addAll: self requests;
 		        yourself.
 
-	sample := Array streamContents: [ :aStream |
-		          remaining := s min: requests size.
+	remaining := aSize min: pool size.
 
+	sample := Array streamContents: [ :aStream |
 		          [ remaining > 0 ] whileTrue: [
 			          | i req |
 			          i := random nextInteger: pool size.
