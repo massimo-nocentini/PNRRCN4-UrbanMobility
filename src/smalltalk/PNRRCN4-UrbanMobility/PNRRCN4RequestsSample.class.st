@@ -56,7 +56,7 @@ PNRRCN4RequestsSample >> totalCount: anObject [
 	totalCount := anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : 'sampling' }
 PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 
 	| random remaining pool sample attempts count |
