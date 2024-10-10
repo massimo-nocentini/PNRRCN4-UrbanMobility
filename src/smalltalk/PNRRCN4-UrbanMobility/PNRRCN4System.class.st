@@ -167,9 +167,9 @@ PNRRCN4System >> requests: aCollection [
 		       keep ].
 
 	col sort: [ :req :anotherReq |
-		PNRRCN4Requests defaultIsRequest: req lessThanRequest: anotherReq ].
+		PNRRCN4RequestsSample defaultIsRequest: req lessThanRequest: anotherReq ].
 
-	^ PNRRCN4Requests new
+	^ PNRRCN4RequestsSample new
 		  requests: col;
 		  totalCount: count;
 		  yourself

@@ -1,5 +1,5 @@
 Class {
-	#name : 'PNRRCN4Requests',
+	#name : 'PNRRCN4RequestsSample',
 	#superclass : 'Object',
 	#instVars : [
 		'requests',
@@ -11,7 +11,7 @@ Class {
 }
 
 { #category : 'as yet unclassified' }
-PNRRCN4Requests class >> defaultIsRequest: req lessThanRequest: anotherReq [
+PNRRCN4RequestsSample class >> defaultIsRequest: req lessThanRequest: anotherReq [
 
 	^ req time = anotherReq time
 		  ifTrue: [ req multiplicity < anotherReq multiplicity ]
@@ -19,31 +19,31 @@ PNRRCN4Requests class >> defaultIsRequest: req lessThanRequest: anotherReq [
 ]
 
 { #category : 'accessing' }
-PNRRCN4Requests >> requests [
+PNRRCN4RequestsSample >> requests [
 
 	^ requests
 ]
 
 { #category : 'accessing' }
-PNRRCN4Requests >> requests: anObject [
+PNRRCN4RequestsSample >> requests: anObject [
 
 	requests := anObject
 ]
 
 { #category : 'accessing' }
-PNRRCN4Requests >> totalCount [
+PNRRCN4RequestsSample >> totalCount [
 
 	^ totalCount
 ]
 
 { #category : 'accessing' }
-PNRRCN4Requests >> totalCount: anObject [
+PNRRCN4RequestsSample >> totalCount: anObject [
 
 	totalCount := anObject
 ]
 
 { #category : 'initialization' }
-PNRRCN4Requests >> weightedSampleOfSize: aSize [
+PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 
 	| random remaining pool sample attempts |
 	random := RSRandom seed: Number firstCarmichaelNumber.
