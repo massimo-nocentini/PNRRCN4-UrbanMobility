@@ -70,7 +70,7 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 	attempts := 0.
 	count := 0.
 
-	sample := Array streamContents: [ :aStream |
+	sample := Array new: remaining streamContents: [ :aStream |
 		          [ remaining > 0 ] whileTrue: [
 			          | i req prob multiplicity |
 			          attempts := attempts + 1. "one more attempt, just for debugging."
