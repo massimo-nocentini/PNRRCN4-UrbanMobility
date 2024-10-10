@@ -67,8 +67,10 @@ PNRRCN4Requests >> weightedSampleOfSize: aSize [
 				          pool removeAt: i.
 				          remaining := remaining - 1 ] ] ].
 
+	self traceCr: 'Attempts for sampling: ' , attempts asString.
+
 	^ sample
 		  sort: [ :req :anotherReq |
 			  self class defaultIsRequest: req lessThanRequest: anotherReq ];
-		  -> attempts
+		  yourself
 ]
