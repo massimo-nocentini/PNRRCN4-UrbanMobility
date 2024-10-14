@@ -167,15 +167,9 @@ PNRRCN4Stop >> name: anObject [
 { #category : 'sorting' }
 PNRRCN4Stop >> sortTemporalNeighborhoods [
 
-	| block |
-	block := [ :edge |
-	         PNRRCN4TemporalEdge timsortKeyFunctionOnTemporalEdge: edge ].
+	temporalOutgoingNeighborhood := temporalOutgoingNeighborhood timsort.
 
-	temporalOutgoingNeighborhood := temporalOutgoingNeighborhood
-		                                timsort: block.
-
-	temporalIncomingNeighborhood := temporalIncomingNeighborhood
-		                                timsort: block
+	temporalIncomingNeighborhood := temporalIncomingNeighborhood timsort
 ]
 
 { #category : 'accessing' }

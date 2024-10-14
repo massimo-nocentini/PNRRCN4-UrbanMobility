@@ -13,13 +13,6 @@ Class {
 	#tag : 'Core'
 }
 
-{ #category : 'sorting' }
-PNRRCN4TemporalEdge class >> timsortKeyFunctionOnTemporalEdge: edge [
-
-	^ edge departureTime asFloatSeconds * 60.0
-	  + edge duration asFloatSeconds
-]
-
 { #category : 'comparing' }
 PNRRCN4TemporalEdge >> = anObject [
 	"Answer whether the receiver and anObject represent the same object."
@@ -135,6 +128,13 @@ PNRRCN4TemporalEdge >> route [
 PNRRCN4TemporalEdge >> route: anObject [
 
 	route := anObject
+]
+
+{ #category : 'sorting' }
+PNRRCN4TemporalEdge >> timsortSortKey [
+
+	^ self departureTime asFloatSeconds * 60.0
+	  + self duration asFloatSeconds
 ]
 
 { #category : 'accessing' }

@@ -21,8 +21,8 @@ PNRRCN4EdgesStreamRepresentation class >> onSystem: aSystem [
 					                  stop temporalOutgoingNeighborhood ] ].
 
 	^ self new
-		  edgesStream: (temporalStream timsort: [ :edge |
-					   PNRRCN4TemporalEdge timsortKeyFunctionOnTemporalEdge: edge ]);
+		  edgesStream:
+			  (temporalStream timsort: [ :edge | edge timsortSortKey ]);
 		  yourself
 ]
 
