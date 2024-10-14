@@ -13,6 +13,25 @@ Class {
 	#tag : 'Core'
 }
 
+{ #category : 'comparing' }
+PNRRCN4TemporalEdge >> = anObject [
+	"Answer whether the receiver and anObject represent the same object."
+
+	self == anObject ifTrue: [ ^ true ].
+	self class = anObject class ifFalse: [ ^ false ].
+	^ from = anObject from and: [
+		  to = anObject to and: [
+			  route = anObject route and: [
+				  departureTime = anObject departureTime ] ] ]
+]
+
+{ #category : 'converting' }
+PNRRCN4TemporalEdge >> arrivalTimeAsFloat [
+
+	^ self departureTime asFloatSeconds
+	  + (self duration asNanoSeconds / 1e9) asFloat
+]
+
 { #category : 'accessing' }
 PNRRCN4TemporalEdge >> departureTime [
 
@@ -90,6 +109,14 @@ PNRRCN4TemporalEdge >> from [
 PNRRCN4TemporalEdge >> from: anObject [
 
 	from := anObject
+]
+
+{ #category : 'comparing' }
+PNRRCN4TemporalEdge >> hash [
+	"Answer an integer value that is related to the identity of the receiver."
+
+	^ from hash bitXor:
+		  (to hash bitXor: (route hash bitXor: departureTime hash))
 ]
 
 { #category : 'accessing' }

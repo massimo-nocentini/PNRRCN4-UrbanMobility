@@ -60,25 +60,26 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		route trips do: [ :trip |
 			trip times
 				sort: [ :t1 :t2 | t1 sequence < t2 sequence ];
-				overlappingPairsDo: [ :r :s |
+				overlappingPairsDo: [ :from :to |
 					| edge d |
 					d := Duration
 						     seconds:
-							     s arrivalTime asSeconds - r departureTime asSeconds
+							     to arrivalTime asSeconds - from departureTime asSeconds
 							     % secondsPerDay
-						     nanoSeconds: (random next * 1000000000) ceiling.
+						     nanoSeconds: (random next * 1e9) floor.
 
 					edge := PNRRCN4TemporalEdge new
-						        from: r stop;
-						        to: s stop;
-						        departureTime: r departureTime;
+						        from: from stop;
+						        to: to stop;
+						        departureTime: from departureTime;
 						        duration: d;
 						        route: route;
 						        yourself.
 
-					r stop temporalNeighborhood add: edge ] ] ].
+					from stop temporalOutgoingNeighborhood add: edge.
+					to stop temporalIncomingNeighborhood add: edge ] ] ].
 
-	stops do: [ :stop | stop sortTemporalNeighborhoodFromSystem: self ].
+	stops do: [ :stop | stop sortTemporalNeighborhoodsUsing: self ].
 
 	^ self new
 		  routes: routes;
@@ -108,7 +109,7 @@ PNRRCN4System >> edgesStream [
 	neighborhood := OrderedCollection new.
 
 	self stops do: [ :stop |
-		neighborhood addAll: stop temporalNeighborhood ].
+		neighborhood addAll: stop temporalOutgoingNeighborhood ].
 
 	^ neighborhood timsort: [ :edge |
 		  self class timsortKeyFunctionOnTemporalEdge: edge ]
@@ -127,7 +128,7 @@ PNRRCN4System >> exportTemporalGraphInSexpFormatOnStream: aStream [
 			<< stop code;
 			space.
 
-		stop temporalNeighborhood do: [ :assoc |
+		stop temporalOutgoingNeighborhood do: [ :assoc |
 			| destStop time |
 			destStop := assoc key.
 			time := assoc value.

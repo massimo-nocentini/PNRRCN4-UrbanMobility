@@ -8,7 +8,8 @@ Class {
 		'longitude',
 		'code',
 		'times',
-		'temporalNeighborhood'
+		'temporalOutgoingNeighborhood',
+		'temporalIncomingNeighborhood'
 	],
 	#category : 'PNRRCN4-UrbanMobility-Core',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -123,7 +124,8 @@ PNRRCN4Stop >> initialize [
 	super initialize.
 
 	times := OrderedCollection new.
-	temporalNeighborhood := OrderedCollection new
+	temporalOutgoingNeighborhood := Set new.
+	temporalIncomingNeighborhood := Set new
 ]
 
 { #category : 'accessing' }
@@ -163,17 +165,31 @@ PNRRCN4Stop >> name: anObject [
 ]
 
 { #category : 'sorting' }
-PNRRCN4Stop >> sortTemporalNeighborhoodFromSystem: client [
+PNRRCN4Stop >> sortTemporalNeighborhoodsUsing: client [
 
-	temporalNeighborhood := temporalNeighborhood timsort: [ :edge |
-		                        client timsortKeyFunctionOnTemporalEdge:
-			                        edge ]
+	temporalOutgoingNeighborhood := temporalOutgoingNeighborhood
+		                                timsort: [ :edge |
+		                                client
+			                                timsortKeyFunctionOnTemporalEdge:
+			                                edge ].
+
+	temporalIncomingNeighborhood := temporalIncomingNeighborhood
+		                                timsort: [ :edge |
+		                                client
+			                                timsortKeyFunctionOnTemporalEdge:
+			                                edge ]
 ]
 
 { #category : 'accessing' }
-PNRRCN4Stop >> temporalNeighborhood [
+PNRRCN4Stop >> temporalIncomingNeighborhood [
 
-	^ temporalNeighborhood
+	^ temporalIncomingNeighborhood
+]
+
+{ #category : 'accessing' }
+PNRRCN4Stop >> temporalOutgoingNeighborhood [
+
+	^ temporalOutgoingNeighborhood
 ]
 
 { #category : 'accessing' }
