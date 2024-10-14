@@ -13,6 +13,12 @@ Class {
 	#tag : 'Core'
 }
 
+{ #category : 'sorting' }
+PNRRCN4TemporalEdge class >> timsortKeyFunctionOnTemporalEdge: edge [
+
+	^ edge departureTime asNanoSeconds + edge duration asNanoSeconds
+]
+
 { #category : 'comparing' }
 PNRRCN4TemporalEdge >> = anObject [
 	"Answer whether the receiver and anObject represent the same object."

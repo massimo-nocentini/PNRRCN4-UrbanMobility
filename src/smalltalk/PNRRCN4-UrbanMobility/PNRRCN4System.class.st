@@ -5,7 +5,8 @@ Class {
 		'routes',
 		'stops',
 		'times',
-		'trips'
+		'trips',
+		'temporalEdgesSize'
 	],
 	#category : 'PNRRCN4-UrbanMobility-API',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -25,7 +26,7 @@ PNRRCN4System class >> florence [
 { #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
-	| routesMap stopsMap tripsMap secondsPerDay random |
+	| routesMap stopsMap tripsMap secondsPerDay random temporalEdgesSize |
 	random := RSRandom seed: Float firstCarmichaelNumber.
 
 	routesMap := Dictionary new.
@@ -79,9 +80,15 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 					from stop temporalOutgoingNeighborhood add: edge.
 					to stop temporalIncomingNeighborhood add: edge ] ] ].
 
-	stops do: [ :stop | stop sortTemporalNeighborhoodsUsing: self ].
+
+	temporalEdgesSize := 0.
+	stops do: [ :stop |
+		temporalEdgesSize := temporalEdgesSize
+		                     + stop temporalOutgoingNeighborhood size.
+		stop sortTemporalNeighborhoods ].
 
 	^ self new
+		  temporalEdgesSize: temporalEdgesSize;
 		  routes: routes;
 		  stops: stopsMap;
 		  times: times;
@@ -89,30 +96,11 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		  yourself
 ]
 
-{ #category : 'sorting' }
-PNRRCN4System class >> timsortKeyFunctionOnTemporalEdge: edge [
-
-	^ edge departureTime asNanoSeconds + edge duration asNanoSeconds
-]
-
 { #category : 'export' }
 PNRRCN4System >> asTemporalGraphInSexpString [
 
 	^ String streamContents: [ :aStream |
 		  self exportTemporalGraphInSexpFormatOnStream: aStream ]
-]
-
-{ #category : 'accessing' }
-PNRRCN4System >> edgesStream [
-
-	| neighborhood |
-	neighborhood := OrderedCollection new.
-
-	self stops do: [ :stop |
-		neighborhood addAll: stop temporalOutgoingNeighborhood ].
-
-	^ neighborhood timsort: [ :edge |
-		  self class timsortKeyFunctionOnTemporalEdge: edge ]
 ]
 
 { #category : 'export' }
@@ -212,6 +200,18 @@ PNRRCN4System >> temporalAssociations [
 
 	^ assocs sort: [ :assoc :anotherAssoc |
 		  assoc key departureTime < anotherAssoc key departureTime ]
+]
+
+{ #category : 'accessing' }
+PNRRCN4System >> temporalEdgesSize [
+
+	^ temporalEdgesSize
+]
+
+{ #category : 'accessing' }
+PNRRCN4System >> temporalEdgesSize: anObject [
+
+	temporalEdgesSize := anObject
 ]
 
 { #category : 'accessing' }
