@@ -16,7 +16,8 @@ Class {
 { #category : 'sorting' }
 PNRRCN4TemporalEdge class >> timsortKeyFunctionOnTemporalEdge: edge [
 
-	^ edge departureTime asNanoSeconds + edge duration asNanoSeconds
+	^ edge departureTime asFloatSeconds * 60.0
+	  + edge duration asFloatSeconds
 ]
 
 { #category : 'comparing' }
@@ -34,8 +35,7 @@ PNRRCN4TemporalEdge >> = anObject [
 { #category : 'converting' }
 PNRRCN4TemporalEdge >> arrivalTimeAsFloat [
 
-	^ self departureTime asFloatSeconds
-	  + (self duration asNanoSeconds / 1e9) asFloat
+	^ self departureTime asFloatSeconds + self duration asFloatSeconds
 ]
 
 { #category : 'accessing' }

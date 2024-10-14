@@ -10,12 +10,41 @@ Class {
 	#tag : 'API'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : 'sorting' }
 PNRRCN4RequestsSample class >> defaultIsRequest: req lessThanRequest: anotherReq [
 
 	^ req time = anotherReq time
 		  ifTrue: [ req multiplicity < anotherReq multiplicity ]
 		  ifFalse: [ req time < anotherReq time ]
+]
+
+{ #category : 'instance creation' }
+PNRRCN4RequestsSample class >> requests: aCollection onSystem: aSystem [
+
+	| col keep count stops |
+	stops := aSystem stops.
+	count := 0.
+
+	col := aCollection select: [ :request |
+		       keep := true.
+
+		       request
+			       fromStop: (stops at: request fromStopId ifAbsent: [
+						        keep := false.
+						        nil ]);
+			       toStop: (stops at: request toStopId ifAbsent: [
+						        keep := false.
+						        nil ]);
+			       time: (DateAndTime fromUnixTime: request unixTime) asTime.
+
+		       keep ifTrue: [ count := count + request multiplicity ].
+
+		       keep ].
+
+	^ self new
+		  requests: col;
+		  totalCount: count;
+		  yourself
 ]
 
 { #category : 'displaying' }

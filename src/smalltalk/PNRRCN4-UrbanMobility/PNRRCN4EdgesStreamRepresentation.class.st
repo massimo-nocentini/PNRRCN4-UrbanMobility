@@ -9,6 +9,23 @@ Class {
 	#tag : 'API'
 }
 
+{ #category : 'instance creation' }
+PNRRCN4EdgesStreamRepresentation class >> onSystem: aSystem [
+
+	| temporalStream |
+	temporalStream := Array
+		                  new: aSystem temporalEdgesSize
+		                  streamContents: [ :aStream |
+			                  aSystem stops do: [ :stop |
+				                  aStream nextPutAll:
+					                  stop temporalOutgoingNeighborhood ] ].
+
+	^ self new
+		  edgesStream: (temporalStream timsort: [ :edge |
+					   PNRRCN4TemporalEdge timsortKeyFunctionOnTemporalEdge: edge ]);
+		  yourself
+]
+
 { #category : 'displaying' }
 PNRRCN4EdgesStreamRepresentation >> displayStringOn: aStream [
 
@@ -29,19 +46,4 @@ PNRRCN4EdgesStreamRepresentation >> edgesStream [
 PNRRCN4EdgesStreamRepresentation >> edgesStream: anObject [
 
 	edgesStream := anObject
-]
-
-{ #category : 'converting' }
-PNRRCN4EdgesStreamRepresentation >> onSystem: aSystem [
-
-	| temporalStream |
-	temporalStream := Array
-		                  new: aSystem temporalEdgesSize
-		                  streamContents: [ :aStream |
-			                  aSystem stops do: [ :stop |
-				                  aStream nextPutAll:
-					                  stop temporalOutgoingNeighborhood ] ].
-
-	self edgesStream: (temporalStream timsort: [ :edge |
-			 PNRRCN4TemporalEdge timsortKeyFunctionOnTemporalEdge: edge ])
 ]

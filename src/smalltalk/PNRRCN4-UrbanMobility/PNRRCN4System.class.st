@@ -136,34 +136,6 @@ PNRRCN4System >> exportTemporalGraphInSexpFormatOnStream: aStream [
 	aStream << '))'
 ]
 
-{ #category : 'parsing' }
-PNRRCN4System >> requests: aCollection [
-
-	| col keep count |
-	count := 0.
-
-	col := aCollection select: [ :request |
-		       keep := true.
-
-		       request
-			       fromStop: (self stops at: request fromStopId ifAbsent: [
-						        keep := false.
-						        nil ]);
-			       toStop: (self stops at: request toStopId ifAbsent: [
-						        keep := false.
-						        nil ]);
-			       time: (DateAndTime fromUnixTime: request unixTime) asTime.
-
-		       keep ifTrue: [ count := count + request multiplicity ].
-
-		       keep ].
-
-	^ PNRRCN4RequestsSample new
-		  requests: col;
-		  totalCount: count;
-		  yourself
-]
-
 { #category : 'accessing' }
 PNRRCN4System >> routes [
 
