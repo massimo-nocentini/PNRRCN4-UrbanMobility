@@ -66,19 +66,20 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 					secs := to arrivalTime asFloatSeconds
 					        - from departureTime asFloatSeconds.
 
-					secs > 0.0 ifTrue: [
-							d := Duration seconds: secs.
+					self assert: secs >= 0.0.
 
-							edge := PNRRCN4TemporalEdge new
-								        from: from stop;
-								        to: to stop;
-								        departureTime: from departureTime;
-								        duration: d;
-								        trip: trip;
-								        yourself.
+					d := Duration seconds: secs.
 
-							from stop temporalOutgoingNeighborhood add: edge.
-							to stop temporalIncomingNeighborhood add: edge ] ] ] ].
+					edge := PNRRCN4TemporalEdge new
+						        from: from stop;
+						        to: to stop;
+						        departureTime: from departureTime;
+						        duration: d;
+						        trip: trip;
+						        yourself.
+
+					from stop temporalOutgoingNeighborhood add: edge.
+					to stop temporalIncomingNeighborhood add: edge ] ] ].
 
 	temporalEdges := OrderedCollection new.
 	stops do: [ :stop |
