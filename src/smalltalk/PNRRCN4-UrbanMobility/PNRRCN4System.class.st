@@ -43,27 +43,31 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
 		tripsMap at: each id put: each ].
 
-	times do: [ :each |
-		| trip stop |
-		trip := tripsMap at: each tripId.
-		stop := stopsMap at: each stopId.
+	times
+		select: [ :each |
+			each departureTime isNotNil and: [ each arrivalTime isNotNil ] ]
+		thenDo: [ :each |
+			| trip stop |
+			trip := tripsMap at: each tripId.
+			stop := stopsMap at: each stopId.
 
-		each stop: stop.
-		each trip: trip.
+			each stop: stop.
+			each trip: trip.
 
-		trip times add: each.
-		stop times add: each ].
+			trip times add: each.
+			stop times add: each ].
 
 	routes do: [ :route |
 		route trips do: [ :trip |
 			trip times
 				sort: [ :t1 :t2 | t1 sequence < t2 sequence ];
 				overlappingPairsDo: [ :from :to |
-					from departureTime = to arrivalTime ifFalse: [
-							| edge d |
-							d := Duration seconds:
-									     (to arrivalTime asFloatSeconds
-									      - from departureTime asFloatSeconds) abs.
+					| edge d secs |
+					secs := to arrivalTime asFloatSeconds
+					        - from departureTime asFloatSeconds.
+
+					secs > 0.0 ifTrue: [
+							d := Duration seconds: secs.
 
 							edge := PNRRCN4TemporalEdge new
 								        from: from stop;
@@ -75,7 +79,6 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
 							from stop temporalOutgoingNeighborhood add: edge.
 							to stop temporalIncomingNeighborhood add: edge ] ] ] ].
-
 
 	temporalEdges := OrderedCollection new.
 	stops do: [ :stop |

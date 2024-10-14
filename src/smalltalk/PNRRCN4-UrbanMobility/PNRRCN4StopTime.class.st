@@ -31,21 +31,26 @@ PNRRCN4StopTime class >> onFileReference: fr [
 	random := RSRandom seed: Number firstCarmichaelNumber.
 
 	converter := [ :s |
-	             | triple main nano |
+	             | triple main nano hour |
 	             main := s splitOn: $..
 
 	             nano := main size = 2
 		                     ifTrue: [
 		                     main second asInteger min: 999999999 max: 0 ]
-		                     ifFalse: [ (random next * 1e9) floor ].
+		                     ifFalse: [ "(random next * 1e9) floor" 0 ].
 
 	             triple := main first splitOn: $:.
 
-	             Time
-		             hour: triple first asInteger % 24
-		             minute: triple second asInteger
-		             second: triple third asInteger
-		             nanoSecond: nano ].
+	             hour := triple first asInteger.
+
+	             hour < 24
+		             ifTrue: [
+			             Time
+				             hour: hour
+				             minute: triple second asInteger
+				             second: triple third asInteger
+				             nanoSecond: nano ]
+		             ifFalse: [ nil ] ].
 
 	^ (NeoCSVReader on: fr readStream)
 		  skipHeader;
