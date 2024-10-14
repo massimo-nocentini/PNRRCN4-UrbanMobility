@@ -56,8 +56,13 @@ PNRRCN4Stop >> code: anObject [
 { #category : 'displaying' }
 PNRRCN4Stop >> displayStringOn: aStream [
 
+	self name displayStringOn: aStream.
+
+	aStream space.
+
+	self code displayStringOn: aStream.
+
 	aStream
-		<< self name;
 		space;
 		<< '('.
 

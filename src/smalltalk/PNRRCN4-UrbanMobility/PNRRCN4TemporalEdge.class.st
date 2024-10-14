@@ -22,7 +22,8 @@ PNRRCN4TemporalEdge >> = anObject [
 	^ from = anObject from and: [
 		  to = anObject to and: [
 			  trip = anObject trip and: [
-				  departureTime = anObject departureTime ] ] ]
+				  departureTime asFloatSeconds
+				  = anObject departureTime asFloatSeconds ] ] ]
 ]
 
 { #category : 'converting' }

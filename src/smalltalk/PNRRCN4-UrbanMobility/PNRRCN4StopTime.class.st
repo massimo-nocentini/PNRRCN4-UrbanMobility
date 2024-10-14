@@ -35,8 +35,9 @@ PNRRCN4StopTime class >> onFileReference: fr [
 	             main := s splitOn: $..
 
 	             nano := main size = 2
-		                     ifTrue: [ main second asInteger min: 1e9 - 1 ]
-		                     ifFalse: [ random next * 1e9 ].
+		                     ifTrue: [
+		                     main second asInteger min: 999999999 max: 0 ]
+		                     ifFalse: [ (random next * 1e9) floor ].
 
 	             triple := main first splitOn: $:.
 

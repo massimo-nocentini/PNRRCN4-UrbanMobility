@@ -31,7 +31,7 @@ PNRRCN4Trip class >> onFileReference: fr [
 	^ reader
 		  skipHeader;
 		  recordClass: self;
-		  addIntegerField: #routeId:;
+		  addField: #routeId:;
 		  addIgnoredField;
 		  addField: #id:;
 		  addField: #head:;
@@ -62,8 +62,9 @@ PNRRCN4Trip >> displayStringOn: aStream [
 	self times size displayStringOn: aStream.
 	aStream << ' stops in '.
 
-	(self times last arrivalTime subtractTime:
-		 self times first arrivalTime) asDuration displayStringOn: aStream.
+	(Duration seconds: (self times last arrivalTime asFloatSeconds
+		  - self times first departureTime asFloatSeconds) abs)
+		displayStringOn: aStream.
 
 	aStream << ' at '.
 

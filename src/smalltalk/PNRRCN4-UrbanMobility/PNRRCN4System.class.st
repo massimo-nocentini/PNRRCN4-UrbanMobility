@@ -26,9 +26,7 @@ PNRRCN4System class >> florence [
 { #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
-	| routesMap stopsMap tripsMap secondsPerDay random temporalEdges |
-	random := RSRandom seed: Float firstCarmichaelNumber.
-
+	| routesMap stopsMap tripsMap temporalEdges |
 	routesMap := Dictionary new.
 	routes do: [ :each | routesMap at: each id put: each ].
 
@@ -56,30 +54,27 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		trip times add: each.
 		stop times add: each ].
 
-	secondsPerDay := 1 day asSeconds.
 	routes do: [ :route |
 		route trips do: [ :trip |
 			trip times
 				sort: [ :t1 :t2 | t1 sequence < t2 sequence ];
 				overlappingPairsDo: [ :from :to |
-					| edge d secs |
-					secs := to arrivalTime asFloatSeconds
-					        - from departureTime asFloatSeconds.
+					from departureTime = to arrivalTime ifFalse: [
+							| edge d |
+							d := Duration seconds:
+									     (to arrivalTime asFloatSeconds
+									      - from departureTime asFloatSeconds) abs.
 
-					d := Duration seconds: (secs < 0
-								      ifTrue: [ secs % 60 ]
-								      ifFalse: [ secs ]).
+							edge := PNRRCN4TemporalEdge new
+								        from: from stop;
+								        to: to stop;
+								        departureTime: from departureTime;
+								        duration: d;
+								        trip: trip;
+								        yourself.
 
-					edge := PNRRCN4TemporalEdge new
-						        from: from stop;
-						        to: to stop;
-						        departureTime: from departureTime;
-						        duration: d;
-						        trip: trip;
-						        yourself.
-
-					from stop temporalOutgoingNeighborhood add: edge.
-					to stop temporalIncomingNeighborhood add: edge ] ] ].
+							from stop temporalOutgoingNeighborhood add: edge.
+							to stop temporalIncomingNeighborhood add: edge ] ] ] ].
 
 
 	temporalEdges := OrderedCollection new.

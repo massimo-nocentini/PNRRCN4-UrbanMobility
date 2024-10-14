@@ -29,7 +29,7 @@ PNRRCN4Route class >> onFileReference: fr [
 	^ reader
 		  skipHeader;
 		  recordClass: self;
-		  addIntegerField: #id:;
+		  addField: #id:;
 		  addIgnoredField;
 		  addField: #shortName:;
 		  addField: #longName:;
