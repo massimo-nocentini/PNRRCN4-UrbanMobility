@@ -6,7 +6,7 @@ Class {
 		'to',
 		'duration',
 		'departureTime',
-		'route'
+		'trip'
 	],
 	#category : 'PNRRCN4-UrbanMobility-Core',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -21,7 +21,7 @@ PNRRCN4TemporalEdge >> = anObject [
 	self class = anObject class ifFalse: [ ^ false ].
 	^ from = anObject from and: [
 		  to = anObject to and: [
-			  route = anObject route and: [
+			  trip = anObject trip and: [
 				  departureTime = anObject departureTime ] ] ]
 ]
 
@@ -115,19 +115,7 @@ PNRRCN4TemporalEdge >> hash [
 	"Answer an integer value that is related to the identity of the receiver."
 
 	^ from hash bitXor:
-		  (to hash bitXor: (route hash bitXor: departureTime hash))
-]
-
-{ #category : 'accessing' }
-PNRRCN4TemporalEdge >> route [
-
-	^ route
-]
-
-{ #category : 'accessing' }
-PNRRCN4TemporalEdge >> route: anObject [
-
-	route := anObject
+		  (to hash bitXor: (trip hash bitXor: departureTime hash))
 ]
 
 { #category : 'sorting' }
@@ -147,4 +135,16 @@ PNRRCN4TemporalEdge >> to [
 PNRRCN4TemporalEdge >> to: anObject [
 
 	to := anObject
+]
+
+{ #category : 'accessing' }
+PNRRCN4TemporalEdge >> trip [
+
+	^ trip
+]
+
+{ #category : 'accessing' }
+PNRRCN4TemporalEdge >> trip: anObject [
+
+	trip := anObject
 ]
