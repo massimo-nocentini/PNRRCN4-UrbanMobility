@@ -55,17 +55,19 @@ PNRRCN4Trip >> direction: anObject [
 { #category : 'displaying' }
 PNRRCN4Trip >> displayStringOn: aStream [
 
-	aStream
-		<< self times first stop name;
-		<< ' -> ';
-		<< self times last stop name;
-		<< ': '.
+	self head displayStringOn: aStream.
+
+	aStream << ' '.
 
 	self times size displayStringOn: aStream.
 	aStream << ' stops in '.
 
 	(self times last arrivalTime subtractTime:
-		 self times first arrivalTime) asDuration displayStringOn: aStream
+		 self times first arrivalTime) asDuration displayStringOn: aStream.
+
+	aStream << ' at '.
+
+	self times first departureTime displayStringOn: aStream
 ]
 
 { #category : 'accessing' }
