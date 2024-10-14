@@ -12,7 +12,7 @@ Class {
 	#tag : 'API'
 }
 
-{ #category : 'instance creation' }
+{ #category : 'examples' }
 PNRRCN4System class >> florence [
 
 	^ self
@@ -58,22 +58,25 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 	secondsPerDay := 1 day asSeconds.
 	routes do: [ :route |
 		route trips do: [ :trip |
-			trip times overlappingPairsDo: [ :r :s |
-				| edge d |
-				d := Duration
-					     seconds:
-					     s arrivalTime asSeconds - r departureTime asSeconds
-					     % secondsPerDay
-					     nanoSeconds: (random next * 1000000000) ceiling.
+			trip times
+				sort: [ :t1 :t2 | t1 sequence < t2 sequence ];
+				overlappingPairsDo: [ :r :s |
+					| edge d |
+					d := Duration
+						     seconds:
+							     s arrivalTime asSeconds - r departureTime asSeconds
+							     % secondsPerDay
+						     nanoSeconds: (random next * 1000000000) ceiling.
 
-				edge := PNRRCN4TemporalEdge new
-					        from: r stop;
-					        to: s stop;
-					        departureTime: r departureTime;
-					        duration: d;
-					        yourself.
+					edge := PNRRCN4TemporalEdge new
+						        from: r stop;
+						        to: s stop;
+						        departureTime: r departureTime;
+						        duration: d;
+						        route: route;
+						        yourself.
 
-				r stop temporalNeighborhood add: edge ] ] ].
+					r stop temporalNeighborhood add: edge ] ] ].
 
 	stops do: [ :stop | stop sortTemporalNeighborhoodFromSystem: self ].
 

@@ -29,6 +29,55 @@ PNRRCN4RequestsSample >> displayStringOn: aStream [
 		<< ' people'
 ]
 
+{ #category : 'estimation' }
+PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
+
+	| aw at k oMatrix cVector |
+	k := self requests size.
+	aw := at := 0.
+	oMatrix := Dictionary new.
+	cVector := Dictionary new.
+
+	self requests do: [ :q |
+		| path |
+		path := q earliestArrivalTimePathOnEdgeStream: edges.
+		1 to: path size - 1 do: [ :i |
+			| edge nextEdge c |
+			edge := path at: i.
+			nextEdge := path at: i + 1.
+
+			c := cVector at: edge ifAbsentPut: [ 0 ].
+			cVector at: edge put: c + 1.
+
+			at := at + edge duration asNanoSeconds.
+
+			edge route = nextEdge route ifFalse: [
+				edge departureTime asNanoSeconds + edge duration asNanoSeconds + 1
+					to: nextEdge departureTime asNanoSeconds - 1 do: [ :nanoSecs |
+					| o tup |
+					tup := {
+						       edge to.
+						       nanoSecs }.
+					o := oMatrix at: tup ifAbsentPut: [ 0 ].
+					oMatrix at: tup put: o + 1.
+
+					aw := aw + 1 ] ] ] ].
+
+	oMatrix keysDo: [ :tup |
+		oMatrix at: tup update: [ :o | (o / k) asFloat ] ].
+
+	cVector keysDo: [ :edge |
+		cVector at: edge update: [ :c | (c / k) asFloat ] ].
+
+	^ PNRRCN4OccupancyAndCrowding new
+		  requestsSample: self;
+		  averageTime: at;
+		  averageWaiting: aw;
+		  occupancyMatrix: oMatrix;
+		  crowdingVector: cVector;
+		  yourself
+]
+
 { #category : 'accessing' }
 PNRRCN4RequestsSample >> requests [
 

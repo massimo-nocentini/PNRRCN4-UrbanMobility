@@ -5,7 +5,8 @@ Class {
 		'from',
 		'to',
 		'duration',
-		'departureTime'
+		'departureTime',
+		'route'
 	],
 	#category : 'PNRRCN4-UrbanMobility-Core',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -59,16 +60,15 @@ PNRRCN4TemporalEdge >> earliestArrivalTimeMaxTime: maxTime pathsSoFar: earliestA
 
 	| t tu arrivalTime tv |
 	t := self departureTime asNanoSeconds.
-
-	t > maxTime ifTrue: [ ^ self ].
-
 	arrivalTime := t + self duration asNanoSeconds.
+
+	arrivalTime <= maxTime ifFalse: [ ^ self ].
 
 	tu := earliestArrivalTimePaths
 		      at: self from
 		      ifAbsentPut: [ Float infinity -> nil ].
 
-	(arrivalTime <= maxTime and: [ tu key <= t ]) ifFalse: [ ^ self ].
+	tu key <= t ifFalse: [ ^ self ].
 
 	tv := earliestArrivalTimePaths
 		      at: self to
@@ -90,6 +90,18 @@ PNRRCN4TemporalEdge >> from [
 PNRRCN4TemporalEdge >> from: anObject [
 
 	from := anObject
+]
+
+{ #category : 'accessing' }
+PNRRCN4TemporalEdge >> route [
+
+	^ route
+]
+
+{ #category : 'accessing' }
+PNRRCN4TemporalEdge >> route: anObject [
+
+	route := anObject
 ]
 
 { #category : 'accessing' }

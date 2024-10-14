@@ -68,15 +68,12 @@ PNRRCN4Stop >> displayStringOn: aStream [
 { #category : 'paths - earliest arrival time' }
 PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromTime toTime: maxTime [
 
-	| toTimeNanoSeconds paths reified |
-	toTimeNanoSeconds := maxTime asNanoSeconds.
-
-	paths := IdentityDictionary new
-		         at: self put: fromTime asNanoSeconds -> nil;
-		         yourself.
-
-	edgesStream do: [ :edge |
-		edge earliestArrivalTimeMaxTime: toTimeNanoSeconds pathsSoFar: paths ].
+	| paths reified |
+	paths := self
+		         earliestArrivalTimePathsOnEdgeStream: edgesStream
+		         fromTime: fromTime
+		         toTime: maxTime
+		         paths: IdentityDictionary new.
 
 	reified := IdentityDictionary new.
 
@@ -92,6 +89,20 @@ PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromT
 		reified at: key put: path ].
 
 	^ reified
+]
+
+{ #category : 'paths - earliest arrival time' }
+PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromTime toTime: maxTime paths: paths [
+
+	| toTimeNanoSeconds |
+	toTimeNanoSeconds := maxTime asNanoSeconds.
+
+	paths at: self put: fromTime asNanoSeconds -> nil.
+
+	edgesStream do: [ :edge | "edge departureTime >= maxTime ifTrue: [ ^ paths ]."
+		edge earliestArrivalTimeMaxTime: toTimeNanoSeconds pathsSoFar: paths ].
+
+	^ paths
 ]
 
 { #category : 'accessing' }
