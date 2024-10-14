@@ -27,16 +27,24 @@ PNRRCN4StopTime class >> florence [
 { #category : 'parsing' }
 PNRRCN4StopTime class >> onFileReference: fr [
 
-	| converter |
+	| converter random |
+	random := RSRandom seed: Number firstCarmichaelNumber.
+
 	converter := [ :s |
-	             | triple |
-	             triple := s splitOn: $:.
+	             | triple main nano |
+	             main := s splitOn: $..
+
+	             nano := main size = 2
+		                     ifTrue: [ main second asInteger min: 1e9 - 1 ]
+		                     ifFalse: [ random next * 1e9 ].
+
+	             triple := main first splitOn: $:.
 
 	             Time
 		             hour: triple first asInteger % 24
 		             minute: triple second asInteger
-		             second: triple third asInteger ].
-
+		             second: triple third asInteger
+		             nanoSecond: nano ].
 
 	^ (NeoCSVReader on: fr readStream)
 		  skipHeader;
