@@ -6,7 +6,7 @@ Class {
 		'stops',
 		'times',
 		'trips',
-		'temporalEdgesSize'
+		'temporalEdges'
 	],
 	#category : 'PNRRCN4-UrbanMobility-API',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -26,7 +26,7 @@ PNRRCN4System class >> florence [
 { #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
-	| routesMap stopsMap tripsMap secondsPerDay random temporalEdgesSize |
+	| routesMap stopsMap tripsMap secondsPerDay random temporalEdges |
 	random := RSRandom seed: Float firstCarmichaelNumber.
 
 	routesMap := Dictionary new.
@@ -62,33 +62,33 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 			trip times
 				sort: [ :t1 :t2 | t1 sequence < t2 sequence ];
 				overlappingPairsDo: [ :from :to |
-					| edge d |
-					d := Duration
-						     seconds:
-							     to arrivalTime asSeconds - from departureTime asSeconds
-							     % secondsPerDay
-						     nanoSeconds: (random next * 1e9) floor.
+					| edge d secs |
+					secs := to arrivalTime asFloatSeconds
+					        - from departureTime asFloatSeconds.
+
+					d := Duration seconds: (secs < 0
+								      ifTrue: [ secs % 60 ]
+								      ifFalse: [ secs ]).
 
 					edge := PNRRCN4TemporalEdge new
 						        from: from stop;
 						        to: to stop;
 						        departureTime: from departureTime;
 						        duration: d;
-						        route: route;
+						        trip: trip;
 						        yourself.
 
 					from stop temporalOutgoingNeighborhood add: edge.
 					to stop temporalIncomingNeighborhood add: edge ] ] ].
 
 
-	temporalEdgesSize := 0.
+	temporalEdges := OrderedCollection new.
 	stops do: [ :stop |
-		temporalEdgesSize := temporalEdgesSize
-		                     + stop temporalOutgoingNeighborhood size.
-		stop sortTemporalNeighborhoods ].
+		stop sortTemporalNeighborhoods.
+		temporalEdges addAll: stop temporalOutgoingNeighborhood ].
 
 	^ self new
-		  temporalEdgesSize: temporalEdgesSize;
+		  temporalEdges: temporalEdges timsort;
 		  routes: routes;
 		  stops: stopsMap;
 		  times: times;
@@ -175,15 +175,15 @@ PNRRCN4System >> temporalAssociations [
 ]
 
 { #category : 'accessing' }
-PNRRCN4System >> temporalEdgesSize [
+PNRRCN4System >> temporalEdges [
 
-	^ temporalEdgesSize
+	^ temporalEdges
 ]
 
 { #category : 'accessing' }
-PNRRCN4System >> temporalEdgesSize: anObject [
+PNRRCN4System >> temporalEdges: anObject [
 
-	temporalEdgesSize := anObject
+	temporalEdges := anObject
 ]
 
 { #category : 'accessing' }
