@@ -75,22 +75,22 @@ PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
 			edge := path at: i.
 			nextEdge := path at: i + 1.
 
-			c := cVector at: edge ifAbsentPut: [ 0 ].
+			c := cVector at: edge ifAbsentPut: 0.
 			cVector at: edge put: c + 1.
 
-			at := at + edge duration asFloatSeconds
+			at := at + edge duration asFloatSeconds.
 
-			"edge route = nextEdge route ifFalse: [
-				edge departureTime asFloatSeconds + edge duration asFloatSeconds
-				+ 1 to: nextEdge departureTime asFloatSeconds - 1 do: [ :secs |
+			edge trip = nextEdge trip ifFalse: [
+				edge departureTime asFloatSeconds + 1 to:
+					nextEdge departureTime asFloatSeconds - 1 do: [ :secs |
 					| o tup |
 					tup := {
 						       edge to.
-						       secs }.
-					o := oMatrix at: tup ifAbsentPut: [ 0 ].
+						       secs ceiling }.
+					o := oMatrix at: tup ifAbsentPut: 0.
 					oMatrix at: tup put: o + q multiplicity.
 
-					aw := aw + 1 ] ]" ] ].
+					aw := aw + 1 ] ] ] ].
 
 	oMatrix keysDo: [ :tup |
 		oMatrix at: tup update: [ :o | (o / k) asFloat ] ].
@@ -100,10 +100,15 @@ PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
 
 	^ PNRRCN4OccupancyAndCrowding new
 		  requestsSample: self;
-		  averageTime: at;
-		  averageWaiting: aw;
-		  occupancyMatrix: oMatrix;
-		  crowdingVector: cVector;
+		  averageTime: (Duration seconds: at / k);
+		  averageWaiting: (Duration seconds: aw / k);
+		  occupancyMatrix: ((oMatrix associations collect: [ :assoc |
+					    {
+						    assoc key first.
+						    (Duration seconds: assoc key second / k).
+						    assoc value } ]) timsort: #third reverse: true);
+		  crowdingVector:
+			  (cVector associations timsort: #value reverse: true);
 		  yourself
 ]
 
