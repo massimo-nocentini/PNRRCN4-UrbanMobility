@@ -58,17 +58,13 @@ PNRRCN4Stop >> displayStringOn: aStream [
 
 	self name displayStringOn: aStream.
 
-	aStream space.
-
-	self code displayStringOn: aStream.
-
 	aStream
 		space;
 		<< '('.
 
-	self times size displayStringOn: aStream.
+	self code displayStringOn: aStream.
 
-	aStream << ' times)'
+	aStream << ')'
 ]
 
 { #category : 'paths - earliest arrival time' }

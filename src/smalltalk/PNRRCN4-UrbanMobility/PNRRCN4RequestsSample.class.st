@@ -63,7 +63,7 @@ PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
 
 	| aw at k oMatrix cVector |
 	k := self requests size.
-	aw := at := 0.
+	aw := at := 0.0.
 	oMatrix := Dictionary new.
 	cVector := Dictionary new.
 
@@ -78,19 +78,19 @@ PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
 			c := cVector at: edge ifAbsentPut: [ 0 ].
 			cVector at: edge put: c + 1.
 
-			at := at + edge duration asNanoSeconds.
+			at := at + edge duration asFloatSeconds
 
-			edge route = nextEdge route ifFalse: [
-				edge departureTime asNanoSeconds + edge duration asNanoSeconds + 1
-					to: nextEdge departureTime asNanoSeconds - 1 do: [ :nanoSecs |
+			"edge route = nextEdge route ifFalse: [
+				edge departureTime asFloatSeconds + edge duration asFloatSeconds
+				+ 1 to: nextEdge departureTime asFloatSeconds - 1 do: [ :secs |
 					| o tup |
 					tup := {
 						       edge to.
-						       nanoSecs }.
+						       secs }.
 					o := oMatrix at: tup ifAbsentPut: [ 0 ].
-					oMatrix at: tup put: o + 1.
+					oMatrix at: tup put: o + q multiplicity.
 
-					aw := aw + 1 ] ] ] ].
+					aw := aw + 1 ] ]" ] ].
 
 	oMatrix keysDo: [ :tup |
 		oMatrix at: tup update: [ :o | (o / k) asFloat ] ].
@@ -132,6 +132,13 @@ PNRRCN4RequestsSample >> totalCount [
 PNRRCN4RequestsSample >> totalCount: anObject [
 
 	totalCount := anObject
+]
+
+{ #category : 'sampling' }
+PNRRCN4RequestsSample >> weightedSampleAbsoluteError: epsilon prob: p [
+
+	^ self weightedSampleOfSize:
+		  (p halved ln negated halved / epsilon squared) ceiling
 ]
 
 { #category : 'sampling' }
