@@ -48,6 +48,12 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 			each departureTime isNotNil and: [ each arrivalTime isNotNil ] ]
 		thenDo: [ :each |
 			| trip stop |
+			each arrivalTime
+				seconds: each arrivalTime asSeconds
+				nanoSeconds: each sequence - 1 * 1e3.
+
+			each departureTime: each arrivalTime.
+
 			trip := tripsMap at: each tripId.
 			stop := stopsMap at: each stopId.
 
@@ -66,7 +72,7 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 					secs := to arrivalTime asFloatSeconds
 					        - from departureTime asFloatSeconds.
 
-					self assert: secs >= 0.0.
+					self assert: secs > 0.0.
 
 					d := Duration seconds: secs.
 
