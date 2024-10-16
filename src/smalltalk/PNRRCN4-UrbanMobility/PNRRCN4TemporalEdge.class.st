@@ -39,12 +39,6 @@ PNRRCN4TemporalEdge >> arrivalTime: anObject [
 	arrivalTime := anObject
 ]
 
-{ #category : 'converting' }
-PNRRCN4TemporalEdge >> arrivalTimeAsFloat [
-
-	^ self departureTime asFloatSeconds + self duration asFloatSeconds
-]
-
 { #category : 'accessing' }
 PNRRCN4TemporalEdge >> departureTime [
 
@@ -60,9 +54,13 @@ PNRRCN4TemporalEdge >> departureTime: anObject [
 { #category : 'accessing' }
 PNRRCN4TemporalEdge >> duration [
 
-	^ Duration seconds:
-		  self arrivalTime asFloatSeconds
-		  - self departureTime asFloatSeconds
+	| secs |
+	secs := self arrivalTime asFloatSeconds
+	        - self departureTime asFloatSeconds.
+
+	self assert: secs >= 0.
+
+	^ Duration seconds: secs
 ]
 
 { #category : 'paths - earliest arrival time' }
@@ -132,8 +130,8 @@ PNRRCN4TemporalEdge >> printOn: aStream [
 { #category : 'sorting' }
 PNRRCN4TemporalEdge >> timsortSortKey [
 
-	^ self departureTime asFloatSeconds * 60.0
-	  + self duration asFloatSeconds
+	^ self departureTime asFloatSeconds * 86400.0
+	  + self duration asFloatSeconds "1 days asSeconds  "
 ]
 
 { #category : 'accessing' }
