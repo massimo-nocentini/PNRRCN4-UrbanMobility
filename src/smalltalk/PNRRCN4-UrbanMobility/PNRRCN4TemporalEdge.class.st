@@ -24,7 +24,9 @@ PNRRCN4TemporalEdge >> = anObject [
 		  to = anObject to and: [
 			  trip = anObject trip and: [
 				  departureTime asFloatSeconds
-				  = anObject departureTime asFloatSeconds ] ] ]
+				  = anObject departureTime asFloatSeconds and: [
+					  arrivalTime asFloatSeconds
+					  = anObject arrivalTime asFloatSeconds ] ] ] ]
 ]
 
 { #category : 'accessing' }
@@ -105,8 +107,8 @@ PNRRCN4TemporalEdge >> from: anObject [
 PNRRCN4TemporalEdge >> hash [
 	"Answer an integer value that is related to the identity of the receiver."
 
-	^ from hash bitXor:
-		  (to hash bitXor: (trip hash bitXor: departureTime hash))
+	^ from hash bitXor: (to hash bitXor:
+			   (trip hash bitXor: (departureTime hash bitXor: arrivalTime hash)))
 ]
 
 { #category : 'displaying' }
