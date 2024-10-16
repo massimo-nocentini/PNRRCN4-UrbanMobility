@@ -6,7 +6,8 @@ Class {
 		'to',
 		'duration',
 		'departureTime',
-		'trip'
+		'trip',
+		'arrivalTime'
 	],
 	#category : 'PNRRCN4-UrbanMobility-Core',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -24,6 +25,18 @@ PNRRCN4TemporalEdge >> = anObject [
 			  trip = anObject trip and: [
 				  departureTime asFloatSeconds
 				  = anObject departureTime asFloatSeconds ] ] ]
+]
+
+{ #category : 'accessing' }
+PNRRCN4TemporalEdge >> arrivalTime [
+
+	^ arrivalTime
+]
+
+{ #category : 'accessing' }
+PNRRCN4TemporalEdge >> arrivalTime: anObject [
+
+	arrivalTime := anObject
 ]
 
 { #category : 'converting' }
@@ -47,13 +60,9 @@ PNRRCN4TemporalEdge >> departureTime: anObject [
 { #category : 'accessing' }
 PNRRCN4TemporalEdge >> duration [
 
-	^ duration
-]
-
-{ #category : 'accessing' }
-PNRRCN4TemporalEdge >> duration: anObject [
-
-	duration := anObject
+	^ Duration seconds:
+		  self arrivalTime asFloatSeconds
+		  - self departureTime asFloatSeconds
 ]
 
 { #category : 'paths - earliest arrival time' }

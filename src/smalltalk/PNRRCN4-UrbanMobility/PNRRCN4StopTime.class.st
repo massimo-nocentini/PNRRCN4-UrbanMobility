@@ -27,9 +27,7 @@ PNRRCN4StopTime class >> florence [
 { #category : 'parsing' }
 PNRRCN4StopTime class >> onFileReference: fr [
 
-	| converter random |
-	random := RSRandom seed: Number firstCarmichaelNumber.
-
+	| converter |
 	converter := [ :s |
 	             | triple main nano hour |
 	             main := s splitOn: $..
@@ -37,13 +35,13 @@ PNRRCN4StopTime class >> onFileReference: fr [
 	             nano := main size = 2
 		                     ifTrue: [
 		                     main second asInteger min: 999999999 max: 0 ]
-		                     ifFalse: [ "(random next * 1e9) floor" 0 ].
+		                     ifFalse: [ 0 ].
 
 	             triple := main first splitOn: $:.
 
 	             hour := triple first asInteger.
 
-	             hour < 24
+	             hour < 23
 		             ifTrue: [
 			             Time
 				             hour: hour
