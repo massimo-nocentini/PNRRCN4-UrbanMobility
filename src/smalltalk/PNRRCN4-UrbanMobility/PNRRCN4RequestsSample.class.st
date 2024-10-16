@@ -62,14 +62,16 @@ PNRRCN4RequestsSample >> isRequest: req lessThanRequest: anotherReq [
 { #category : 'estimation' }
 PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
 
-	| aw at k oMatrix cVector |
+	| aw at k oMatrix cVector res |
 	k := self requests size asFloat.
 	aw := at := 0.0.
 	oMatrix := Dictionary new.
 	cVector := Dictionary new.
 
 	self requests do: [ :q |
-		| path |
+		| path multiplicity |
+		multiplicity := q multiplicity asFloat / k.
+
 		path := q earliestArrivalTimePathOnEdgeStream: edges.
 		1 to: path size - 1 do: [ :i |
 			| edge nextEdge c |
@@ -79,30 +81,33 @@ PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
 			c := cVector at: edge ifAbsentPut: 0.
 			cVector at: edge put: c + 1.
 
-			at := at + (edge duration asFloatSeconds / k).
+			at := at + edge duration asFloatSeconds.
 
 			edge trip = nextEdge trip ifFalse: [
-				edge arrivalTime asFloatSeconds + 1 to:
-					nextEdge departureTime asFloatSeconds - 1 do: [ :secs |
-					| o tup |
-					tup := {
-						       edge to.
-						       secs ceiling }.
-					o := oMatrix at: tup ifAbsentPut: 0.
-					oMatrix at: tup put: o + (q multiplicity asFloat / k).
+				edge arrivalTime asFloatSeconds + 1.0 to:
+					nextEdge departureTime asFloatSeconds - 1.0 do: [ :secs |
+					| col |
+					col := oMatrix at: secs ceiling ifAbsentPut: [ Dictionary new ].
 
-					aw := aw + (1.0 / k) ] ] ] ].
+					col
+						at: edge to
+						update: [ :o | o + multiplicity ]
+						initial: multiplicity.
 
+					aw := aw + 1.0 ] ] ] ].
+
+	res := Dictionary new.
+	oMatrix keysAndValuesDo: [ :t :dict |
+		res
+			at: (Time seconds: t)
+			put: (dict associations timsort: #value reverse: true) ].
 
 	^ PNRRCN4OccupancyAndCrowding new
 		  requestsSample: self;
-		  averageTime: (Duration seconds: at);
-		  averageWaiting: (Duration seconds: aw);
-		  occupancyMatrix: ((oMatrix associations collect: [ :assoc |
-					    {
-						    assoc key first.
-						    (Time seconds: assoc key second).
-						    assoc value } ]) timsort: #third reverse: true);
+		  averageTime: (Duration seconds: at / k);
+		  averageWaiting: (Duration seconds: aw / k);
+		  occupancyMatrix:
+			  (res associations timsort: [ :assoc | assoc key asFloatSeconds ]);
 		  crowdingVector:
 			  (cVector associations timsort: #value reverse: true);
 		  yourself
@@ -146,7 +151,7 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 	| random remaining pool sample count |
 	aSize >= self requests size ifTrue: [ ^ self ].
 
-	random := RSRandom seed: Number firstCarmichaelNumber.
+	random := RSRandom new.
 
 	pool := OrderedCollection new
 		        addAll: self requests;
