@@ -83,9 +83,9 @@ PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromT
 PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromTime toTime: maxTime paths: paths [
 
 	| toTimeNanoSeconds |
-	toTimeNanoSeconds := maxTime asNanoSeconds.
+	toTimeNanoSeconds := maxTime asFloatSeconds.
 
-	paths at: self put: fromTime asNanoSeconds -> nil.
+	paths at: self put: fromTime asFloatSeconds -> nil.
 
 	edgesStream do: [ :edge | "edge departureTime >= maxTime ifTrue: [ ^ paths ]."
 		edge earliestArrivalTimeMaxTime: toTimeNanoSeconds pathsSoFar: paths ].

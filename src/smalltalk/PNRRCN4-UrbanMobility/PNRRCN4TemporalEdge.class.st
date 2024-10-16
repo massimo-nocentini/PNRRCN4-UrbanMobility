@@ -68,11 +68,12 @@ PNRRCN4TemporalEdge >> duration [
 { #category : 'paths - earliest arrival time' }
 PNRRCN4TemporalEdge >> earliestArrivalTimeMaxTime: maxTime pathsSoFar: earliestArrivalTimePaths [
 
-	| t tu arrivalTime tv |
-	t := self departureTime asNanoSeconds.
-	arrivalTime := t + self duration asNanoSeconds.
+	| t tu tv at |
+	at := arrivalTime asFloatSeconds.
 
-	arrivalTime <= maxTime ifFalse: [ ^ self ].
+	at <= maxTime ifFalse: [ ^ self ].
+
+	t := self departureTime asFloatSeconds.
 
 	tu := earliestArrivalTimePaths
 		      at: self from
@@ -84,9 +85,9 @@ PNRRCN4TemporalEdge >> earliestArrivalTimeMaxTime: maxTime pathsSoFar: earliestA
 		      at: self to
 		      ifAbsentPut: [ Float infinity -> nil ].
 
-	arrivalTime < tv key ifFalse: [ ^ self ].
+	at < tv key ifFalse: [ ^ self ].
 
-	tv key: arrivalTime.
+	tv key: at.
 	tv value: self
 ]
 

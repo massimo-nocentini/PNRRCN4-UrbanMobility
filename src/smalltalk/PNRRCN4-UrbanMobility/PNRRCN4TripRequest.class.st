@@ -72,7 +72,7 @@ PNRRCN4TripRequest >> earliestArrivalTimePathOnEdgeStream: edgesStream [
 		         fromTime: self time
 		         toTime: edgesStream last departureTime.
 
-	^ paths at: self toStop
+	^ paths at: self toStop ifAbsent: [ OrderedCollection new ]
 ]
 
 { #category : 'accessing' }
