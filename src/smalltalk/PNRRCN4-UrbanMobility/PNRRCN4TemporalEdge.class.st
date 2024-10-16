@@ -44,24 +44,6 @@ PNRRCN4TemporalEdge >> departureTime: anObject [
 	departureTime := anObject
 ]
 
-{ #category : 'displaying' }
-PNRRCN4TemporalEdge >> displayStringOn: aStream [
-
-	self from displayStringOn: aStream.
-
-	aStream << ' -> '.
-
-	self to displayStringOn: aStream.
-
-	aStream << ' at '.
-
-	self departureTime displayStringOn: aStream.
-
-	aStream << ' in '.
-
-	self duration displayStringOn: aStream
-]
-
 { #category : 'accessing' }
 PNRRCN4TemporalEdge >> duration [
 
@@ -117,6 +99,24 @@ PNRRCN4TemporalEdge >> hash [
 
 	^ from hash bitXor:
 		  (to hash bitXor: (trip hash bitXor: departureTime hash))
+]
+
+{ #category : 'displaying' }
+PNRRCN4TemporalEdge >> printOn: aStream [
+
+	self from printOn: aStream.
+
+	aStream << ' -> '.
+
+	self to printOn: aStream.
+
+	aStream << ' at '.
+
+	self departureTime printOn: aStream.
+
+	aStream << ' in '.
+
+	self duration printOn: aStream
 ]
 
 { #category : 'sorting' }

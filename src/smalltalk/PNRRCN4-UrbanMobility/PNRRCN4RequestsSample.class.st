@@ -101,11 +101,11 @@ PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
 	^ PNRRCN4OccupancyAndCrowding new
 		  requestsSample: self;
 		  averageTime: (Duration seconds: at / k);
-		  averageWaiting: (Duration seconds: aw / k);
+		  averageWaiting: (aw / k) asFloat;
 		  occupancyMatrix: ((oMatrix associations collect: [ :assoc |
 					    {
 						    assoc key first.
-						    (Duration seconds: assoc key second / k).
+						    (Time seconds: assoc key second).
 						    assoc value } ]) timsort: #third reverse: true);
 		  crowdingVector:
 			  (cVector associations timsort: #value reverse: true);

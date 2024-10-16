@@ -53,20 +53,6 @@ PNRRCN4Stop >> code: anObject [
 	code := anObject
 ]
 
-{ #category : 'displaying' }
-PNRRCN4Stop >> displayStringOn: aStream [
-
-	self name displayStringOn: aStream.
-
-	aStream
-		space;
-		<< '('.
-
-	self code displayStringOn: aStream.
-
-	aStream << ')'
-]
-
 { #category : 'paths - earliest arrival time' }
 PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromTime toTime: maxTime [
 
@@ -163,6 +149,20 @@ PNRRCN4Stop >> name [
 PNRRCN4Stop >> name: anObject [
 
 	name := anObject
+]
+
+{ #category : 'displaying' }
+PNRRCN4Stop >> printOn: aStream [
+
+	self name displayStringOn: aStream.
+
+	aStream
+		space;
+		<< '('.
+
+	self code displayStringOn: aStream.
+
+	aStream << ')'
 ]
 
 { #category : 'sorting' }
