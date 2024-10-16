@@ -1,10 +1,9 @@
 Class {
 	#name : 'PNRRCN4TemporalEdge',
-	#superclass : 'Object',
+	#superclass : 'PNRRCN4Object',
 	#instVars : [
 		'from',
 		'to',
-		'duration',
 		'departureTime',
 		'trip',
 		'arrivalTime'

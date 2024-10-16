@@ -1,6 +1,6 @@
 Class {
 	#name : 'PNRRCN4Stop',
-	#superclass : 'Object',
+	#superclass : 'PNRRCN4Object',
 	#instVars : [
 		'id',
 		'name',
@@ -87,7 +87,7 @@ PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromT
 
 	paths at: self put: fromTime asFloatSeconds -> nil.
 
-	edgesStream do: [ :edge | "edge departureTime >= maxTime ifTrue: [ ^ paths ]."
+	edgesStream do: [ :edge |
 		edge earliestArrivalTimeMaxTime: toTimeNanoSeconds pathsSoFar: paths ].
 
 	^ paths

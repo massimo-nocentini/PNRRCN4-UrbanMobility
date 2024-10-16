@@ -1,6 +1,6 @@
 Class {
 	#name : 'PNRRCN4TripRequest',
-	#superclass : 'Object',
+	#superclass : 'PNRRCN4Object',
 	#instVars : [
 		'fromStop',
 		'toStop',

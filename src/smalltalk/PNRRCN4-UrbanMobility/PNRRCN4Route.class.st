@@ -1,6 +1,6 @@
 Class {
 	#name : 'PNRRCN4Route',
-	#superclass : 'Object',
+	#superclass : 'PNRRCN4Object',
 	#instVars : [
 		'id',
 		'shortName',

@@ -1,6 +1,6 @@
 Class {
 	#name : 'PNRRCN4StopTime',
-	#superclass : 'Object',
+	#superclass : 'PNRRCN4Object',
 	#instVars : [
 		'tripId',
 		'arrivalTime',

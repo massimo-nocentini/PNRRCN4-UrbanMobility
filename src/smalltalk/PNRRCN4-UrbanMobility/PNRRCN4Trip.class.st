@@ -1,6 +1,6 @@
 Class {
 	#name : 'PNRRCN4Trip',
-	#superclass : 'Object',
+	#superclass : 'PNRRCN4Object',
 	#instVars : [
 		'routeId',
 		'id',
