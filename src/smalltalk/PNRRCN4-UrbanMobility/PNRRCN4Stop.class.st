@@ -54,12 +54,11 @@ PNRRCN4Stop >> code: anObject [
 ]
 
 { #category : 'paths - earliest arrival time' }
-PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromTime toTime: maxTime [
+PNRRCN4Stop >> earliestArrivalTimePathsFromTime: fromTime toTime: maxTime [
 
 	| paths reified |
 	paths := self
-		         earliestArrivalTimePathsOnEdgeStream: edgesStream
-		         fromTime: fromTime
+		         earliestArrivalTimePathsFromTime: fromTime
 		         toTime: maxTime
 		         paths: IdentityDictionary new.
 
@@ -80,14 +79,14 @@ PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromT
 ]
 
 { #category : 'paths - earliest arrival time' }
-PNRRCN4Stop >> earliestArrivalTimePathsOnEdgeStream: edgesStream fromTime: fromTime toTime: maxTime paths: paths [
+PNRRCN4Stop >> earliestArrivalTimePathsFromTime: fromTime toTime: maxTime paths: paths [
 
 	| toTimeNanoSeconds |
 	toTimeNanoSeconds := maxTime asFloatSeconds.
 
 	paths at: self put: fromTime asFloatSeconds -> nil.
 
-	edgesStream do: [ :edge |
+	self owner temporalEdges do: [ :edge |
 		edge earliestArrivalTimeMaxTime: toTimeNanoSeconds pathsSoFar: paths ].
 
 	^ paths

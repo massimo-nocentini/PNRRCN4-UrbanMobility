@@ -26,12 +26,18 @@ PNRRCN4System class >> florence [
 { #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
-	| routesMap stopsMap tripsMap temporalEdges |
+	| routesMap stopsMap tripsMap temporalEdges graph |
+	graph := self new.
+
 	routesMap := Dictionary new.
-	routes do: [ :each | routesMap at: each id put: each ].
+	routes do: [ :each |
+		each owner: graph.
+		routesMap at: each id put: each ].
 
 	stopsMap := Dictionary new.
-	stops do: [ :each | stopsMap at: each id put: each ].
+	stops do: [ :each |
+		each owner: graph.
+		stopsMap at: each id put: each ].
 
 	tripsMap := Dictionary new.
 	trips do: [ :each |
@@ -39,7 +45,10 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		"Tying the 1-to-many relation with the routes."
 		route := routesMap at: each routeId.
 		route trips add: each.
-		each route: route.
+
+		each
+			route: route;
+			owner: graph.
 
 		tripsMap at: each id put: each ].
 
@@ -51,8 +60,10 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 			trip := tripsMap at: each tripId.
 			stop := stopsMap at: each stopId.
 
-			each stop: stop.
-			each trip: trip.
+			each
+				owner: graph;
+				stop: stop;
+				trip: trip.
 
 			trip times add: each.
 			stop times add: each ].
@@ -69,6 +80,7 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 						        arrivalTime: to arrivalTime;
 						        departureTime: from departureTime;
 						        trip: trip;
+						        owner: graph;
 						        yourself.
 
 					from stop temporalOutgoingNeighborhood add: edge.
@@ -79,7 +91,7 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		stop sortTemporalNeighborhoods.
 		temporalEdges addAll: stop temporalOutgoingNeighborhood ].
 
-	^ self new
+	^ graph
 		  temporalEdges: temporalEdges timsort;
 		  routes: routes;
 		  stops: stopsMap;

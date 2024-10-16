@@ -30,7 +30,9 @@ PNRRCN4RequestsSample class >> requests: aCollection onSystem: aSystem [
 						        nil ]);
 			       time: (DateAndTime fromUnixTime: request unixTime) asTime.
 
-		       keep ifTrue: [ count := count + request multiplicity ].
+		       keep ifTrue: [
+			       count := count + request multiplicity.
+			       request owner: aSystem ].
 
 		       keep ].
 
@@ -60,9 +62,10 @@ PNRRCN4RequestsSample >> isRequest: req lessThanRequest: anotherReq [
 ]
 
 { #category : 'estimation' }
-PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
+PNRRCN4RequestsSample >> occupancyAndCrowding [
 
-	| aw at k oMatrix cVector res |
+	| aw at k oMatrix cVector res edges |
+	edges := self temporalEdges.
 	k := self requests size asFloat.
 	aw := at := 0.0.
 	oMatrix := Dictionary new.
@@ -72,7 +75,8 @@ PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
 		| path multiplicity |
 		multiplicity := q multiplicity asFloat / k.
 
-		path := q earliestArrivalTimePathOnEdgeStream: edges.
+		path := q earliestArrivalTimePath.
+
 		1 to: path size - 1 do: [ :i |
 			| edge nextEdge c |
 			edge := path at: i.
@@ -84,8 +88,8 @@ PNRRCN4RequestsSample >> occupancyAndCrowdingOnEdgeStream: edges [
 			at := at + edge duration asFloatSeconds.
 
 			edge trip = nextEdge trip ifFalse: [
-				edge arrivalTime asFloatSeconds + 1.0 to:
-					nextEdge departureTime asFloatSeconds - 1.0 do: [ :secs |
+				edge arrivalTime asFloatSeconds + 60.0 to:
+					nextEdge departureTime asFloatSeconds - 60.0 by: 60.0 do: [ :secs |
 					| col |
 					col := oMatrix at: secs ceiling ifAbsentPut: [ Dictionary new ].
 
@@ -124,6 +128,14 @@ PNRRCN4RequestsSample >> requests: anObject [
 
 	requests := anObject sorted: [ :req :anotherReq |
 		            self isRequest: req lessThanRequest: anotherReq ]
+]
+
+{ #category : 'accessing' }
+PNRRCN4RequestsSample >> temporalEdges [
+
+	^ self requests
+		  ifEmpty: [ Array new ]
+		  ifNotEmpty: [ :reqs | reqs first owner temporalEdges ]
 ]
 
 { #category : 'accessing' }

@@ -64,13 +64,12 @@ PNRRCN4TripRequest >> displayStringOn: aStream [
 ]
 
 { #category : 'paths - earliest arrival time' }
-PNRRCN4TripRequest >> earliestArrivalTimePathOnEdgeStream: edgesStream [
+PNRRCN4TripRequest >> earliestArrivalTimePath [
 
 	| paths |
 	paths := self fromStop
-		         earliestArrivalTimePathsOnEdgeStream: edgesStream
-		         fromTime: self time
-		         toTime: edgesStream last departureTime.
+		         earliestArrivalTimePathsFromTime: self time
+		         toTime: self owner temporalEdges last departureTime.
 
 	^ paths at: self toStop ifAbsent: [ OrderedCollection new ]
 ]
