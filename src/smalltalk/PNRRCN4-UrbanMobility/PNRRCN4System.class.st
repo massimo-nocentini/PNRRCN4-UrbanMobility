@@ -140,6 +140,18 @@ PNRRCN4System >> exportTemporalGraphInSexpFormatOnStream: aStream [
 	aStream << '))'
 ]
 
+{ #category : 'printing' }
+PNRRCN4System >> printOn: aStream [
+
+	aStream << 'a temporal graph (V, E) such that |V| = '.
+
+	self stops size printOn: aStream.
+
+	aStream << ' and |E| = '.
+
+	self temporalEdges size printOn: aStream
+]
+
 { #category : 'accessing' }
 PNRRCN4System >> routes [
 

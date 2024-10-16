@@ -64,7 +64,8 @@ PNRRCN4RequestsSample >> isRequest: req lessThanRequest: anotherReq [
 { #category : 'estimation' }
 PNRRCN4RequestsSample >> occupancyAndCrowding [
 
-	| aw at k oMatrix cVector res edges |
+	| aw at k oMatrix cVector res edges timeStep |
+	timeStep := 60.0.
 	edges := self temporalEdges.
 	k := self requests size asFloat.
 	aw := at := 0.0.
@@ -88,8 +89,9 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 			at := at + edge duration asFloatSeconds.
 
 			edge trip = nextEdge trip ifFalse: [
-				edge arrivalTime asFloatSeconds + 60.0 to:
-					nextEdge departureTime asFloatSeconds - 60.0 by: 60.0 do: [ :secs |
+				edge arrivalTime asFloatSeconds + timeStep to:
+					nextEdge departureTime asFloatSeconds - timeStep by: timeStep do: [
+					:secs |
 					| col |
 					col := oMatrix at: secs ceiling ifAbsentPut: [ Dictionary new ].
 
@@ -98,7 +100,7 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 						update: [ :o | o + multiplicity ]
 						initial: multiplicity.
 
-					aw := aw + 1.0 ] ] ] ].
+					aw := aw + timeStep ] ] ] ].
 
 	res := Dictionary new.
 	oMatrix keysAndValuesDo: [ :t :dict |
