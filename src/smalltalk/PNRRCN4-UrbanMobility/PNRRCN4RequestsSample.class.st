@@ -10,22 +10,15 @@ Class {
 	#tag : 'API'
 }
 
-{ #category : 'sorting' }
-PNRRCN4RequestsSample class >> defaultIsRequest: req lessThanRequest: anotherReq [
-
-	^ req time = anotherReq time
-		  ifTrue: [ req multiplicity < anotherReq multiplicity ]
-		  ifFalse: [ req time < anotherReq time ]
-]
-
 { #category : 'instance creation' }
 PNRRCN4RequestsSample class >> requests: aCollection onSystem: aSystem [
 
-	| col keep count stops |
+	| col count stops |
 	stops := aSystem stops.
 	count := 0.
 
 	col := aCollection select: [ :request |
+		       | keep |
 		       keep := true.
 
 		       request
@@ -56,6 +49,14 @@ PNRRCN4RequestsSample >> displayStringOn: aStream [
 		<< ' requests by ';
 		<< self totalCount asString;
 		<< ' people'
+]
+
+{ #category : 'testing' }
+PNRRCN4RequestsSample >> isRequest: req lessThanRequest: anotherReq [
+
+	^ req time = anotherReq time
+		  ifTrue: [ req multiplicity < anotherReq multiplicity ]
+		  ifFalse: [ req time < anotherReq time ]
 ]
 
 { #category : 'estimation' }
@@ -122,9 +123,7 @@ PNRRCN4RequestsSample >> requests [
 PNRRCN4RequestsSample >> requests: anObject [
 
 	requests := anObject sorted: [ :req :anotherReq |
-		            self class
-			            defaultIsRequest: req
-			            lessThanRequest: anotherReq ]
+		            self isRequest: req lessThanRequest: anotherReq ]
 ]
 
 { #category : 'accessing' }
@@ -149,32 +148,30 @@ PNRRCN4RequestsSample >> weightedSampleAbsoluteError: epsilon prob: p [
 { #category : 'sampling' }
 PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 
-	| random remaining pool sample attempts count |
+	| random remaining pool sample count |
+	aSize >= self requests size ifTrue: [ ^ self ].
+
 	random := RSRandom seed: Number firstCarmichaelNumber.
 
 	pool := OrderedCollection new
 		        addAll: self requests;
 		        yourself.
 
-	remaining := aSize min: pool size.
-	attempts := 0.
+	remaining := aSize.
 	count := 0.
 
 	sample := Array new: remaining streamContents: [ :aStream |
 		          [ remaining > 0 ] whileTrue: [
 			          | i req prob multiplicity |
-			          attempts := attempts + 1. "one more attempt, just for debugging."
 			          i := random nextInteger: pool size. "try an index."
 			          req := pool at: i. "retrive the actual request."
 			          multiplicity := req multiplicity. "bind its multiplicity"
-			          prob := (multiplicity / totalCount) asFloat. "compute its frequence, aka probability mass."
-			          random next <= prob ifTrue: [
+			          prob := multiplicity / totalCount. "compute its frequence, aka probability mass."
+			          random next <= prob asFloat ifTrue: [
 				          aStream nextPut: req. "take it!"
 				          pool removeAt: i. "remove from the remaining possibilities."
 				          count := count + multiplicity. "accumulate the number of people."
 				          remaining := remaining - 1 "one less to do" ] ] ].
-
-	self traceCr: 'Attempts for sampling: ' , attempts asString.
 
 	^ self class new
 		  requests: sample;
