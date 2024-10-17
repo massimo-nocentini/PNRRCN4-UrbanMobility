@@ -14,33 +14,7 @@ Class {
 }
 
 { #category : 'instance creation' }
-PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
-
-	| routesMap stopsMap tripsMap temporalEdges graph |
-	graph := self new.
-
-	routesMap := Dictionary new.
-	routes do: [ :each |
-		each owner: graph.
-		routesMap at: each id put: each ].
-
-	stopsMap := Dictionary new.
-	stops do: [ :each |
-		each owner: graph.
-		stopsMap at: each id put: each ].
-
-	tripsMap := Dictionary new.
-	trips do: [ :each |
-		| route |
-		"Tying the 1-to-many relation with the routes."
-		route := routesMap at: each routeId.
-		route trips add: each.
-
-		each
-			route: route;
-			owner: graph.
-
-		tripsMap at: each id put: each ].
+PNRRCN4System class >> manyToManyTimes: times tripsMap: tripsMap stopsMap: stopsMap onGraph: graph [
 
 	times
 		select: [ :each |
@@ -56,7 +30,84 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 				trip: trip.
 
 			trip times add: each.
-			stop times add: each ].
+			stop times add: each ]
+]
+
+{ #category : 'instance creation' }
+PNRRCN4System class >> mapOfRoutes: routes onGraph: graph [
+
+	| routesMap |
+	routesMap := Dictionary new.
+	routes do: [ :each |
+		each owner: graph.
+		routesMap at: each id put: each ].
+	^ routesMap
+]
+
+{ #category : 'instance creation' }
+PNRRCN4System class >> mapOfStops: stops onGraph: graph [
+
+	| stopsMap |
+	stopsMap := Dictionary new.
+	stops do: [ :each |
+		each owner: graph.
+		stopsMap at: each id put: each ].
+	^ stopsMap
+]
+
+{ #category : 'instance creation' }
+PNRRCN4System class >> mapOfTrips: trips routesMap: routesMap onGraph: graph [
+
+	| tripsMap |
+	tripsMap := Dictionary new.
+	trips do: [ :each |
+		| route |
+		"Tying the 1-to-many relation with the routes."
+		route := routesMap at: each routeId.
+		route trips add: each.
+
+		each
+			route: route;
+			owner: graph.
+
+		tripsMap at: each id put: each ].
+
+	^ tripsMap
+]
+
+{ #category : 'instance creation' }
+PNRRCN4System class >> newTemporalEdgeFrom: from to: to trip: trip onGraph: graph [
+
+	^ PNRRCN4TemporalEdge new
+		  from: from stop;
+		  to: to stop;
+		  arrivalTime: to arrivalTime;
+		  departureTime: from departureTime;
+		  trip: trip;
+		  owner: graph;
+		  yourself
+]
+
+{ #category : 'instance creation' }
+PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
+
+	| routesMap stopsMap tripsMap temporalEdges graph |
+	graph := self new.
+
+	routesMap := self mapOfRoutes: routes onGraph: graph.
+
+	stopsMap := self mapOfStops: stops onGraph: graph.
+
+	tripsMap := self
+		            mapOfTrips: trips
+		            routesMap: routesMap
+		            onGraph: graph.
+
+	self
+		manyToManyTimes: times
+		tripsMap: tripsMap
+		stopsMap: stopsMap
+		onGraph: graph.
 
 	routes do: [ :route |
 		route trips do: [ :trip |
@@ -64,14 +115,11 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 				sort: [ :t1 :t2 | t1 sequence < t2 sequence ];
 				overlappingPairsDo: [ :from :to |
 					| edge |
-					edge := PNRRCN4TemporalEdge new
-						        from: from stop;
-						        to: to stop;
-						        arrivalTime: to arrivalTime;
-						        departureTime: from departureTime;
-						        trip: trip;
-						        owner: graph;
-						        yourself.
+					edge := self
+						        newTemporalEdgeFrom: from
+						        to: to
+						        trip: trip
+						        onGraph: graph.
 
 					from stop temporalOutgoingNeighborhood add: edge.
 					to stop temporalIncomingNeighborhood add: edge ] ] ].
@@ -88,6 +136,12 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		  times: times;
 		  trips: tripsMap;
 		  yourself
+]
+
+{ #category : 'visiting' }
+PNRRCN4System >> acceptSlotDescriptorsVisitor: aVisitor [
+
+	^ aVisitor visitPNRRCN4Graph: self
 ]
 
 { #category : 'export' }
