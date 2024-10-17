@@ -156,7 +156,7 @@ PNRRCN4Stop >> printOn: aStream [
 	aStream << ')'
 ]
 
-{ #category : 'sorting' }
+{ #category : 'neighborhoods' }
 PNRRCN4Stop >> sortTemporalNeighborhoods [
 
 	temporalOutgoingNeighborhood := temporalOutgoingNeighborhood timsort.
@@ -164,16 +164,37 @@ PNRRCN4Stop >> sortTemporalNeighborhoods [
 	temporalIncomingNeighborhood := temporalIncomingNeighborhood timsort
 ]
 
-{ #category : 'accessing' }
+{ #category : 'neighborhoods' }
 PNRRCN4Stop >> temporalIncomingNeighborhood [
 
 	^ temporalIncomingNeighborhood
 ]
 
-{ #category : 'accessing' }
+{ #category : 'neighborhoods' }
 PNRRCN4Stop >> temporalOutgoingNeighborhood [
 
 	^ temporalOutgoingNeighborhood
+]
+
+{ #category : 'neighborhoods' }
+PNRRCN4Stop >> temporalOutgoingNeighborhoodGroupedByDestination [
+
+	| map |
+	map := IdentityDictionary new.
+
+	self temporalOutgoingNeighborhood do: [ :edge |
+		| group |
+		group := map at: edge to ifAbsentPut: [ Set new ].
+
+		group add: edge departureTime ].
+
+	map keysDo: [ :stop |
+		map
+			at: stop
+			update: [ :assocs |
+			assocs timsort: [ :time | time asFloatSeconds ] ] ].
+
+	^ map
 ]
 
 { #category : 'accessing' }
