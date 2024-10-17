@@ -5,6 +5,53 @@ Class {
 	#package : 'PNRRCN4-UrbanMobility-Tests'
 }
 
+{ #category : 'notebook' }
+PNRRCN4NotebookTest >> implementationNotebook: thisNotebook [
+
+	<notebook>
+	| florence |
+	thisNotebook title: 'Occupancy and crowding in Florence'.
+
+	"# Intro"
+
+	"The transport network of Florence can be introduced with the following message:"
+
+	florence := PNRRCN4FlorenceGraph instance.
+
+	"# Earliest Arrival Time Paths"
+
+	PNRRCN4Stop >> #earliestArrivalTimePathsFromTime:toTime:.
+
+	PNRRCN4Stop >> #earliestArrivalTimePathsFromTime:toTime:paths:.
+
+	PNRRCN4TemporalEdge >> #earliestArrivalTimeMaxTime:pathsSoFar:.
+
+	"# Sampling"
+
+	PNRRCN4RequestsSample >> #weightedSampleAbsoluteError:prob:.
+
+	PNRRCN4RequestsSample >> #weightedSampleOfSize:.
+
+	"# Parsing the data sources"
+
+	PNRRCN4System class >> #routes:stops:times:trips:.
+
+	"## Routes"
+	PNRRCN4Route class >> #onFileReference:.
+
+	"## Stops"
+	PNRRCN4Stop class >> #onFileReference:.
+
+	"## Times"
+	PNRRCN4StopTime class >> #onFileReference:.
+
+	"## Trips"
+	PNRRCN4Trip class >> #onFileReference:.
+
+	"## Requests"
+	PNRRCN4TripRequest class >> #onFileReference:
+]
+
 { #category : 'tests' }
 PNRRCN4NotebookTest >> testLoadingRequests [
 

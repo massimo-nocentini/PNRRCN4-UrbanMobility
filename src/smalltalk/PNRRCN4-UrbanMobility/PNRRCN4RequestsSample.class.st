@@ -154,9 +154,30 @@ PNRRCN4RequestsSample >> totalCount: anObject [
 
 { #category : 'sampling' }
 PNRRCN4RequestsSample >> weightedSampleAbsoluteError: epsilon prob: p [
+	"
+
+According to Hoeffding's bound
+
+$$
+\mathbb{P} \left\lbrace \left| y_{S_{k}} - \hat{y}\right| \ge \epsilon \right\rbrace \le 2 e^{-2 k \epsilon^{2}}
+$$
+
+in order to find the size $k$ of the sample we make the previous right hand side equals to a probability $p$
+
+$$
+ 2 e^{-2 k \epsilon^{2}} = p
+$$
+
+such that the probability to make an absolute mistake greater than epsilon is less than $p$.
+
+$$
+ k  = -{{log_{e}{p} - log_{e}{2}}\over{2 \epsilon^{2}}}
+$$
+	
+	"
 
 	^ self weightedSampleOfSize:
-		  (p halved ln negated halved / epsilon squared) ceiling
+		  (p halved ln halved / epsilon squared) negated ceiling
 ]
 
 { #category : 'sampling' }
@@ -180,7 +201,7 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 			          i := random nextInteger: pool size. "try an index."
 			          req := pool at: i. "retrive the actual request."
 			          multiplicity := req multiplicity. "bind its multiplicity"
-			          prob := multiplicity / totalCount. "compute its frequence, aka probability mass."
+			          prob := multiplicity / self totalCount. "compute its frequence, aka probability mass."
 			          random next <= prob asFloat ifTrue: [
 				          aStream nextPut: req. "take it!"
 				          pool removeAt: i. "remove from the remaining possibilities."
