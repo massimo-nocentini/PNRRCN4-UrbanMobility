@@ -1,6 +1,8 @@
 Class {
 	#name : 'PNRRCN4NotebookTest',
 	#superclass : 'TestCase',
+	#traits : 'TIceImagesExporting',
+	#classTraits : 'TIceImagesExporting classTrait',
 	#category : 'PNRRCN4-UrbanMobility-Tests',
 	#package : 'PNRRCN4-UrbanMobility-Tests'
 }
@@ -19,6 +21,9 @@ PNRRCN4NotebookTest >> implementationNotebook: thisNotebook [
 	florence := PNRRCN4FlorenceGraph instance.
 
 	"# Earliest Arrival Time Paths"
+
+	'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/earliest arrival time.pdf'
+		asFileReference asPdf pages.
 
 	PNRRCN4Stop >> #earliestArrivalTimePathsFromTime:toTime:.
 
@@ -50,6 +55,15 @@ PNRRCN4NotebookTest >> implementationNotebook: thisNotebook [
 
 	"## Requests"
 	PNRRCN4TripRequest class >> #onFileReference:
+]
+
+{ #category : 'tests' }
+PNRRCN4NotebookTest >> testExportImplementationNotebook [
+
+	self timeLimit: 1 minute.
+
+	self exportSlotsGraphOf:
+		(self class >> #implementationNotebook:) asNotebook
 ]
 
 { #category : 'tests' }
