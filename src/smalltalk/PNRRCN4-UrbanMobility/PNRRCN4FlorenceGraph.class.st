@@ -1,9 +1,9 @@
 Class {
 	#name : 'PNRRCN4FlorenceGraph',
 	#superclass : 'PNRRCN4KnownGraph',
-	#category : 'PNRRCN4-UrbanMobility-API',
+	#category : 'PNRRCN4-UrbanMobility-Case studies',
 	#package : 'PNRRCN4-UrbanMobility',
-	#tag : 'API'
+	#tag : 'Case studies'
 }
 
 { #category : 'class initialization' }

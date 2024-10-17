@@ -4,9 +4,9 @@ Class {
 	#classVars : [
 		'Instance'
 	],
-	#category : 'PNRRCN4-UrbanMobility-API',
+	#category : 'PNRRCN4-UrbanMobility-Case studies',
 	#package : 'PNRRCN4-UrbanMobility',
-	#tag : 'API'
+	#tag : 'Case studies'
 }
 
 { #category : 'accessing' }
