@@ -13,16 +13,6 @@ Class {
 	#tag : 'API'
 }
 
-{ #category : 'examples' }
-PNRRCN4System class >> florence [
-
-	^ self
-		  routes: PNRRCN4Route florence
-		  stops: PNRRCN4Stop florence
-		  times: PNRRCN4StopTime florence
-		  trips: PNRRCN4Trip florence
-]
-
 { #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 

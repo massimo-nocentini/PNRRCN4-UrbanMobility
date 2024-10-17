@@ -16,14 +16,6 @@ Class {
 	#tag : 'Core'
 }
 
-{ #category : 'instance creation' }
-PNRRCN4StopTime class >> florence [
-
-	^ self onFileReference:
-		  'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/stop_times.txt'
-			  asFileReference
-]
-
 { #category : 'parsing' }
 PNRRCN4StopTime class >> onFileReference: fr [
 

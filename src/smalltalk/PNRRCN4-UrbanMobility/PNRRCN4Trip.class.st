@@ -1,3 +1,6 @@
+"
+An instance $t$ of mine represents a _bus_ in a transport network.
+"
 Class {
 	#name : 'PNRRCN4Trip',
 	#superclass : 'PNRRCN4Object',
@@ -5,7 +8,6 @@ Class {
 		'routeId',
 		'id',
 		'head',
-		'direction',
 		'times',
 		'route'
 	],
@@ -13,14 +15,6 @@ Class {
 	#package : 'PNRRCN4-UrbanMobility',
 	#tag : 'Core'
 }
-
-{ #category : 'instance creation' }
-PNRRCN4Trip class >> florence [
-
-	^ self onFileReference:
-		  'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/trips.txt'
-			  asFileReference
-]
 
 { #category : 'parsing' }
 PNRRCN4Trip class >> onFileReference: fr [
@@ -36,20 +30,8 @@ PNRRCN4Trip class >> onFileReference: fr [
 		  addField: #id:;
 		  addField: #head:;
 		  addIgnoredField;
-		  addField: #direction:;
+		  addIgnoredField;
 		  upToEnd
-]
-
-{ #category : 'accessing' }
-PNRRCN4Trip >> direction [
-
-	^ direction
-]
-
-{ #category : 'accessing' }
-PNRRCN4Trip >> direction: anObject [
-
-	direction := anObject
 ]
 
 { #category : 'displaying' }

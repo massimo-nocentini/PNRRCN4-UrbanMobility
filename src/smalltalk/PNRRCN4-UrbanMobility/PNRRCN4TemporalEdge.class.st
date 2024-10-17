@@ -68,7 +68,7 @@ PNRRCN4TemporalEdge >> duration [
 PNRRCN4TemporalEdge >> earliestArrivalTimeMaxTime: maxTime pathsSoFar: earliestArrivalTimePaths [
 
 	| t tu tv at |
-	at := arrivalTime asFloatSeconds.
+	at := self arrivalTime asFloatSeconds.
 
 	at <= maxTime ifFalse: [ ^ self ].
 
