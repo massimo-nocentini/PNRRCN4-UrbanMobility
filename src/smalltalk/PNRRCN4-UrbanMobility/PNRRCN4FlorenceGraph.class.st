@@ -9,6 +9,8 @@ Class {
 { #category : 'class initialization' }
 PNRRCN4FlorenceGraph class >> initialize [
 
+	'Time to load the Florence transport network: ' trace.
+
 	[
 	Instance := PNRRCN4System
 		            routes: self routes
