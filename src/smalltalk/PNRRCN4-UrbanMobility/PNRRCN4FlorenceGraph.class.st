@@ -43,6 +43,22 @@ PNRRCN4FlorenceGraph class >> times [
 			  asFileReference
 ]
 
+{ #category : 'instance creation' }
+PNRRCN4FlorenceGraph class >> tripRequests1 [
+
+	^ PNRRCN4TripRequest onFileReference:
+		  'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/requests/requests_K10649_N30161.csv'
+			  asFileReference
+]
+
+{ #category : 'instance creation' }
+PNRRCN4FlorenceGraph class >> tripRequests2 [
+
+	^ PNRRCN4TripRequest onFileReference:
+		  'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/requests/requests_K30161_N30161.csv'
+			  asFileReference
+]
+
 { #category : 'class initialization' }
 PNRRCN4FlorenceGraph class >> trips [
 

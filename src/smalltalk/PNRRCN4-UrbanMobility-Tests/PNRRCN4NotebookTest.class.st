@@ -68,8 +68,8 @@ PNRRCN4NotebookTest >> testExportImplementationNotebook [
 PNRRCN4NotebookTest >> testLoadingRequests [
 
 	self
-		assert: PNRRCN4TripRequest florence1 size equals: 10649;
-		assert: PNRRCN4TripRequest florence2 size equals: 30161
+		assert: PNRRCN4FlorenceGraph tripRequests1 size equals: 10649;
+		assert: PNRRCN4FlorenceGraph tripRequests2 size equals: 30161
 ]
 
 { #category : 'tests' }

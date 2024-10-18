@@ -16,22 +16,6 @@ Class {
 }
 
 { #category : 'instance creation' }
-PNRRCN4TripRequest class >> florence1 [
-
-	^ self onFileReference:
-		  'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/requests/requests_K10649_N30161.csv'
-			  asFileReference
-]
-
-{ #category : 'instance creation' }
-PNRRCN4TripRequest class >> florence2 [
-
-	^ self onFileReference:
-		  'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/florence/requests/requests_K30161_N30161.csv'
-			  asFileReference
-]
-
-{ #category : 'instance creation' }
 PNRRCN4TripRequest class >> onFileReference: fr [
 
 	^ (NeoCSVReader on: fr readStream)
