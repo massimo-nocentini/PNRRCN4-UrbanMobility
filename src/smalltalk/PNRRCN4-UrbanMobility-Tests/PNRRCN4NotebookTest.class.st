@@ -55,6 +55,25 @@ PNRRCN4NotebookTest >> implementationNotebook: thisNotebook [
 	PNRRCN4TripRequest class >> #onFileReference:
 ]
 
+{ #category : 'notebooks' }
+PNRRCN4NotebookTest >> occupancyAndCrowdingNotebook: thisNotebook [
+
+	<notebook>
+	| florence sample sample1 t res |
+	florence := PNRRCN4FlorenceGraph instance.
+
+	sample := PNRRCN4RequestsSample
+		          requests: PNRRCN4FlorenceGraph tripRequests1
+		          onSystem: florence.
+
+	sample1 := sample weightedSampleAbsoluteError: 0.1 prob: 0.001.
+
+	t := [ res := sample1 occupancyAndCrowding ] timeToRun.
+
+	'temp.scm' asFileReference writeStreamDo: [ :s |
+		florence exportTemporalGraphInSexpFormatOnStream: s ]
+]
+
 { #category : 'tests' }
 PNRRCN4NotebookTest >> testExportImplementationNotebook [
 
