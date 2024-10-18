@@ -71,7 +71,7 @@ PNRRCN4TripRequest >> earliestArrivalTimePath [
 		         earliestArrivalTimePathsFromTime: self time
 		         toTime: self owner temporalEdges last departureTime.
 
-	^ paths at: self toStop ifAbsent: [ OrderedCollection new ]
+	^ paths at: self toStop ifAbsent: [ Array new ]
 ]
 
 { #category : 'accessing' }

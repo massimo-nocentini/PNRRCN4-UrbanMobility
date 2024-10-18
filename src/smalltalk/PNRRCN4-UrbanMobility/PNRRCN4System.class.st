@@ -164,18 +164,22 @@ PNRRCN4System >> exportTemporalGraphInSexpFormatOnStream: aStream [
 			<< stop code;
 			space.
 
-		stop temporalOutgoingNeighborhood do: [ :assoc |
-			| destStop time |
-			destStop := assoc key.
-			time := assoc value.
+		stop temporalOutgoingNeighborhoodGroupedByDestination
+			keysAndValuesDo: [ :to :tCol |
+				aStream
+					<< '(';
+					<< to code;
+					space;
+					<< '('.
 
-			aStream
-				<< '(';
-				<< destStop code;
-				space;
-				<< time asSeconds asString;
-				<< ')';
-				space ].
+				tCol do: [ :t |
+					aStream
+						<< t asFloatSeconds asString;
+						space ].
+
+				aStream
+					<< '))';
+					space ].
 
 		aStream
 			<< ')';

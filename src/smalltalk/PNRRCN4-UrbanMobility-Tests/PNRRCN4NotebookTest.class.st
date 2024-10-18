@@ -7,7 +7,7 @@ Class {
 	#package : 'PNRRCN4-UrbanMobility-Tests'
 }
 
-{ #category : 'notebook' }
+{ #category : 'notebooks' }
 PNRRCN4NotebookTest >> implementationNotebook: thisNotebook [
 
 	<notebook>
@@ -26,8 +26,6 @@ PNRRCN4NotebookTest >> implementationNotebook: thisNotebook [
 		asFileReference asPdf pages.
 
 	PNRRCN4Stop >> #earliestArrivalTimePathsFromTime:toTime:.
-
-	PNRRCN4Stop >> #earliestArrivalTimePathsFromTime:toTime:paths:.
 
 	PNRRCN4TemporalEdge >> #earliestArrivalTimeMaxTime:pathsSoFar:.
 
