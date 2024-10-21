@@ -61,6 +61,24 @@ PNRRCN4OccupancyAndCrowding >> occupancyMatrix: anObject [
 	occupancyMatrix := anObject
 ]
 
+{ #category : 'printing' }
+PNRRCN4OccupancyAndCrowding >> printOn: aStream [
+
+	| avg |
+	aStream << 'In average: waiting time '.
+	self averageWaiting printOn: aStream.
+
+	aStream << ', travelling time '.
+	self averageTime printOn: aStream.
+
+	avg := self crowdingVector
+		       foldr: [ :each :count | each value + count ]
+		       init: 0.
+
+	aStream << ', people per edge '.
+	(avg / self crowdingVector size) asFloat printOn: aStream
+]
+
 { #category : 'accessing' }
 PNRRCN4OccupancyAndCrowding >> requestsSample [
 
