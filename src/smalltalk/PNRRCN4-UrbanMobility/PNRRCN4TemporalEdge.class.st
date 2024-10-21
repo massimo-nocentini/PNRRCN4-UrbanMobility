@@ -125,7 +125,11 @@ PNRRCN4TemporalEdge >> printOn: aStream [
 
 	aStream << ' in '.
 
-	self duration printOn: aStream
+	self duration printOn: aStream.
+
+	aStream << ' by '.
+
+	self trip printOn: aStream
 ]
 
 { #category : 'sorting' }

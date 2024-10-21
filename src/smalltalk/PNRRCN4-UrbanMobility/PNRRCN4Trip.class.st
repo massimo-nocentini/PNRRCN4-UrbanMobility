@@ -34,25 +34,6 @@ PNRRCN4Trip class >> onFileReference: fr [
 		  upToEnd
 ]
 
-{ #category : 'displaying' }
-PNRRCN4Trip >> displayStringOn: aStream [
-
-	self head displayStringOn: aStream.
-
-	aStream << ' '.
-
-	self times size displayStringOn: aStream.
-	aStream << ' stops in '.
-
-	(Duration seconds: (self times last arrivalTime asFloatSeconds
-		  - self times first departureTime asFloatSeconds) abs)
-		displayStringOn: aStream.
-
-	aStream << ' at '.
-
-	self times first departureTime displayStringOn: aStream
-]
-
 { #category : 'accessing' }
 PNRRCN4Trip >> head [
 
@@ -83,6 +64,27 @@ PNRRCN4Trip >> initialize [
 	super initialize.
 
 	times := OrderedCollection new
+]
+
+{ #category : 'displaying' }
+PNRRCN4Trip >> printOn: aStream [
+
+	aStream
+		<< self head;
+		<< ' ('.
+
+	self times size printOn: aStream.
+	aStream << ' stops in '.
+
+	(Duration seconds: (self times last arrivalTime asFloatSeconds
+		  - self times first departureTime asFloatSeconds) abs) printOn:
+		aStream.
+
+	aStream << ' at '.
+
+	self times first departureTime printOn: aStream.
+
+	aStream << ')'
 ]
 
 { #category : 'accessing' }
