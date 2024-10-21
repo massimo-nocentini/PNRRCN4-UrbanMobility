@@ -8,9 +8,9 @@ Class {
 		'occupancyMatrix',
 		'crowdingVector'
 	],
-	#category : 'PNRRCN4-UrbanMobility-Core',
+	#category : 'PNRRCN4-UrbanMobility-API',
 	#package : 'PNRRCN4-UrbanMobility',
-	#tag : 'Core'
+	#tag : 'API'
 }
 
 { #category : 'accessing' }
@@ -77,6 +77,46 @@ PNRRCN4OccupancyAndCrowding >> printOn: aStream [
 
 	aStream << ', people per edge '.
 	(avg / self crowdingVector size) asFloat printOn: aStream
+]
+
+{ #category : 'printing' }
+PNRRCN4OccupancyAndCrowding >> printStringVerbose [
+
+	^ String streamContents: [ :aStream |
+		  self printOn: aStream.
+
+		  aStream
+			  cr;
+			  cr;
+			  << 'Crowding vector (most crowded first)';
+			  cr.
+
+		  self crowdingVector do: [ :each |
+			  each value printOn: aStream.
+			  aStream << ' people travelling in '.
+			  each key printOn: aStream.
+			  aStream cr ].
+
+		  aStream
+			  cr;
+			  cr;
+			  <<
+				  'Occupancy matrix (chronologically ordered, most crowded stops first)';
+			  cr.
+
+		  self occupancyMatrix do: [ :each |
+			  each key printOn: aStream.
+			  aStream << ':'.
+
+			  each value do: [ :assoc |
+				  aStream
+					  cr;
+					  tab.
+				  aStream << (assoc value * 100.00 printShowingDecimalPlaces: 2).
+				  aStream << '% of people waiting in '.
+				  assoc key printOn: aStream ].
+
+			  aStream cr ] ]
 ]
 
 { #category : 'accessing' }
