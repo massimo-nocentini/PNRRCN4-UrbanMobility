@@ -171,7 +171,7 @@ $$
 such that the probability to make an absolute mistake greater than epsilon is less than $p$.
 
 $$
- k  = -{{log_{e}{p} - log_{e}{2}}\over{2 \epsilon^{2}}}
+ k  = -\frac{log_{e}{p} - log_{e}{2}}{2 \epsilon^{2}}
 $$
 	
 	"
