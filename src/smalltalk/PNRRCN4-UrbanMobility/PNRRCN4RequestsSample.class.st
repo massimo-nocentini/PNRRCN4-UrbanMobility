@@ -3,7 +3,8 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'requests',
-		'totalCount'
+		'totalCount',
+		'timeStepInSeconds'
 	],
 	#category : 'PNRRCN4-UrbanMobility-API',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -42,6 +43,14 @@ PNRRCN4RequestsSample class >> requests: aCollection onSystem: aSystem [
 		  yourself
 ]
 
+{ #category : 'initialization' }
+PNRRCN4RequestsSample >> initialize [
+
+	super initialize.
+
+	self timeStepInSeconds: 60
+]
+
 { #category : 'testing' }
 PNRRCN4RequestsSample >> isRequest: req lessThanRequest: anotherReq [
 
@@ -53,16 +62,19 @@ PNRRCN4RequestsSample >> isRequest: req lessThanRequest: anotherReq [
 { #category : 'estimation' }
 PNRRCN4RequestsSample >> occupancyAndCrowding [
 
-	| aw at k oMatrix cVector res edges timeStep newDictionaryBlock |
+	| aw at k oMatrix cVector res timeStep newDictionaryBlock |
 	newDictionaryBlock := [ Dictionary new ].
 
-	timeStep := 60.0.
-	edges := self temporalEdges.
-	k := self requests size asFloat.
+	"Some parameters."
+	timeStep := self timeStepInSeconds asFloat.
+	k := self totalCount asFloat.
+
+	"The output."
 	aw := at := 0.0.
 	oMatrix := Dictionary new.
 	cVector := Dictionary new.
 
+	"Go!"
 	self requests do: [ :q |
 		| path multiplicity |
 		multiplicity := q multiplicity asFloat / k.
@@ -74,10 +86,10 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 			edge := path at: i.
 			nextEdge := path at: i + 1.
 
-			c := cVector at: edge ifAbsentPut: 0.
-			cVector at: edge put: c + 1.
+			c := cVector at: edge ifAbsentPut: 0.0.
+			cVector at: edge put: c + multiplicity.
 
-			at := at + edge duration asFloatSeconds.
+			at := at + (edge duration asFloatSeconds * multiplicity).
 
 			edge trip = nextEdge trip ifFalse: [
 				edge arrivalTime asFloatSeconds + timeStep to:
@@ -91,7 +103,7 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 						update: [ :o | o + multiplicity ]
 						initial: multiplicity.
 
-					aw := aw + timeStep ] ] ] ].
+					aw := aw + multiplicity ] ] ] ].
 
 	res := Dictionary new.
 	oMatrix keysAndValuesDo: [ :t :dict |
@@ -101,8 +113,8 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 
 	^ PNRRCN4OccupancyAndCrowding new
 		  requestsSample: self;
-		  averageTime: (Duration seconds: at / k);
-		  averageWaiting: (Duration seconds: aw / k);
+		  averageTime: (Duration seconds: at);
+		  averageWaiting: aw;
 		  occupancyMatrix:
 			  (res associations timsort: [ :assoc | assoc key asFloatSeconds ]);
 		  crowdingVector:
@@ -135,11 +147,15 @@ PNRRCN4RequestsSample >> requests: anObject [
 ]
 
 { #category : 'accessing' }
-PNRRCN4RequestsSample >> temporalEdges [
+PNRRCN4RequestsSample >> timeStepInSeconds [
 
-	^ self requests
-		  ifEmpty: [ Array new ]
-		  ifNotEmpty: [ :reqs | reqs first owner temporalEdges ]
+	^ timeStepInSeconds
+]
+
+{ #category : 'accessing' }
+PNRRCN4RequestsSample >> timeStepInSeconds: anObject [
+
+	timeStepInSeconds := anObject
 ]
 
 { #category : 'accessing' }
@@ -185,33 +201,30 @@ $$
 { #category : 'sampling' }
 PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 
-	| random remaining pool sample count |
-	aSize >= self requests size ifTrue: [ ^ self ].
+	| random pool sample |
+	aSize >= self totalCount ifTrue: [ ^ self ].
+
+	pool := OrderedCollection
+		        new: self totalCount
+		        streamContents: [ :aStream |
+			        self requests do: [ :q |
+				        | qq |
+				        qq := q copy
+					              multiplicity: 1;
+					              yourself.
+
+				        q multiplicity timesRepeat: [ aStream << qq ] ] ].
 
 	random := RSRandom new.
-
-	pool := OrderedCollection new
-		        addAll: self requests;
-		        yourself.
-
-	remaining := aSize.
-	count := 0.
-
-	sample := Array new: remaining streamContents: [ :aStream |
-		          [ remaining > 0 ] whileTrue: [
-			          | i req prob multiplicity |
-			          i := random nextInteger: pool size. "try an index."
-			          req := pool at: i. "retrive the actual request."
-			          multiplicity := req multiplicity. "bind its multiplicity"
-			          prob := multiplicity / self totalCount. "compute its frequence, aka probability mass."
-			          random next <= prob asFloat ifTrue: [
-				          aStream nextPut: req. "take it!"
-				          pool removeAt: i. "remove from the remaining possibilities."
-				          count := count + multiplicity. "accumulate the number of people."
-				          remaining := remaining - 1 "one less to do" ] ] ].
+	sample := Array new: aSize streamContents: [ :aStream |
+		          aSize timesRepeat: [
+			          | q i |
+			          i := random nextInteger: pool size.
+			          q := pool removeAt: i.
+			          aStream << q ] ].
 
 	^ self class new
 		  requests: sample;
-		  totalCount: count;
+		  totalCount: aSize;
 		  yourself
 ]

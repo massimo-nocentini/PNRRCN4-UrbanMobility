@@ -64,22 +64,13 @@ PNRRCN4OccupancyAndCrowding >> occupancyMatrix: anObject [
 { #category : 'printing' }
 PNRRCN4OccupancyAndCrowding >> printOn: aStream [
 
-	| avg |
-	aStream << 'In average: waiting time '.
-	self averageWaiting printOn: aStream.
+	aStream
+		<< 'In average: ';
+		<< self averageWaiting ceiling asString;
+		<< ' people wait at stops'.
 
 	aStream << ', travelling time '.
-	self averageTime printOn: aStream.
-
-	avg := self crowdingVector
-		       foldr: [ :each :count | each value + count ]
-		       init: 0.
-
-	avg := (avg / self crowdingVector size) asFloat.
-
-	aStream
-		<< ', people per edge ';
-		<< (avg printShowingDecimalPlaces: 2)
+	self averageTime printOn: aStream
 ]
 
 { #category : 'printing' }
@@ -102,8 +93,9 @@ PNRRCN4OccupancyAndCrowding >> printStringVerbose [
 			  cr.
 
 		  self crowdingVector do: [ :each |
-			  each value printOn: aStream.
-			  aStream << ' people travelling in '.
+			  aStream
+				  << (each value * 100.0 printShowingDecimalPlaces: 2);
+				  << '% people travelling in '.
 			  each key printOn: aStream.
 			  aStream cr ].
 
