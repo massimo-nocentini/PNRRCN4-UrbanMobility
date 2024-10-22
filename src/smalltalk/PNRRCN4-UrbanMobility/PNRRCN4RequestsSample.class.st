@@ -60,14 +60,17 @@ PNRRCN4RequestsSample >> isRequest: req lessThanRequest: anotherReq [
 ]
 
 { #category : 'estimation' }
-PNRRCN4RequestsSample >> occupancy: oMatrix crowding: cVector averageQty: pair [
+PNRRCN4RequestsSample >> occupancy: oMatrix crowding: cVector [
 
-	| k timeStep newDictionaryBlock |
+	| k timeStep newDictionaryBlock at aw |
 	newDictionaryBlock := [ Dictionary new ].
 
 	"Some parameters."
 	timeStep := self timeStepInSeconds asFloat.
 	k := self totalCount asFloat.
+
+	"Output."
+	at := aw := 0.0.
 
 	"Go!"
 	self requests do: [ :q |
@@ -84,9 +87,7 @@ PNRRCN4RequestsSample >> occupancy: oMatrix crowding: cVector averageQty: pair [
 			c := cVector at: edge ifAbsentPut: 0.0.
 			cVector at: edge put: c + multiplicity.
 
-			pair
-				at: 1
-				put: pair first + (edge duration asFloatSeconds * multiplicity).
+			at := at + (edge duration asFloatSeconds * multiplicity).
 
 			edge trip = nextEdge trip ifFalse: [
 				edge arrivalTime asFloatSeconds + timeStep to:
@@ -100,22 +101,19 @@ PNRRCN4RequestsSample >> occupancy: oMatrix crowding: cVector averageQty: pair [
 						update: [ :o | o + multiplicity ]
 						initial: multiplicity.
 
-					pair at: 2 put: pair second + multiplicity ] ] ] ]
+					aw := aw + multiplicity ] ] ] ].
+
+	^ Array with: at with: aw
 ]
 
 { #category : 'estimation' }
 PNRRCN4RequestsSample >> occupancyAndCrowding [
 
-	| aw at oMatrix cVector res pair |
+	| oMatrix cVector res pair |
 	"The output."
-	pair := { 0.0. 0.0 }.
 	oMatrix := Dictionary new.
 	cVector := Dictionary new.
-
-	self occupancy: oMatrix crowding: cVector averageQty: pair.
-
-	at := pair first.
-	aw := pair second.
+	pair := self occupancy: oMatrix crowding: cVector.
 
 	res := Dictionary new.
 	oMatrix keysAndValuesDo: [ :t :dict |
@@ -125,8 +123,8 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 
 	^ PNRRCN4OccupancyAndCrowding new
 		  requestsSample: self;
-		  averageTime: (Duration seconds: at);
-		  averageWaiting: aw;
+		  averageTime: (Duration seconds: pair first);
+		  averageWaiting: pair second;
 		  occupancyMatrix:
 			  (res associations timsort: [ :assoc | assoc key asFloatSeconds ]);
 		  crowdingVector:
