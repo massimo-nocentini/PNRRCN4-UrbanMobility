@@ -42,17 +42,6 @@ PNRRCN4RequestsSample class >> requests: aCollection onSystem: aSystem [
 		  yourself
 ]
 
-{ #category : 'displaying' }
-PNRRCN4RequestsSample >> displayStringOn: aStream [
-
-	aStream
-		<< 'Sample of ';
-		<< self requests size asString;
-		<< ' requests by ';
-		<< self totalCount asString;
-		<< ' people'
-]
-
 { #category : 'testing' }
 PNRRCN4RequestsSample >> isRequest: req lessThanRequest: anotherReq [
 
@@ -119,6 +108,17 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 		  crowdingVector:
 			  (cVector associations timsort: #value reverse: true);
 		  yourself
+]
+
+{ #category : 'displaying' }
+PNRRCN4RequestsSample >> printOn: aStream [
+
+	aStream
+		<< 'Sample of ';
+		<< self requests size asString;
+		<< ' requests by ';
+		<< self totalCount asString;
+		<< ' people'
 ]
 
 { #category : 'accessing' }

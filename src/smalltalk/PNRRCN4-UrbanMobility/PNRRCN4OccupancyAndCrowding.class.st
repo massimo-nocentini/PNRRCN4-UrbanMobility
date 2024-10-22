@@ -75,8 +75,11 @@ PNRRCN4OccupancyAndCrowding >> printOn: aStream [
 		       foldr: [ :each :count | each value + count ]
 		       init: 0.
 
-	aStream << ', people per edge '.
-	(avg / self crowdingVector size) asFloat printOn: aStream
+	avg := (avg / self crowdingVector size) asFloat.
+
+	aStream
+		<< ', people per edge ';
+		<< (avg printShowingDecimalPlaces: 2)
 ]
 
 { #category : 'printing' }
@@ -88,7 +91,14 @@ PNRRCN4OccupancyAndCrowding >> printStringVerbose [
 		  aStream
 			  cr;
 			  cr;
-			  << 'Crowding vector (most crowded first)';
+			  << '*** Requests sample';
+			  cr.
+		  self requestsSample printOn: aStream.
+
+		  aStream
+			  cr;
+			  cr;
+			  << '*** Crowding vector (most crowded edge first)';
 			  cr.
 
 		  self crowdingVector do: [ :each |
@@ -101,7 +111,7 @@ PNRRCN4OccupancyAndCrowding >> printStringVerbose [
 			  cr;
 			  cr;
 			  <<
-				  'Occupancy matrix (chronologically ordered, most crowded stops first)';
+				  '*** Occupancy matrix (chronologically ordered, most crowded stops first)';
 			  cr.
 
 		  self occupancyMatrix do: [ :each |
