@@ -60,19 +60,14 @@ PNRRCN4RequestsSample >> isRequest: req lessThanRequest: anotherReq [
 ]
 
 { #category : 'estimation' }
-PNRRCN4RequestsSample >> occupancyAndCrowding [
+PNRRCN4RequestsSample >> occupancy: oMatrix crowding: cVector averageQty: pair [
 
-	| aw at k oMatrix cVector res timeStep newDictionaryBlock |
+	| k timeStep newDictionaryBlock |
 	newDictionaryBlock := [ Dictionary new ].
 
 	"Some parameters."
 	timeStep := self timeStepInSeconds asFloat.
 	k := self totalCount asFloat.
-
-	"The output."
-	aw := at := 0.0.
-	oMatrix := Dictionary new.
-	cVector := Dictionary new.
 
 	"Go!"
 	self requests do: [ :q |
@@ -89,7 +84,9 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 			c := cVector at: edge ifAbsentPut: 0.0.
 			cVector at: edge put: c + multiplicity.
 
-			at := at + (edge duration asFloatSeconds * multiplicity).
+			pair
+				at: 1
+				put: pair first + (edge duration asFloatSeconds * multiplicity).
 
 			edge trip = nextEdge trip ifFalse: [
 				edge arrivalTime asFloatSeconds + timeStep to:
@@ -103,7 +100,22 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 						update: [ :o | o + multiplicity ]
 						initial: multiplicity.
 
-					aw := aw + multiplicity ] ] ] ].
+					pair at: 2 put: pair second + multiplicity ] ] ] ]
+]
+
+{ #category : 'estimation' }
+PNRRCN4RequestsSample >> occupancyAndCrowding [
+
+	| aw at oMatrix cVector res pair |
+	"The output."
+	pair := { 0.0. 0.0 }.
+	oMatrix := Dictionary new.
+	cVector := Dictionary new.
+
+	self occupancy: oMatrix crowding: cVector averageQty: pair.
+
+	at := pair first.
+	aw := pair second.
 
 	res := Dictionary new.
 	oMatrix keysAndValuesDo: [ :t :dict |
