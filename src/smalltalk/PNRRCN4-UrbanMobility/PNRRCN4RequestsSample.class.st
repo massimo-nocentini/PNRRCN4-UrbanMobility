@@ -181,6 +181,12 @@ PNRRCN4RequestsSample >> totalCount: anObject [
 ]
 
 { #category : 'sampling' }
+PNRRCN4RequestsSample >> weighted [
+
+	^ self weightedSampleOfSize: self totalCount
+]
+
+{ #category : 'sampling' }
 PNRRCN4RequestsSample >> weightedSampleAbsoluteError: epsilon prob: p [
 	"
 
@@ -212,7 +218,8 @@ $$
 PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 
 	| random pool sample |
-	aSize >= self totalCount ifTrue: [ ^ self ].
+	aSize > self totalCount ifTrue: [
+		Error signal: 'Requested too many people.' ].
 
 	pool := OrderedCollection
 		        new: self totalCount
