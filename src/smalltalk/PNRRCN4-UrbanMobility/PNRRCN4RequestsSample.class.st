@@ -221,22 +221,24 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 		        streamContents: [ :aStream |
 			        self requests do: [ :q |
 				        | qq |
-				        qq := q copy
-					              multiplicity: 1;
-					              yourself.
+				        qq := q copy.
 
 				        q multiplicity timesRepeat: [ aStream << qq ] ] ].
 
 	random := RSRandom new.
-	sample := Array new: aSize streamContents: [ :aStream |
-		          aSize timesRepeat: [
-			          | q i |
-			          i := random nextInteger: pool size.
-			          q := pool removeAt: i.
-			          aStream << q ] ].
+
+	sample := IdentityDictionary new: aSize.
+	aSize timesRepeat: [
+		| q i m |
+		i := random nextInteger: pool size.
+		q := pool removeAt: i.
+		m := sample at: q ifAbsentPut: 0.
+		sample at: q put: m + 1 ].
+
+	sample keysAndValuesDo: [ :q :m | q multiplicity: m ].
 
 	^ self class new
-		  requests: sample;
+		  requests: sample keys;
 		  totalCount: aSize;
 		  yourself
 ]
