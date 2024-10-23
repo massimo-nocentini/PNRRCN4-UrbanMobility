@@ -189,8 +189,10 @@ PNRRCN4RequestsSample >> weighted [
 { #category : 'sampling' }
 PNRRCN4RequestsSample >> weightedSampleAbsoluteError: epsilon prob: p [
 
-	| k |
-	k := (2.0 / p) ln / epsilon squared doubled.
+	| alpha k n |
+	n := self totalCount.
+	alpha := 2.0 / p log: n.
+	k := alpha * n ln / epsilon squared doubled.
 
 	^ self weightedSampleOfSize: k ceiling
 ]
