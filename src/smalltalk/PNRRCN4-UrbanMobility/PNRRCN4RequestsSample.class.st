@@ -188,30 +188,11 @@ PNRRCN4RequestsSample >> weighted [
 
 { #category : 'sampling' }
 PNRRCN4RequestsSample >> weightedSampleAbsoluteError: epsilon prob: p [
-	"
 
-According to Hoeffding's bound
+	| k |
+	k := (2.0 / p) ln / epsilon squared doubled.
 
-$$
-\mathbb{P} \left\lbrace \left| y_{S_{k}} - \hat{y}\right| \ge \epsilon \right\rbrace \le 2 e^{-2 k \epsilon^{2}}
-$$
-
-in order to find the size $k$ of the sample we make the previous right hand side equals to a probability $p$
-
-$$
- 2 e^{-2 k \epsilon^{2}} = p
-$$
-
-such that the probability to make an absolute mistake greater than epsilon is less than $p$.
-
-$$
- k  = -\frac{log_{e}{p} - log_{e}{2}}{2 \epsilon^{2}}
-$$
-	
-	"
-
-	^ self weightedSampleOfSize:
-		  (p halved ln halved / epsilon squared) negated ceiling
+	^ self weightedSampleOfSize: k ceiling
 ]
 
 { #category : 'sampling' }
