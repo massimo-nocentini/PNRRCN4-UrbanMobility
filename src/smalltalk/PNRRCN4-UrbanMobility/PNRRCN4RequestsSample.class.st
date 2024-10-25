@@ -213,7 +213,7 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 					              multiplicity: 1;
 					              yourself.
 
-				        q multiplicity timesRepeat: [ aStream << qq ] ] ].
+				        q multiplicity timesRepeat: [ aStream nextPut: qq ] ] ].
 
 	random := RSRandom new.
 
@@ -221,7 +221,7 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 	aSize timesRepeat: [
 		| q i m |
 		i := random nextInteger: pool size.
-		q := pool removeAt: i.
+		q := pool at: i. "using #at: means sampling with replacement, using #removeAt: means sampling without replacement."
 		m := sample at: q ifAbsentPut: 0.
 		sample at: q put: m + 1 ].
 
