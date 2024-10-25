@@ -209,7 +209,9 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 		        streamContents: [ :aStream |
 			        self requests do: [ :q |
 				        | qq |
-				        qq := q copy.
+				        qq := q copy
+					              multiplicity: 1;
+					              yourself.
 
 				        q multiplicity timesRepeat: [ aStream << qq ] ] ].
 
