@@ -28,6 +28,12 @@ PNRRCN4FlorenceGraph class >> instantiateInstance [
 		  trips: self trips
 ]
 
+{ #category : 'accessing' }
+PNRRCN4FlorenceGraph class >> resetInstance [
+
+	Instance := nil
+]
+
 { #category : 'class initialization' }
 PNRRCN4FlorenceGraph class >> routes [
 
