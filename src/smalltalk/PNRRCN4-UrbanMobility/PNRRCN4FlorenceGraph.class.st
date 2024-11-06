@@ -1,22 +1,31 @@
 Class {
 	#name : 'PNRRCN4FlorenceGraph',
-	#superclass : 'PNRRCN4KnownGraph',
+	#superclass : 'Object',
+	#classVars : [
+		'Instance'
+	],
 	#category : 'PNRRCN4-UrbanMobility-Case studies',
 	#package : 'PNRRCN4-UrbanMobility',
 	#tag : 'Case studies'
 }
 
-{ #category : 'class initialization' }
-PNRRCN4FlorenceGraph class >> initialize [
+{ #category : 'accessing' }
+PNRRCN4FlorenceGraph class >> instance [
 
-	'Time to load the Florence transport network: ' trace.
+	Instance ifNil: [
+		[ Instance := self instantiateInstance ] timeToRun traceCr ].
 
-	[
-	Instance := PNRRCN4System
-		            routes: self routes
-		            stops: self stops
-		            times: self times
-		            trips: self trips ] timeToRun traceCr
+	^ Instance
+]
+
+{ #category : 'instance creation' }
+PNRRCN4FlorenceGraph class >> instantiateInstance [
+
+	^ PNRRCN4System
+		  routes: self routes
+		  stops: self stops
+		  times: self times
+		  trips: self trips
 ]
 
 { #category : 'class initialization' }
