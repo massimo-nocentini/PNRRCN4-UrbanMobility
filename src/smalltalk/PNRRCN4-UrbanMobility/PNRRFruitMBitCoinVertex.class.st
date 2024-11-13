@@ -49,7 +49,7 @@ PNRRFruitMBitCoinVertex >> breadthFirstSearchRec [
 			          yourself.
 
 		  self outgoingNeighborhood do: [ :edge |
-			  edge to breadthFirstSearch keysAndValuesDo: [ :v :d |
+			  edge to breadthFirstSearchRec keysAndValuesDo: [ :v :d |
 				  | w dd |
 				  dd := d + 1.
 				  w := seen at: v ifAbsent: dd.

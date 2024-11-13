@@ -2,7 +2,8 @@ Class {
 	#name : 'PNRRFruitMBitCoinGraph',
 	#superclass : 'Object',
 	#instVars : [
-		'vertices'
+		'vertices',
+		'edges'
 	],
 	#classVars : [
 		'Instance'
@@ -43,6 +44,14 @@ PNRRFruitMBitCoinGraph class >> instance5m [
 ]
 
 { #category : 'accessing' }
+PNRRFruitMBitCoinGraph class >> instanceHuge [
+	" '/home/mn/Developer/bitcoin/small.txt'"
+
+	^ self onFileReference:
+		  '/Volumes/Data/bitcoin/pg-edges.txt' asFileReference
+]
+
+{ #category : 'accessing' }
 PNRRFruitMBitCoinGraph class >> newInstance [
 	" '/home/mn/Developer/bitcoin/small.txt'"
 
@@ -59,9 +68,13 @@ PNRRFruitMBitCoinGraph class >> onFileReference: aFileReference [
 	aFileReference exists ifTrue: [
 		aFileReference readStreamDo: [ :fileStream |
 			[ fileStream atEnd ] whileFalse: [
-				| line |
-				line := fileStream nextLine splitOn: Character tab.
-				graph addEdgeFrom: line first to: line second ] ] ].
+				| line i |
+				line := fileStream nextLine.
+				i := line indexOf: Character tab.
+
+				graph
+					addEdgeFrom: (line copyFrom: 1 to: i - 1)
+					to: (line copyFrom: i + 1 to: line size) ] ] ].
 
 	^ graph
 ]
@@ -99,6 +112,8 @@ PNRRFruitMBitCoinGraph >> addEdgeFrom: fromId to: toId [
 		        to: to;
 		        yourself.
 
+	edges add: edge.
+
 	from outgoingNeighborhood add: edge.
 	to incomingNeighborhood add: edge.
 
@@ -110,7 +125,8 @@ PNRRFruitMBitCoinGraph >> initialize [
 
 	super initialize.
 
-	vertices := Dictionary new
+	vertices := Dictionary new.
+	edges := OrderedCollection new
 ]
 
 { #category : 'accessing' }
