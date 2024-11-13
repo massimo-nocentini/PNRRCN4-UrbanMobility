@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'id',
 		'outgoingNeighborhood',
-		'incomingNeighborhood'
+		'incomingNeighborhood',
+		'bfs'
 	],
 	#category : 'PNRRCN4-UrbanMobility-DLT Fruit - Bitcoin',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -36,6 +37,25 @@ PNRRFruitMBitCoinVertex >> breadthFirstSearch [
 			dist ] ].
 
 	^ seen
+]
+
+{ #category : 'visiting' }
+PNRRFruitMBitCoinVertex >> breadthFirstSearchRec [
+
+	^ bfs ifNil: [
+		  | seen |
+		  seen := Dictionary new
+			          at: self put: 0;
+			          yourself.
+
+		  self outgoingNeighborhood do: [ :edge |
+			  edge to breadthFirstSearch keysAndValuesDo: [ :v :d |
+				  | w dd |
+				  dd := d + 1.
+				  w := seen at: v ifAbsent: dd.
+				  seen at: v put: (w min: dd) ] ].
+
+		  bfs := seen ]
 ]
 
 { #category : 'accessing' }

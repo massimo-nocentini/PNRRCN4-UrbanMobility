@@ -19,6 +19,30 @@ PNRRFruitMBitCoinGraph class >> instance [
 ]
 
 { #category : 'accessing' }
+PNRRFruitMBitCoinGraph class >> instance1k [
+	" '/home/mn/Developer/bitcoin/small.txt'"
+
+	^ self onFileReference:
+		  '/Volumes/Data/bitcoin/1k.txt' asFileReference
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinGraph class >> instance1m [
+	" '/home/mn/Developer/bitcoin/small.txt'"
+
+	^ self onFileReference:
+		  '/Volumes/Data/bitcoin/1m.txt' asFileReference
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinGraph class >> instance5m [
+	" '/home/mn/Developer/bitcoin/small.txt'"
+
+	^ self onFileReference:
+		  '/Volumes/Data/bitcoin/5m.txt' asFileReference
+]
+
+{ #category : 'accessing' }
 PNRRFruitMBitCoinGraph class >> newInstance [
 	" '/home/mn/Developer/bitcoin/small.txt'"
 
@@ -46,6 +70,14 @@ PNRRFruitMBitCoinGraph class >> onFileReference: aFileReference [
 PNRRFruitMBitCoinGraph class >> resetInstance [
 
 	Instance := nil
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinGraph class >> smallInstance [
+	" '/home/mn/Developer/bitcoin/small.txt'"
+
+	^ self onFileReference:
+		  '/Volumes/Data/bitcoin/small.txt' asFileReference
 ]
 
 { #category : 'accessing' }
@@ -93,7 +125,7 @@ PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
 	| k pool random sample backward |
 	k := (vertices size ln / epsilon squared) ceiling min: vertices size.
 
-	random := RSRandom new.
+	random := RSRandom seed: Number firstCarmichaelNumber.
 
 	pool := OrderedCollection newFrom: vertices values.
 
