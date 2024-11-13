@@ -5,7 +5,8 @@ Class {
 		'id',
 		'outgoingNeighborhood',
 		'incomingNeighborhood',
-		'bfs'
+		'bfs',
+		'index'
 	],
 	#category : 'PNRRCN4-UrbanMobility-DLT Fruit - Bitcoin',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -74,6 +75,18 @@ PNRRFruitMBitCoinVertex >> id: anObject [
 PNRRFruitMBitCoinVertex >> incomingNeighborhood [
 
 	^ incomingNeighborhood
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinVertex >> index [
+
+	^ index
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinVertex >> index: anObject [
+
+	index := anObject
 ]
 
 { #category : 'initialization' }

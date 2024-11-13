@@ -3,7 +3,8 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'from',
-		'to'
+		'to',
+		'index'
 	],
 	#category : 'PNRRCN4-UrbanMobility-DLT Fruit - Bitcoin',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -20,6 +21,18 @@ PNRRFruitMBitCoinEdge >> from [
 PNRRFruitMBitCoinEdge >> from: anObject [
 
 	from := anObject
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinEdge >> index [
+
+	^ index
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinEdge >> index: anObject [
+
+	index := anObject
 ]
 
 { #category : 'printing' }

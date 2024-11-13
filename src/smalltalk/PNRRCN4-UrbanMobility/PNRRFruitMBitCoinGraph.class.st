@@ -100,16 +100,19 @@ PNRRFruitMBitCoinGraph >> addEdgeFrom: fromId to: toId [
 	from := vertices at: fromId ifAbsentPut: [
 		        PNRRFruitMBitCoinVertex new
 			        id: fromId;
+			        index: vertices size + 1;
 			        yourself ].
 
 	to := vertices at: toId ifAbsentPut: [
 		      PNRRFruitMBitCoinVertex new
 			      id: toId;
+			      index: vertices size + 1;
 			      yourself ].
 
 	edge := PNRRFruitMBitCoinEdge new
 		        from: from;
 		        to: to;
+		        index: edges size + 1;
 		        yourself.
 
 	edges add: edge.
@@ -118,6 +121,17 @@ PNRRFruitMBitCoinGraph >> addEdgeFrom: fromId to: toId [
 	to incomingNeighborhood add: edge.
 
 	^ edge
+]
+
+{ #category : 'converting' }
+PNRRFruitMBitCoinGraph >> asVerticesArray [
+
+	| array |
+	array := Array new: vertices size.
+
+	vertices valuesDo: [ :v | array at: v index put: v ].
+
+	^ array
 ]
 
 { #category : 'initialization' }
