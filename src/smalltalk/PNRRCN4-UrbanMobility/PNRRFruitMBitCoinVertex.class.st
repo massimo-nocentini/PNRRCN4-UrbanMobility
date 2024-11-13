@@ -11,6 +11,33 @@ Class {
 	#tag : 'DLT Fruit - Bitcoin'
 }
 
+{ #category : 'visiting' }
+PNRRFruitMBitCoinVertex >> breadthFirstSearch [
+
+	| seen queue |
+	seen := Dictionary new.
+
+	queue := self outgoingNeighborhood collect: [ :edge | edge to -> 1 ].
+
+	[ queue isEmpty ] whileFalse: [
+		| assoc dist vertex |
+		assoc := queue removeAt: 1.
+
+		vertex := assoc key.
+		dist := assoc value.
+
+		seen at: vertex ifAbsentPut: [
+			| neighborhood |
+			neighborhood := vertex outgoingNeighborhood collect: [ :edge |
+				                edge to -> (dist + 1) ].
+
+			queue addAll: neighborhood.
+
+			dist ] ].
+
+	^ seen
+]
+
 { #category : 'accessing' }
 PNRRFruitMBitCoinVertex >> id [
 

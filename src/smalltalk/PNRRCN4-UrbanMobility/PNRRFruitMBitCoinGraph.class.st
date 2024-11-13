@@ -20,9 +20,10 @@ PNRRFruitMBitCoinGraph class >> instance [
 
 { #category : 'accessing' }
 PNRRFruitMBitCoinGraph class >> newInstance [
+	" '/home/mn/Developer/bitcoin/small.txt'"
 
 	^ self onFileReference:
-		  '/home/mn/Developer/bitcoin/small.txt' asFileReference
+		  '/Volumes/Data/bitcoin/very-small.txt' asFileReference
 ]
 
 { #category : 'accessing' }
@@ -39,6 +40,12 @@ PNRRFruitMBitCoinGraph class >> onFileReference: aFileReference [
 				graph addEdgeFrom: line first to: line second ] ] ].
 
 	^ graph
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinGraph class >> resetInstance [
+
+	Instance := nil
 ]
 
 { #category : 'accessing' }
@@ -78,4 +85,33 @@ PNRRFruitMBitCoinGraph >> initialize [
 PNRRFruitMBitCoinGraph >> vertexAt: anObject [
 
 	^ vertices at: anObject
+]
+
+{ #category : 'sampling' }
+PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
+
+	| k pool random sample backward |
+	k := (vertices size ln / epsilon squared) ceiling min: vertices size.
+
+	random := RSRandom new.
+
+	pool := OrderedCollection newFrom: vertices values.
+
+	sample := Array new: k streamContents: [ :sampleStream |
+		          k timesRepeat: [
+			          | i |
+			          i := random nextInteger: pool size.
+			          sampleStream nextPut: (pool removeAt: i) ] ].
+
+	backward := sample collect: [ :each |
+		            each incomingNeighborhood
+			            ifEmpty: [ each ]
+			            ifNotEmpty: [ :neighborhood |
+				            | edge |
+				            edge := neighborhood atRandom: random.
+				            edge from ] ].
+
+	^ PNRRFruitMBitCoinSample new
+		  sample: backward;
+		  yourself
 ]
