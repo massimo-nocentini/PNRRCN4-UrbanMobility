@@ -52,25 +52,22 @@ local function bfs (v)
 
 	if not v.bfs then
 
+		local seen = {} 
+		seen[v] = 0
 
-	end
+		v.bfs = seen
 
-	local queue = {} for i, w in pairs (v.outhood) do queue[i] = {vertex = w, distance = 1} end
-
-	local seen = {}
-
-	while #queue > 0 do
-		local meta = table.remove (queue, 1)
-		local vertex = meta.vertex
-		local distance = meta.distance
-		if not seen[vertex] then
-			seen[vertex] = distance
-			local d = distance + 1
-			for i, w in pairs (vertex.outhood) do table.insert (queue, {vertex = w, distance = d}) end
+		for i, w in pairs (v.outhood) do 
+			local B = bfs (w)
+			for r, dd in pairs (B) do 
+				local d = dd + 1
+				if not seen[r] then seen[r] = d 
+				else seen[r] = math.min (seen[r], d) end
+			end
 		end
 	end
 
-	return seen
+	return v.bfs
 
 end
 
@@ -92,13 +89,12 @@ end
 
 --------------------------------------------------------------------------------
 
-print (arg[1])
 local graph = parse_graph (arg[1])
 
-print ("Loaded graph", #graph.vertices, #graph.edges)
+--print ("Loaded graph", #graph.vertices, #graph.edges)
 
 local S = sample (graph, 0.1)
 
-print ("sample", #S)
+--print ("sample", #S)
 
-print ("diameter", diameter (S))
+print (diameter (S))
