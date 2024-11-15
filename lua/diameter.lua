@@ -49,7 +49,33 @@ local function sample (vertices, epsilon)
 
 end
 
+
 local function bfs (v)
+
+	if not v.bfs then
+		local seen = {}
+
+		local queue = {} for i, w in pairs (v.outhood) do queue[i] = {vertex = w, distance = 1} end
+
+		while #queue > 0 do
+			local meta = table.remove (queue, 1)
+			local vertex = meta.vertex
+			local distance = meta.distance
+			if not seen[vertex] then
+				seen[vertex] = distance
+				local d = distance + 1
+				for i, w in pairs (vertex.outhood) do table.insert (queue, {vertex = w, distance = d}) end
+			end
+		end
+
+		v.bfs = seen
+	end
+
+	return v.bfs
+
+end
+
+local function bfs_rec (v)
 
 	if not v.bfs then
 
@@ -104,6 +130,7 @@ local epsilon = arg[3] or 0.1
 
 local graph = parse_graph (filename)
 
+local t = os.time ()
 local avg = 0.0
 local nS = 0
 for i = 1, n do
@@ -113,5 +140,6 @@ for i = 1, n do
 end
 avg = avg / n
 nS = nS / n
+t = os.difftime (os.time(), t)
 
-print (filename, #graph.vertices, #graph.edges, nS, diameter_true(graph.vertices), avg)
+print (filename, #graph.vertices, #graph.edges, nS, diameter_true(graph.vertices), avg, t)
