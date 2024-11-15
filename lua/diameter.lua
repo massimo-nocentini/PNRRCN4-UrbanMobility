@@ -1,41 +1,15 @@
 
 -- the following script allows us to test the main algorithm over the whole file.
 
-local function parse_graph (filename)
 
-	local graph = { vertices = {}, edges = {} }
-
-	local function vertex_of (id)
-		local vs = graph.vertices
-		if not vs[id] then 
-			local v = {id = id, progressive = #vs + 1, outhood = {}, inhood = {}} -- a very simple table that represents a vertex.
-			vs[v.progressive] = v -- to allow access by position
-			vs[id] = v -- and by id.
-		end
-
-		return vs[id]
-	end
-
-	for l in io.lines (filename) do
-		local i = string.find (l, '\t')
-		local from = vertex_of (string.sub (l, 1, i - 1))
-		local to = vertex_of (string.sub (l, i + 1))
-		--print (l, from.id, to.id)
-
-		table.insert (from.outhood, to)
-		table.insert (to.inhood, from)
-		table.insert (graph.edges, {from, to})
-	end
-
-	return graph
+local function sample_size (vertices, epsilon)
+	local n = #vertices
+	return math.min(math.ceil (math.log (n) / (epsilon * epsilon)), n)
 end
 
-local function sample (vertices, epsilon)
+local function sample (vertices, k)
 
 	local pool = {} for i, v in ipairs (vertices) do pool[i] = v end -- just prepare the pool
-
-	local k = math.ceil (math.log (#vertices) / (epsilon * epsilon))
-	k = math.min(math.max(k, 5), #pool)
 
 	local V = {} for j=1, k do V[j] = table.remove (pool, math.random (#pool)) end
 
@@ -124,22 +98,60 @@ end
 
 --------------------------------------------------------------------------------
 
-local filename = arg[1]
-local n = arg[2] or 1
-local epsilon = arg[3] or 0.1
+local module = {}
 
-local graph = parse_graph (filename)
+function module.parse_graph (filename)
 
-local t = os.time ()
-local avg = 0.0
-local nS = 0
-for i = 1, n do
-	local S = sample (graph.vertices, epsilon)
-	nS = nS + #S
-	avg = avg + diameter(S)
+	local graph = { vertices = {}, edges = {} }
+
+	local function vertex_of (id)
+		local vs = graph.vertices
+		if not vs[id] then 
+			local v = {id = id, progressive = #vs + 1, outhood = {}, inhood = {}} -- a very simple table that represents a vertex.
+			vs[v.progressive] = v -- to allow access by position
+			vs[id] = v -- and by id.
+		end
+
+		return vs[id]
+	end
+
+	for l in io.lines (filename) do
+		local i = string.find (l, '\t')
+		local from = vertex_of (string.sub (l, 1, i - 1))
+		local to = vertex_of (string.sub (l, i + 1))
+		--print (l, from.id, to.id)
+
+		table.insert (from.outhood, to)
+		table.insert (to.inhood, from)
+		table.insert (graph.edges, {from, to})
+	end
+
+	return graph
 end
-avg = avg / n
-nS = nS / n
-t = os.difftime (os.time(), t)
 
-print (filename, #graph.vertices, #graph.edges, nS, diameter_true(graph.vertices), avg, t)
+function module.diameter (filename, graph, n, epsilon)
+
+	local t = os.time ()
+	local avg = 0.0
+	local k = sample_size (graph.vertices, epsilon) 
+	for i = 1, n do
+		local S = sample (graph.vertices, k)
+		avg = avg + diameter(S)
+	end
+	avg = avg / n
+	t = os.difftime (os.time(), t)
+
+	return {
+		filename,
+		#graph.vertices,
+		#graph.edges,
+		epsilon,
+		k,
+		n,
+		t,
+		diameter_true(graph.vertices),
+		avg,
+	}
+end
+
+return module
