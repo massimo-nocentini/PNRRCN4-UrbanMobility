@@ -9,4 +9,4 @@ p = float(sys.argv[2])
 G = erdos_renyi_graph (nodes, p, None, True)
 
 for u, v in G.edges():
-    print (u, "\t", v)
+    print (str(u) + "\t" + str(v))
