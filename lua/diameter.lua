@@ -9,8 +9,8 @@ local function parse_graph (filename)
 		local vs = graph.vertices
 		if not vs[id] then 
 			local v = {id = id, progressive = #vs + 1, outhood = {}, inhood = {}} -- a very simple table that represents a vertex.
-			vs[v.progressive] = v
-			vs[id] = v
+			vs[v.progressive] = v -- to allow access by position
+			vs[id] = v -- and by id.
 		end
 
 		return vs[id]
@@ -30,11 +30,12 @@ local function parse_graph (filename)
 	return graph
 end
 
-local function sample (graph, epsilon)
+local function sample (vertices, epsilon)
 
-	local pool = {} for id, v in pairs (graph.vertices) do pool[v.progressive] = v end -- just prepare the pool
+	local pool = {} for i, v in ipairs (vertices) do pool[i] = v end -- just prepare the pool
 
-	local k = math.ceil (math.log (#graph.vertices) / (epsilon * epsilon))
+	local k = math.ceil (math.log (#vertices) / (epsilon * epsilon))
+	k = math.min(math.max(k, 5), #pool)
 
 	local V = {} for j=1, k do V[j] = table.remove (pool, math.random (#pool)) end
 
@@ -58,8 +59,7 @@ local function bfs (v)
 		v.bfs = seen
 
 		for i, w in pairs (v.outhood) do 
-			local B = bfs (w)
-			for r, dd in pairs (B) do 
+			for r, dd in pairs (bfs (w)) do 
 				local d = dd + 1
 				if not seen[r] then seen[r] = d 
 				else seen[r] = math.min (seen[r], d) end
@@ -74,11 +74,9 @@ end
 local function diameter (S)
 	local sum, count, B = 0, 0, {}
 
-	for i, v in pairs (S) do
+	for i, v in ipairs (S) do
 
-		if not B[v] then B[v] = bfs (v) end
-
-		for w, d in pairs (B[v]) do
+		for w, d in pairs (bfs (v)) do
 			sum = sum + d
 			count = count + 1
 		end
@@ -87,14 +85,33 @@ local function diameter (S)
 	return sum / count
 end
 
+local function diameter_true (V)
+
+	local d = 0
+
+	for i, v in ipairs (V) do
+		for w, dist in pairs (bfs (v)) do d = math.max(d, dist) end
+	end
+
+	return d
+end
+
 --------------------------------------------------------------------------------
 
-local graph = parse_graph (arg[1])
+local filename = arg[1]
+local n = arg[2] or 1
+local epsilon = arg[3] or 0.1
 
---print ("Loaded graph", #graph.vertices, #graph.edges)
+local graph = parse_graph (filename)
 
-local S = sample (graph, 0.1)
+local avg = 0.0
+local nS = 0
+for i = 1, n do
+	local S = sample (graph.vertices, epsilon)
+	nS = nS + #S
+	avg = avg + diameter(S)
+end
+avg = avg / n
+nS = nS / n
 
---print ("sample", #S)
-
-print (diameter (S))
+print (filename, #graph.vertices, #graph.edges, nS, diameter_true(graph.vertices), avg)
