@@ -10,6 +10,7 @@ Class {
 { #category : 'tests' }
 PNRRCN4FruitTestCase >> testExportCompiledMethods [
 
+	| pdf |
 	self
 		exportSlotsGraphOf: PNRRFruitMBitCoinGraph >> #verticesSample:
 		pathSuffix: 'sampling'.
@@ -20,5 +21,12 @@ PNRRCN4FruitTestCase >> testExportCompiledMethods [
 
 	self
 		exportSlotsGraphOf: PNRRFruitMBitCoinSample >> #diameter
-		pathSuffix: 'diameter'
+		pathSuffix: 'diameter'.
+
+	pdf := PopplerPdf
+		       compileTeX:
+		       PNRRFruitMBitCoinGraph estimatingDiameterTeXString
+		       times: 2.
+
+	self exportSlotsGraphOf: pdf pages pathSuffix: 'pdf'
 ]

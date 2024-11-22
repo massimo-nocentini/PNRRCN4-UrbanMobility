@@ -13,6 +13,68 @@ Class {
 	#tag : 'DLT Fruit - Bitcoin'
 }
 
+{ #category : 'TeX chunks' }
+PNRRFruitMBitCoinGraph class >> estimatingDiameterTeXString [
+
+	<tex: 'pdflatex' times: 2 pagesPerRow: 2>
+	^ '
+\documentclass[12pt, letterpaper]{article}
+\usepackage[utf8]{inputenc}
+%\documentclass[runningheads]{llncs}
+%\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+\usepackage{amsthm}
+\usepackage{bbm}
+\usepackage{complexity}
+\usepackage{amsfonts}
+\usepackage{soul,color}
+\usepackage{authblk}
+\usepackage{multirow}
+\usepackage{mathrsfs}
+\usepackage{xspace}
+\usepackage{amsfonts,amssymb}
+\usepackage{pgf,tikz}
+\usepackage{euler}
+\usepackage{times}
+\usetikzlibrary{decorations}
+\usetikzlibrary{decorations.markings}
+\usepackage{tikz-network}
+\usepackage{caption}
+%\usepackage{fullpage}
+\usepackage{subcaption}
+\title{Diameter estimation}
+\author{}
+\date{}
+\begin{document}
+\maketitle
+
+Let $G = (V, E)$ be a directed, \textit{acyclic} graph where $V$ and $E$ are the sets of vertices and edges, respectively.
+Let $G^{T} = (V, E^{T})$ be the \textit{transposed} of $G$, where $ E^{T} = \lbrace (v, u): (u, v)\in E \rbrace$.
+
+Define also $n = |V|$ and $R = |\lbrace (u, v) : u, v\in V \rbrace|$ such that there exists a path from $u$ to $v$ in the graph $G$. 
+Let $S_k = (v_1, ..., v_k)$ be a sample of $k$ vertices uniformly choosen from $V$. 
+For each $v_i \in S_k$ choose at random $u_i \in N_{E^{T}}(v_i)$, where $N_{E^{T}}: V \rightarrow 2^{V}$ denotes the neighborhood of a vertex in the transposed graph. 
+
+The collection composed of each $u_i$, for all $i \in\lbrace 1,...,k\rbrace$, is our sample $U_k$ of vertices. 
+To estimate the diameter, for each $u \in U_k$ compute $B_u = BFS(u, G)$ where $B_u=\lbrace (v, d) \in V \times \mathbb{N} \rbrace$ is a set of distances; then accumulate 
+$$
+\sum_{(v, d)\in B_u}{d}
+$$
+and $|B_u|$ in two variables $D$ and $C$, respectively initialized both to $0$; the ratio $\frac{D}{C}$ is the estimation of the diameter, as desired.
+
+\begin{proof} Without loss of generality, let $u\in V$ be a vertex; then,
+$$
+\mathbb{P}\,\lbrace u \in U_k \rbrace = \frac{\left| \lbrace v \in V: u \leadsto v \rbrace \right|}{R}
+$$
+in
+$$
+\hat{D} = \sum_{(u, v) \in V^2:\, u \leadsto v}{\frac{dist(u, v)}{R}} 
+$$
+\end{proof}
+
+\end{document}
+	'
+]
+
 { #category : 'accessing' }
 PNRRFruitMBitCoinGraph class >> instance [
 
