@@ -5,9 +5,9 @@ python random-graph.py 200 0.01 > ../data/erdos-renyi/200-0.618p.txt
 echo 'Generate 200 nodes graoh.'
 python random-graph.py 500 0.01 > ../data/erdos-renyi/500-0.618p.txt
 echo 'Generate 500 nodes graoh.'
-python random-graph.py 800 0.618 > ../data/erdos-renyi/800-0.618p.txt
+python random-graph.py 800 0.01 > ../data/erdos-renyi/800-0.618p.txt
 echo 'Generate 800 nodes graoh.'
-python random-graph.py 1000 0.618 > ../data/erdos-renyi/1k-0.618p.txt
+python random-graph.py 1000 0.01 > ../data/erdos-renyi/1k-0.618p.txt
 echo 'Generate 1k nodes graoh.'
 #python random-graph.py 2000 0.618 > ../data/erdos-renyi/2k-0.618p.txt
 #echo 'Generate 2k nodes graoh.'
