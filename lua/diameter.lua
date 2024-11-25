@@ -8,7 +8,7 @@ local function bfs (v, borhoodSelector)
 	
 	if not v[key] then
 		local seen = {}
-
+		local maxdistance = {vertex = nil, distance = 0}
 		local queue = {} for i, w in ipairs (v[borhoodSelector]) do queue[i] = {vertex = w, distance = 1} end
 
 		while #queue > 0 do
@@ -18,11 +18,17 @@ local function bfs (v, borhoodSelector)
 				seen[vertex] = distance
 				table.insert(seen, vertex)
 
+				if distance > maxdistance.distance then
+					maxdistance.distance = distance
+					maxdistance.vertex = vertex
+				end
+
 				local d = distance + 1
 				for i, w in ipairs (vertex[borhoodSelector]) do table.insert (queue, {vertex = w, distance = d}) end
 			end
 		end
 
+		seen.maxdistance_vertex = maxdistance.vertex
 		v[key] = seen
 	end
 
@@ -47,11 +53,8 @@ local function sample (vertices, k)
 		local v = V[i]
 		local vbfs = bfs (v, 'inhood')
 
-		table.sort (vbfs, function (a, b) return vbfs[a] < vbfs[b] end)
-
-		local n = #vbfs
-		--if n > 0 then S[i] = vbfs[math.random (n)] else S[i] = v end
-		if n > 0 then S[i] = vbfs[n] else S[i] = v end
+		--local n = #vbfs if n > 0 then S[i] = vbfs[math.random (n)] else S[i] = v end
+		if vbfs.maxdistance_vertex then S[i] = vbfs.maxdistance_vertex else S[i] = v end
 	end
 
 	return S
