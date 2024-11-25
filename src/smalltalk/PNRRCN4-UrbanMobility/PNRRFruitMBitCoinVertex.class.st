@@ -16,10 +16,27 @@ Class {
 { #category : 'visiting' }
 PNRRFruitMBitCoinVertex >> breadthFirstSearch [
 
-	| seen queue |
-	seen := Dictionary new.
+	^ self
+		  breadthFirstSearchNeighborhoodBlock: #outgoingNeighborhood
+		  edgeAccessor: #to
+]
 
-	queue := self outgoingNeighborhood collect: [ :edge | edge to -> 1 ].
+{ #category : 'visiting' }
+PNRRFruitMBitCoinVertex >> breadthFirstSearchBackward [
+
+	^ self
+		  breadthFirstSearchNeighborhoodBlock: #incomingNeighborhood
+		  edgeAccessor: #from
+]
+
+{ #category : 'visiting' }
+PNRRFruitMBitCoinVertex >> breadthFirstSearchNeighborhoodBlock: nBlock edgeAccessor: eBlock [
+
+	| seen queue vertexAtMaxDistance |
+	seen := Dictionary new.
+	vertexAtMaxDistance := nil -> 0.
+	queue := (nBlock value: self) collect: [ :edge |
+		         (eBlock value: edge) -> 1 ].
 
 	[ queue isEmpty ] whileFalse: [
 		| assoc dist vertex |
@@ -30,33 +47,20 @@ PNRRFruitMBitCoinVertex >> breadthFirstSearch [
 
 		seen at: vertex ifAbsentPut: [
 			| neighborhood |
-			neighborhood := vertex outgoingNeighborhood collect: [ :edge |
-				                edge to -> (dist + 1) ].
+			neighborhood := (nBlock value: vertex) collect: [ :edge |
+				                (eBlock value: edge) -> (dist + 1) ].
 
 			queue addAll: neighborhood.
 
+			dist > vertexAtMaxDistance value ifTrue: [
+				vertexAtMaxDistance := vertex -> dist ].
+
 			dist ] ].
 
-	^ seen
-]
-
-{ #category : 'visiting' }
-PNRRFruitMBitCoinVertex >> breadthFirstSearchRec [
-
-	^ bfs ifNil: [
-		  | seen |
-		  seen := Dictionary new
-			          at: self put: 0;
-			          yourself.
-
-		  self outgoingNeighborhood do: [ :edge |
-			  edge to breadthFirstSearchRec keysAndValuesDo: [ :v :d |
-				  | w dd |
-				  dd := d + 1.
-				  w := seen at: v ifAbsent: dd.
-				  seen at: v put: (w min: dd) ] ].
-
-		  bfs := seen ]
+	^ PNRRFruitMBitCoinBFS new
+		  distances: seen;
+		  maxVertex: vertexAtMaxDistance key;
+		  yourself
 ]
 
 { #category : 'accessing' }

@@ -221,19 +221,15 @@ PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
 
 	pool := OrderedCollection newFrom: vertices values.
 
-	sample := Array new: k streamContents: [ :sampleStream |
-		          k timesRepeat: [
-			          | i |
-			          i := random nextInteger: pool size.
-			          sampleStream nextPut: (pool removeAt: i) ] ].
+	sample := Array new: k.
+
+	1 to: k do: [ :j |
+		| i |
+		i := random nextInteger: pool size.
+		sample at: j put: (pool removeAt: i) ].
 
 	backward := sample collect: [ :each |
-		            each incomingNeighborhood
-			            ifEmpty: [ each ]
-			            ifNotEmpty: [ :neighborhood |
-				            | edge |
-				            edge := neighborhood atRandom: random.
-				            edge from ] ].
+		            each breadthFirstSearchBackward maxVertex ifNil: [ each ] ].
 
 	^ PNRRFruitMBitCoinSample new
 		  sample: backward;
