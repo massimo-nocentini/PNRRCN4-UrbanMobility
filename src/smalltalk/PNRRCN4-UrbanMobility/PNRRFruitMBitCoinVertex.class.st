@@ -23,6 +23,12 @@ PNRRFruitMBitCoinVertex >> breadthFirstSearch [
 ]
 
 { #category : 'visiting' }
+PNRRFruitMBitCoinVertex >> breadthFirstSearchBackward [
+
+	^ self breadthFirstSearchBackwardDo: nil
+]
+
+{ #category : 'visiting' }
 PNRRFruitMBitCoinVertex >> breadthFirstSearchBackwardDo: aBlock [
 
 	^ self

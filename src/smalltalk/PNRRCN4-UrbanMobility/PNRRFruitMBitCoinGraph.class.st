@@ -232,21 +232,65 @@ PNRRFruitMBitCoinGraph >> vertexAt: anObject [
 ]
 
 { #category : 'sampling' }
-PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
+PNRRFruitMBitCoinGraph >> verticesSample1: epsilon [
 
-	| k pool random sample backward cross distances init |
-	k := (vertices size ln / epsilon squared) ceiling min: vertices size.
-
+	| random backward |
 	random := RSRandom seed: Number firstCarmichaelNumber.
 
-	pool := OrderedCollection newFrom: vertices values.
+	backward := vertices
+		            samplingWithEpsilon: epsilon
+		            random: random
+		            collect: [ :each |
+			            | cross distances init j w |
+			            cross := Dictionary new.
 
-	sample := Array new: k.
+			            each breadthFirstSearchBackwardDo: [ :v :d |
+				            | col |
+				            col := cross
+					                   at: v
+					                   ifAbsentPut: [ OrderedCollection new ].
 
-	1 to: k do: [ :j |
-		| i |
-		i := random nextInteger: pool size.
-		sample at: j put: (pool removeAt: i) ].
+				            col add: d ].
+
+			            cross ifEmpty: [ each ] ifNotEmpty: [
+				            distances := OrderedCollection new: cross size.
+				            init := 0.
+
+				            cross keysAndValuesDo: [ :v :ds |
+					            init := init + ds size.
+					            distances add: v -> init ].
+
+				            distances := distances timsort: #value.
+
+				            j := random nextInteger: init.
+
+				            w := distances
+					                 findBinaryIndex: [ :assoc |
+					                 j threeWayCompareTo: assoc value ]
+					                 ifNone: [ :l | l min: init max: 1 ].
+
+				            (distances at: w) key ] ].
+
+	^ PNRRFruitMBitCoinSample new
+		  sample: backward;
+		  yourself
+]
+
+{ #category : 'sampling' }
+PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
+
+	| random backward |
+	random := RSRandom seed: Number firstCarmichaelNumber.
+
+	backward := vertices
+		            samplingWithEpsilon: epsilon
+		            random: random
+		            collect: [ :each |
+			            each breadthFirstSearchBackward layers
+				            ifEmpty: [ each ]
+				            ifNotEmpty: [ :layers | layers last atRandom: random ] ].
+
+	"     
 
 	cross := Dictionary new.
 
@@ -280,7 +324,7 @@ PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
 			                 j threeWayCompareTo: assoc value ]
 			                 ifNone: [ :l | l min: init max: 1 ].
 
-		            (distances at: w) key ].
+		            (distances at: w) key ]."
 
 	^ PNRRFruitMBitCoinSample new
 		  sample: backward;
