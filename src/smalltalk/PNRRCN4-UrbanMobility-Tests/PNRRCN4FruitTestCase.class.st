@@ -20,6 +20,16 @@ PNRRCN4FruitTestCase >> testExportCompiledMethods [
 		pathSuffix: 'bfs'.
 
 	self
+		exportSlotsGraphOf:
+		PNRRFruitMBitCoinVertex >> #breadthFirstSearchBackward
+		pathSuffix: 'bfs-back'.
+
+	self
+		exportSlotsGraphOf: PNRRFruitMBitCoinVertex
+			>> #breadthFirstSearchNeighborhoodBlock:edgeAccessor:
+		pathSuffix: 'bfs-gen'.
+
+	self
 		exportSlotsGraphOf: PNRRFruitMBitCoinSample >> #diameter
 		pathSuffix: 'diameter'.
 

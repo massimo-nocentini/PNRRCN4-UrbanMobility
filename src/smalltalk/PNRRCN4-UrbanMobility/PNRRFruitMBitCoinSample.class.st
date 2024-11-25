@@ -17,7 +17,7 @@ PNRRFruitMBitCoinSample >> diameter [
 	count := 0.
 
 	self sample do: [ :vertex |
-		vertex breadthFirstSearch valuesDo: [ :dist |
+		vertex breadthFirstSearch distances valuesDo: [ :dist |
 			sum := sum + dist.
 			count := count + 1 ] ].
 

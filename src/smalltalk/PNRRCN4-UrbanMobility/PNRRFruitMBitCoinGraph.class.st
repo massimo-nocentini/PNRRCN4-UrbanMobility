@@ -106,6 +106,14 @@ PNRRFruitMBitCoinGraph class >> instance5m [
 ]
 
 { #category : 'accessing' }
+PNRRFruitMBitCoinGraph class >> instanceErdosRenyi [
+
+	^ self onFileReference:
+		  'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/1k-0.001p.txt'
+			  asFileReference
+]
+
+{ #category : 'accessing' }
 PNRRFruitMBitCoinGraph class >> instanceHuge [
 	" '/home/mn/Developer/bitcoin/small.txt'"
 
