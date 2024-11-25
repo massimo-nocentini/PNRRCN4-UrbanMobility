@@ -21,7 +21,7 @@ PNRRCN4FruitTestCase >> testExportCompiledMethods [
 
 	self
 		exportSlotsGraphOf:
-		PNRRFruitMBitCoinVertex >> #breadthFirstSearchBackward
+		PNRRFruitMBitCoinVertex >> #breadthFirstSearchBackwardDo:
 		pathSuffix: 'bfs-back'.
 
 	self

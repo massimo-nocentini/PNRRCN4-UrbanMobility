@@ -23,6 +23,12 @@ PNRRFruitMBitCoinBFS >> distances: anObject [
 ]
 
 { #category : 'accessing' }
+PNRRFruitMBitCoinBFS >> maxDistance [
+
+	^ self distances at: self maxVertex ifAbsent: 0
+]
+
+{ #category : 'accessing' }
 PNRRFruitMBitCoinBFS >> maxVertex [
 
 	^ maxVertex

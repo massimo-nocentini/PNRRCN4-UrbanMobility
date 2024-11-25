@@ -204,6 +204,18 @@ PNRRFruitMBitCoinGraph >> asVerticesArray [
 	^ array
 ]
 
+{ #category : 'estimation' }
+PNRRFruitMBitCoinGraph >> diameter [
+
+	| d |
+	d := 0.
+	
+	vertices valuesDo: [ :v |
+		d := d max: v breadthFirstSearch maxDistance ].
+
+	^ d
+]
+
 { #category : 'initialization' }
 PNRRFruitMBitCoinGraph >> initialize [
 
@@ -222,7 +234,7 @@ PNRRFruitMBitCoinGraph >> vertexAt: anObject [
 { #category : 'sampling' }
 PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
 
-	| k pool random sample backward |
+	| k pool random sample backward cross distances init |
 	k := (vertices size ln / epsilon squared) ceiling min: vertices size.
 
 	random := RSRandom seed: Number firstCarmichaelNumber.
@@ -236,8 +248,39 @@ PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
 		i := random nextInteger: pool size.
 		sample at: j put: (pool removeAt: i) ].
 
+	cross := Dictionary new.
+
 	backward := sample collect: [ :each |
-		            each breadthFirstSearchBackward maxVertex ifNil: [ each ] ].
+		            | bfs |
+		            bfs := each breadthFirstSearchBackwardDo: [ :v :d |
+			                   (cross
+				                    at: v
+				                    ifAbsentPut: [ OrderedCollection new ]) add: d ].
+
+		            bfs maxVertex ifNil: [ each ] ].
+
+	distances := OrderedCollection new: cross size.
+	init := 0.
+	cross keysAndValuesDo: [ :v :ds |
+		init := init + ds size.
+		distances add: v -> init ].
+	distances := distances timsort: #value.
+
+	backward := distances collect: [ :each |
+		            | j w |
+		            j := random nextInteger: init.
+
+		            w := distances binarySearchIndex: [ :assoc |
+			                 | f |
+			                 f := assoc value.
+			                 f = j
+				                 ifTrue: [ 0 ]
+				                 ifFalse: [
+					                 j < f
+						                 ifTrue: [ -1 ]
+						                 ifFalse: [ 1 ] ] ].
+
+		            (distances at: w) key ].
 
 	^ PNRRFruitMBitCoinSample new
 		  sample: backward;
