@@ -253,9 +253,12 @@ PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
 	backward := sample collect: [ :each |
 		            | bfs |
 		            bfs := each breadthFirstSearchBackwardDo: [ :v :d |
-			                   (cross
-				                    at: v
-				                    ifAbsentPut: [ OrderedCollection new ]) add: d ].
+			                   | col |
+			                   col := cross
+				                          at: v
+				                          ifAbsentPut: [ OrderedCollection new ].
+
+			                   col add: d ].
 
 		            bfs maxVertex ifNil: [ each ] ].
 
@@ -266,19 +269,21 @@ PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
 		distances add: v -> init ].
 	distances := distances timsort: #value.
 
-	backward := distances collect: [ :each |
+	backward := sample collect: [ :each |
 		            | j w |
 		            j := random nextInteger: init.
 
-		            w := distances binarySearchIndex: [ :assoc |
-			                 | f |
-			                 f := assoc value.
-			                 f = j
-				                 ifTrue: [ 0 ]
-				                 ifFalse: [
-					                 j < f
-						                 ifTrue: [ -1 ]
-						                 ifFalse: [ 1 ] ] ].
+		            w := distances
+			                 findBinaryIndex: [ :assoc |
+				                 | f |
+				                 f := assoc value.
+				                 j = f
+					                 ifTrue: [ 0 ]
+					                 ifFalse: [
+						                 j < f
+							                 ifTrue: [ -1 ]
+							                 ifFalse: [ 1 ] ] ]
+			                 ifNone: [ :l | l ].
 
 		            (distances at: w) key ].
 
