@@ -17,7 +17,8 @@ Class {
 PNRRFruitMBitCoinVertex >> breadthFirstSearch [
 
 	^ self
-		  breadthFirstSearchNeighborhoodBlock: #outgoingNeighborhood
+		  breadthFirstSearchDo: nil
+		  neighborhoodBlock: #outgoingNeighborhood
 		  edgeAccessor: #to
 ]
 
@@ -33,10 +34,9 @@ PNRRFruitMBitCoinVertex >> breadthFirstSearchBackwardDo: aBlock [
 { #category : 'visiting' }
 PNRRFruitMBitCoinVertex >> breadthFirstSearchDo: doBlock neighborhoodBlock: nBlock edgeAccessor: eBlock [
 
-	| seen queue vertexAtMaxDistance |
+	| seen queue layers |
 	seen := Dictionary new.
-
-	vertexAtMaxDistance := nil -> 0.
+	layers := OrderedCollection new.
 
 	queue := (nBlock value: self) collect: [ :edge |
 		         (eBlock value: edge) -> 1 ].
@@ -49,56 +49,22 @@ PNRRFruitMBitCoinVertex >> breadthFirstSearchDo: doBlock neighborhoodBlock: nBlo
 		dist := assoc value.
 
 		seen at: vertex ifAbsentPut: [
-			| neighborhood |
+			| neighborhood layer |
 			neighborhood := (nBlock value: vertex) collect: [ :edge |
 				                (eBlock value: edge) -> (dist + 1) ].
 
 			queue addAll: neighborhood.
+
+			layer := layers at: dist ifAbsentPut: [ OrderedCollection new ].
+			layer add: vertex.
 
 			doBlock ifNotNil: [ doBlock value: vertex value: dist ].
 
-			dist > vertexAtMaxDistance value ifTrue: [
-				vertexAtMaxDistance := vertex -> dist ].
-
 			dist ] ].
 
 	^ PNRRFruitMBitCoinBFS new
+		  layers: layers;
 		  distances: seen;
-		  maxVertex: vertexAtMaxDistance key;
-		  yourself
-]
-
-{ #category : 'visiting' }
-PNRRFruitMBitCoinVertex >> breadthFirstSearchNeighborhoodBlock: nBlock edgeAccessor: eBlock [
-
-	| seen queue vertexAtMaxDistance |
-	seen := Dictionary new.
-	vertexAtMaxDistance := nil -> 0.
-	queue := (nBlock value: self) collect: [ :edge |
-		         (eBlock value: edge) -> 1 ].
-
-	[ queue isEmpty ] whileFalse: [
-		| assoc dist vertex |
-		assoc := queue removeAt: 1.
-
-		vertex := assoc key.
-		dist := assoc value.
-
-		seen at: vertex ifAbsentPut: [
-			| neighborhood |
-			neighborhood := (nBlock value: vertex) collect: [ :edge |
-				                (eBlock value: edge) -> (dist + 1) ].
-
-			queue addAll: neighborhood.
-
-			dist > vertexAtMaxDistance value ifTrue: [
-				vertexAtMaxDistance := vertex -> dist ].
-
-			dist ] ].
-
-	^ PNRRFruitMBitCoinBFS new
-		  distances: seen;
-		  maxVertex: vertexAtMaxDistance key;
 		  yourself
 ]
 

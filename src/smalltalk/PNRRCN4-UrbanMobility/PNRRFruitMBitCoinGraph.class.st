@@ -209,9 +209,9 @@ PNRRFruitMBitCoinGraph >> diameter [
 
 	| d |
 	d := 0.
-	
+
 	vertices valuesDo: [ :v |
-		d := d max: v breadthFirstSearch maxDistance ].
+		d := d max: v breadthFirstSearch layers size ].
 
 	^ d
 ]
@@ -260,7 +260,9 @@ PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
 
 			                   col add: d ].
 
-		            bfs maxVertex ifNil: [ each ] ].
+		            bfs layers
+			            ifEmpty: [ each ]
+			            ifNotEmpty: [ :layers | layers last atRandom: random ] ].
 
 	distances := OrderedCollection new: cross size.
 	init := 0.
@@ -275,15 +277,8 @@ PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
 
 		            w := distances
 			                 findBinaryIndex: [ :assoc |
-				                 | f |
-				                 f := assoc value.
-				                 j = f
-					                 ifTrue: [ 0 ]
-					                 ifFalse: [
-						                 j < f
-							                 ifTrue: [ -1 ]
-							                 ifFalse: [ 1 ] ] ]
-			                 ifNone: [ :l | l ].
+			                 j threeWayCompareTo: assoc value ]
+			                 ifNone: [ :l | l min: init max: 1 ].
 
 		            (distances at: w) key ].
 

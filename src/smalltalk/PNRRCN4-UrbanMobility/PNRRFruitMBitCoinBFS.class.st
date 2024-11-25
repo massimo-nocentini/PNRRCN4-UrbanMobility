@@ -3,7 +3,7 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'distances',
-		'maxVertex'
+		'layers'
 	],
 	#category : 'PNRRCN4-UrbanMobility-DLT Fruit - Bitcoin',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -23,19 +23,13 @@ PNRRFruitMBitCoinBFS >> distances: anObject [
 ]
 
 { #category : 'accessing' }
-PNRRFruitMBitCoinBFS >> maxDistance [
+PNRRFruitMBitCoinBFS >> layers [
 
-	^ self distances at: self maxVertex ifAbsent: 0
+	^ layers
 ]
 
 { #category : 'accessing' }
-PNRRFruitMBitCoinBFS >> maxVertex [
+PNRRFruitMBitCoinBFS >> layers: anObject [
 
-	^ maxVertex
-]
-
-{ #category : 'accessing' }
-PNRRFruitMBitCoinBFS >> maxVertex: anObject [
-
-	maxVertex := anObject
+	layers := anObject
 ]
