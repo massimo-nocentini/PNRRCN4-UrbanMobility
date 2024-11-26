@@ -6,12 +6,6 @@ Class {
 	#tag : 'DLT Fruit - Bitcoin'
 }
 
-{ #category : 'accessing' }
-PNRRFruitMBitCoinSampleForAverageDistance >> aggregateDistances: distances [
-
-	^ distances size
-]
-
 { #category : 'estimation' }
 PNRRFruitMBitCoinSampleForAverageDistance >> estimate [
 
@@ -25,4 +19,19 @@ PNRRFruitMBitCoinSampleForAverageDistance >> estimate [
 			count := count + 1 ] ].
 
 	^ (distance / count) asFloat
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinSampleForAverageDistance >> sampleVertex: each bfs: bfs crossDistances: cross [
+
+	^ cross ifEmpty: [ each ] ifNotEmpty: [
+		  | init distances |
+		  distances := OrderedCollection new: cross size.
+		  init := 0.
+
+		  cross keysAndValuesDo: [ :v :ds |
+			  init := init + ds size.
+			  distances add: v -> init ].
+
+		  (distances weightedSample: #value random: random) key ]
 ]

@@ -6,12 +6,6 @@ Class {
 	#tag : 'DLT Fruit - Bitcoin'
 }
 
-{ #category : 'accessing' }
-PNRRFruitMBitCoinSampleForDiameter >> aggregateDistances: distances [
-
-	^ distances max
-]
-
 { #category : 'estimation' }
 PNRRFruitMBitCoinSampleForDiameter >> estimate [
 
@@ -20,4 +14,12 @@ PNRRFruitMBitCoinSampleForDiameter >> estimate [
 		             vertex breadthFirstSearch layers size ].
 
 	^ diameters average asFloat
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinSampleForDiameter >> sampleVertex: each bfs: bfs crossDistances: cross [
+
+	^ bfs layers
+		  ifEmpty: [ each ]
+		  ifNotEmpty: [ :ls | ls last atRandom: random ]
 ]

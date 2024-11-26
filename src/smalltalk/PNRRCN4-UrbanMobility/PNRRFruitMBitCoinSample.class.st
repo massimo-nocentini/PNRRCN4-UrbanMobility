@@ -12,12 +12,6 @@ Class {
 }
 
 { #category : 'accessing' }
-PNRRFruitMBitCoinSample >> aggregateDistances: distances [
-
-	self subclassResponsibility
-]
-
-{ #category : 'accessing' }
 PNRRFruitMBitCoinSample >> epsilon [
 
 	^ epsilon
@@ -42,7 +36,7 @@ PNRRFruitMBitCoinSample >> initialize [
 
 	self
 		epsilon: 0.1;
-		random: (RSRandom seed: Number firstCarmichaelNumber)
+		random: Random new "(RSRandom seed: Number firstCarmichaelNumber)"
 ]
 
 { #category : 'printing' }
@@ -78,23 +72,20 @@ PNRRFruitMBitCoinSample >> sample: aCollection [
 		          samplingWithEpsilon: epsilon
 		          random: random
 		          collect: [ :each |
-			          | cross |
+			          | cross bfs |
 			          cross := Dictionary new.
 
-			          each breadthFirstSearchBackwardDo: [ :v :d |
-				          cross
-					          at: v
-					          ifPresent: [ :col | col add: d ]
-					          ifAbsentPut: [ OrderedCollection with: d ] ].
+			          bfs := each breadthFirstSearchBackwardDo: [ :v :d |
+				                 cross
+					                 at: v
+					                 ifPresent: [ :col | col add: d ]
+					                 ifAbsentPut: [ OrderedCollection with: d ] ].
 
-			          cross ifEmpty: [ each ] ifNotEmpty: [
-				          | init distances |
-				          distances := OrderedCollection new: cross size.
-				          init := 0.
+			          self sampleVertex: each bfs: bfs crossDistances: cross ]
+]
 
-				          cross keysAndValuesDo: [ :v :ds |
-					          init := init + (self aggregateDistances: ds).
-					          distances add: v -> init ].
+{ #category : 'accessing' }
+PNRRFruitMBitCoinSample >> sampleVertex: each bfs: bfs crossDistances: cross [
 
-				          (distances weightedSample: #value random: random) key ] ]
+	self subclassResponsibility
 ]
