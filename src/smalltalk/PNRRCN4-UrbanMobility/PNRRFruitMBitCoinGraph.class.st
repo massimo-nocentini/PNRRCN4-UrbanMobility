@@ -204,16 +204,29 @@ PNRRFruitMBitCoinGraph >> asVerticesArray [
 	^ array
 ]
 
-{ #category : 'estimation' }
-PNRRFruitMBitCoinGraph >> diameter [
+{ #category : 'measuring' }
+PNRRFruitMBitCoinGraph >> averageDistance [
 
-	| d |
-	d := 0.
+	| distance count |
+	distance := 0.
+	count := 0.
 
 	vertices valuesDo: [ :v |
-		d := d max: v breadthFirstSearch layers size ].
+		| bfs |
+		bfs := v breadthFirstSearch.
+		bfs distances valuesDo: [ :vd |
+			distance := distance + vd.
+			count := count + 1 ] ].
 
-	^ d
+	^ (distance / count) asFloat
+]
+
+{ #category : 'measuring' }
+PNRRFruitMBitCoinGraph >> diameter [
+
+	^ vertices values
+		  foldr: [ :v :d | d max: v breadthFirstSearch layers size ]
+		  init: 0
 ]
 
 { #category : 'initialization' }
@@ -223,6 +236,41 @@ PNRRFruitMBitCoinGraph >> initialize [
 
 	vertices := Dictionary new.
 	edges := OrderedCollection new
+]
+
+{ #category : 'sampling' }
+PNRRFruitMBitCoinGraph >> sampleVertices: epsilon aggregateDistances: dBlock [
+
+	| random backward |
+	random := RSRandom seed: Number firstCarmichaelNumber.
+
+	backward := vertices
+		            samplingWithEpsilon: epsilon
+		            random: random
+		            collect: [ :each |
+			            | cross |
+			            cross := Dictionary new.
+
+			            each breadthFirstSearchBackwardDo: [ :v :d |
+				            cross
+					            at: v
+					            ifPresent: [ :col | col add: d ]
+					            ifAbsentPut: [ OrderedCollection with: d ] ].
+
+			            cross ifEmpty: [ each ] ifNotEmpty: [
+				            | init distances |
+				            distances := OrderedCollection new: cross size.
+				            init := 0.
+
+				            cross keysAndValuesDo: [ :v :ds |
+					            init := init + (dBlock value: ds).
+					            distances add: v -> init ].
+
+				            (distances weightedSample: #value random: random) key ] ].
+
+	^ PNRRFruitMBitCoinSample new
+		  sample: backward;
+		  yourself
 ]
 
 { #category : 'accessing' }
@@ -256,10 +304,48 @@ PNRRFruitMBitCoinGraph >> verticesSample1: epsilon [
 				            init := 0.
 
 				            cross keysAndValuesDo: [ :v :ds |
-					            init := init + ds size.
+					            init := init + ds max.
 					            distances add: v -> init ].
 
 				            (distances weightedSample: #value random: random) key ] ].
+
+	^ PNRRFruitMBitCoinSample new
+		  sample: backward;
+		  yourself
+]
+
+{ #category : 'sampling' }
+PNRRFruitMBitCoinGraph >> verticesSample2: epsilon [
+
+	| random backward cross |
+	random := RSRandom seed: Number firstCarmichaelNumber.
+
+	cross := Dictionary new.
+
+	backward := vertices
+		            samplingWithEpsilon: epsilon
+		            random: random
+		            collect: [ :each |
+			            each breadthFirstSearchBackwardDo: [ :v :d |
+				            cross
+					            at: v
+					            ifPresent: [ :col | col add: d ]
+					            ifAbsentPut: [ OrderedCollection with: d ] ].
+			            each ].
+
+	cross ifNotEmpty: [
+		| init distances |
+		distances := OrderedCollection new: cross size.
+		init := 0.
+
+		cross keysAndValuesDo: [ :v :ds |
+			init := init + ds max.
+			distances add: v -> init ].
+
+		1 to: backward size do: [ :i |
+			backward
+				at: i
+				put: (distances weightedSample: #value random: random) key ] ].
 
 	^ PNRRFruitMBitCoinSample new
 		  sample: backward;
