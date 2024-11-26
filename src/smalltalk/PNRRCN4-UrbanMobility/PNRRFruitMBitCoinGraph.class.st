@@ -241,18 +241,17 @@ PNRRFruitMBitCoinGraph >> verticesSample1: epsilon [
 		            samplingWithEpsilon: epsilon
 		            random: random
 		            collect: [ :each |
-			            | cross distances init j w |
+			            | cross |
 			            cross := Dictionary new.
 
 			            each breadthFirstSearchBackwardDo: [ :v :d |
-				            | col |
-				            col := cross
-					                   at: v
-					                   ifAbsentPut: [ OrderedCollection new ].
-
-				            col add: d ].
+				            cross
+					            at: v
+					            ifPresent: [ :col | col add: d ]
+					            ifAbsentPut: [ OrderedCollection with: d ] ].
 
 			            cross ifEmpty: [ each ] ifNotEmpty: [
+				            | init distances |
 				            distances := OrderedCollection new: cross size.
 				            init := 0.
 
@@ -260,16 +259,7 @@ PNRRFruitMBitCoinGraph >> verticesSample1: epsilon [
 					            init := init + ds size.
 					            distances add: v -> init ].
 
-				            distances := distances timsort: #value.
-
-				            j := random nextInteger: init.
-
-				            w := distances
-					                 findBinaryIndex: [ :assoc |
-					                 j threeWayCompareTo: assoc value ]
-					                 ifNone: [ :l | l min: init max: 1 ].
-
-				            (distances at: w) key ] ].
+				            (distances weightedSample: #value random: random) key ] ].
 
 	^ PNRRFruitMBitCoinSample new
 		  sample: backward;
@@ -289,42 +279,6 @@ PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
 			            each breadthFirstSearchBackward layers
 				            ifEmpty: [ each ]
 				            ifNotEmpty: [ :layers | layers last atRandom: random ] ].
-
-	"     
-
-	cross := Dictionary new.
-
-	backward := sample collect: [ :each |
-		            | bfs |
-		            bfs := each breadthFirstSearchBackwardDo: [ :v :d |
-			                   | col |
-			                   col := cross
-				                          at: v
-				                          ifAbsentPut: [ OrderedCollection new ].
-
-			                   col add: d ].
-
-		            bfs layers
-			            ifEmpty: [ each ]
-			            ifNotEmpty: [ :layers | layers last atRandom: random ] ].
-
-	distances := OrderedCollection new: cross size.
-	init := 0.
-	cross keysAndValuesDo: [ :v :ds |
-		init := init + ds size.
-		distances add: v -> init ].
-	distances := distances timsort: #value.
-
-	backward := sample collect: [ :each |
-		            | j w |
-		            j := random nextInteger: init.
-
-		            w := distances
-			                 findBinaryIndex: [ :assoc |
-			                 j threeWayCompareTo: assoc value ]
-			                 ifNone: [ :l | l min: init max: 1 ].
-
-		            (distances at: w) key ]."
 
 	^ PNRRFruitMBitCoinSample new
 		  sample: backward;
