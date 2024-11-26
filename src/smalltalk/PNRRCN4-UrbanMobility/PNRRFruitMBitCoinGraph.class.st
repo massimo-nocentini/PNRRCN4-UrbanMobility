@@ -229,14 +229,6 @@ PNRRFruitMBitCoinGraph >> diameter [
 		  init: 0
 ]
 
-{ #category : 'estimation' }
-PNRRFruitMBitCoinGraph >> estimate: estimator [
-
-	^ estimator
-		  sample: vertices values;
-		  estimate
-]
-
 { #category : 'initialization' }
 PNRRFruitMBitCoinGraph >> initialize [
 
