@@ -2,36 +2,47 @@ Class {
 	#name : 'PNRRFruitMBitCoinSample',
 	#superclass : 'Object',
 	#instVars : [
-		'sample'
+		'sample',
+		'random',
+		'epsilon'
 	],
 	#category : 'PNRRCN4-UrbanMobility-DLT Fruit - Bitcoin',
 	#package : 'PNRRCN4-UrbanMobility',
 	#tag : 'DLT Fruit - Bitcoin'
 }
 
-{ #category : 'estimation' }
-PNRRFruitMBitCoinSample >> averageDistance [
+{ #category : 'accessing' }
+PNRRFruitMBitCoinSample >> aggregateDistances: distances [
 
-	| distance count |
-	distance := 0.
-	count := 0.
+	self subclassResponsibility
+]
 
-	self sample do: [ :vertex |
-		vertex breadthFirstSearch distances valuesDo: [ :dist |
-			distance := distance + dist.
-			count := count + 1 ] ].
+{ #category : 'accessing' }
+PNRRFruitMBitCoinSample >> epsilon [
 
-	^ (distance / count) asFloat
+	^ epsilon
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinSample >> epsilon: anObject [
+
+	epsilon := anObject
 ]
 
 { #category : 'estimation' }
-PNRRFruitMBitCoinSample >> diameter [
+PNRRFruitMBitCoinSample >> estimate [
 
-	| diameters |
-	diameters := self sample collect: [ :vertex |
-		             vertex breadthFirstSearch layers size ].
+	self subclassResponsibility
+]
 
-	^ diameters average asFloat
+{ #category : 'initialization' }
+PNRRFruitMBitCoinSample >> initialize [
+
+	super initialize.
+
+	self
+		epsilon: 0.1;
+		random: (RSRandom seed: Number firstCarmichaelNumber)
 ]
 
 { #category : 'printing' }
@@ -43,13 +54,47 @@ PNRRFruitMBitCoinSample >> printOn: aStream [
 ]
 
 { #category : 'accessing' }
+PNRRFruitMBitCoinSample >> random [
+
+	^ random
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinSample >> random: anObject [
+
+	random := anObject
+]
+
+{ #category : 'accessing' }
 PNRRFruitMBitCoinSample >> sample [
 
 	^ sample
 ]
 
 { #category : 'accessing' }
-PNRRFruitMBitCoinSample >> sample: anObject [
+PNRRFruitMBitCoinSample >> sample: aCollection [
 
-	sample := anObject
+	sample := aCollection
+		          samplingWithEpsilon: epsilon
+		          random: random
+		          collect: [ :each |
+			          | cross |
+			          cross := Dictionary new.
+
+			          each breadthFirstSearchBackwardDo: [ :v :d |
+				          cross
+					          at: v
+					          ifPresent: [ :col | col add: d ]
+					          ifAbsentPut: [ OrderedCollection with: d ] ].
+
+			          cross ifEmpty: [ each ] ifNotEmpty: [
+				          | init distances |
+				          distances := OrderedCollection new: cross size.
+				          init := 0.
+
+				          cross keysAndValuesDo: [ :v :ds |
+					          init := init + (self aggregateDistances: ds).
+					          distances add: v -> init ].
+
+				          (distances weightedSample: #value random: random) key ] ]
 ]

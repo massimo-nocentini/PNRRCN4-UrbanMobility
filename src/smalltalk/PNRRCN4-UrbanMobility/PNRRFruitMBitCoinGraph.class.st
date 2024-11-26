@@ -229,6 +229,14 @@ PNRRFruitMBitCoinGraph >> diameter [
 		  init: 0
 ]
 
+{ #category : 'estimation' }
+PNRRFruitMBitCoinGraph >> estimate: estimator [
+
+	^ estimator
+		  sample: vertices values;
+		  estimate
+]
+
 { #category : 'initialization' }
 PNRRFruitMBitCoinGraph >> initialize [
 
@@ -238,135 +246,8 @@ PNRRFruitMBitCoinGraph >> initialize [
 	edges := OrderedCollection new
 ]
 
-{ #category : 'sampling' }
-PNRRFruitMBitCoinGraph >> sampleVertices: epsilon aggregateDistances: dBlock [
-
-	| random backward |
-	random := RSRandom seed: Number firstCarmichaelNumber.
-
-	backward := vertices
-		            samplingWithEpsilon: epsilon
-		            random: random
-		            collect: [ :each |
-			            | cross |
-			            cross := Dictionary new.
-
-			            each breadthFirstSearchBackwardDo: [ :v :d |
-				            cross
-					            at: v
-					            ifPresent: [ :col | col add: d ]
-					            ifAbsentPut: [ OrderedCollection with: d ] ].
-
-			            cross ifEmpty: [ each ] ifNotEmpty: [
-				            | init distances |
-				            distances := OrderedCollection new: cross size.
-				            init := 0.
-
-				            cross keysAndValuesDo: [ :v :ds |
-					            init := init + (dBlock value: ds).
-					            distances add: v -> init ].
-
-				            (distances weightedSample: #value random: random) key ] ].
-
-	^ PNRRFruitMBitCoinSample new
-		  sample: backward;
-		  yourself
-]
-
 { #category : 'accessing' }
 PNRRFruitMBitCoinGraph >> vertexAt: anObject [
 
 	^ vertices at: anObject
-]
-
-{ #category : 'sampling' }
-PNRRFruitMBitCoinGraph >> verticesSample1: epsilon [
-
-	| random backward |
-	random := RSRandom seed: Number firstCarmichaelNumber.
-
-	backward := vertices
-		            samplingWithEpsilon: epsilon
-		            random: random
-		            collect: [ :each |
-			            | cross |
-			            cross := Dictionary new.
-
-			            each breadthFirstSearchBackwardDo: [ :v :d |
-				            cross
-					            at: v
-					            ifPresent: [ :col | col add: d ]
-					            ifAbsentPut: [ OrderedCollection with: d ] ].
-
-			            cross ifEmpty: [ each ] ifNotEmpty: [
-				            | init distances |
-				            distances := OrderedCollection new: cross size.
-				            init := 0.
-
-				            cross keysAndValuesDo: [ :v :ds |
-					            init := init + ds max.
-					            distances add: v -> init ].
-
-				            (distances weightedSample: #value random: random) key ] ].
-
-	^ PNRRFruitMBitCoinSample new
-		  sample: backward;
-		  yourself
-]
-
-{ #category : 'sampling' }
-PNRRFruitMBitCoinGraph >> verticesSample2: epsilon [
-
-	| random backward cross |
-	random := RSRandom seed: Number firstCarmichaelNumber.
-
-	cross := Dictionary new.
-
-	backward := vertices
-		            samplingWithEpsilon: epsilon
-		            random: random
-		            collect: [ :each |
-			            each breadthFirstSearchBackwardDo: [ :v :d |
-				            cross
-					            at: v
-					            ifPresent: [ :col | col add: d ]
-					            ifAbsentPut: [ OrderedCollection with: d ] ].
-			            each ].
-
-	cross ifNotEmpty: [
-		| init distances |
-		distances := OrderedCollection new: cross size.
-		init := 0.
-
-		cross keysAndValuesDo: [ :v :ds |
-			init := init + ds max.
-			distances add: v -> init ].
-
-		1 to: backward size do: [ :i |
-			backward
-				at: i
-				put: (distances weightedSample: #value random: random) key ] ].
-
-	^ PNRRFruitMBitCoinSample new
-		  sample: backward;
-		  yourself
-]
-
-{ #category : 'sampling' }
-PNRRFruitMBitCoinGraph >> verticesSample: epsilon [
-
-	| random backward |
-	random := RSRandom seed: Number firstCarmichaelNumber.
-
-	backward := vertices
-		            samplingWithEpsilon: epsilon
-		            random: random
-		            collect: [ :each |
-			            each breadthFirstSearchBackward layers
-				            ifEmpty: [ each ]
-				            ifNotEmpty: [ :layers | layers last atRandom: random ] ].
-
-	^ PNRRFruitMBitCoinSample new
-		  sample: backward;
-		  yourself
 ]
