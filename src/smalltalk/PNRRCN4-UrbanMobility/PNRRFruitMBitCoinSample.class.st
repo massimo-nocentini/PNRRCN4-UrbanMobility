@@ -10,18 +10,28 @@ Class {
 }
 
 { #category : 'estimation' }
-PNRRFruitMBitCoinSample >> diameter [
+PNRRFruitMBitCoinSample >> averageDistance [
 
-	| sum count |
-	sum := 0.
+	| distance count |
+	distance := 0.
 	count := 0.
 
 	self sample do: [ :vertex |
 		vertex breadthFirstSearch distances valuesDo: [ :dist |
-			sum := sum + dist.
+			distance := distance + dist.
 			count := count + 1 ] ].
 
-	^ (sum / count) asFloat
+	^ (distance / count) asFloat
+]
+
+{ #category : 'estimation' }
+PNRRFruitMBitCoinSample >> diameter [
+
+	| diameters |
+	diameters := self sample collect: [ :vertex |
+		             vertex breadthFirstSearch layers size ].
+
+	^ diameters average asFloat
 ]
 
 { #category : 'printing' }
