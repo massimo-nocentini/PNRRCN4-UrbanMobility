@@ -9,11 +9,16 @@ Class {
 { #category : 'estimation' }
 PNRRFruitMBitCoinSampleForDiameter >> estimate [
 
-	| diameters |
-	diameters := self sample collect: [ :vertex |
-		             vertex breadthFirstSearch layers size ].
+	| sum count |
+	sum := 0.
+	count := 0.
+	originalVertices do: [ :vertex |
+		vertex breadthFirstSearch distances keysAndValuesDo: [ :v :d |
+			sum := sum + d ].
 
-	^ diameters average asFloat
+		count := count + vertex breadthFirstSearch distances size ].
+
+	^ (sum / count) asFloat
 ]
 
 { #category : 'accessing' }
@@ -21,5 +26,5 @@ PNRRFruitMBitCoinSampleForDiameter >> sampleVertex: each bfs: bfs crossDistances
 
 	^ bfs layers
 		  ifEmpty: [ each ]
-		  ifNotEmpty: [ :ls | ls last atRandom: random ]
+		  ifNotEmpty: [ :ls | bfs distances keys atRandom: random ]
 ]

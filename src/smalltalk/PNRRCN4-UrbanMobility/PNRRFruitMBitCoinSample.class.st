@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'sample',
 		'random',
-		'epsilon'
+		'epsilon',
+		'originalVertices'
 	],
 	#category : 'PNRRCN4-UrbanMobility-DLT Fruit - Bitcoin',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -69,6 +70,7 @@ PNRRFruitMBitCoinSample >> sample [
 PNRRFruitMBitCoinSample >> sample: aCollection [
 
 	| cross c |
+	originalVertices := aCollection.
 	cross := Dictionary new.
 
 	c := aCollection
