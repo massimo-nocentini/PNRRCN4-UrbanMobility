@@ -6,23 +6,6 @@ Class {
 	#tag : 'DLT Fruit - Bitcoin'
 }
 
-{ #category : 'estimation' }
-PNRRFruitMBitCoinSampleForAverageDistance >> estimate [
-
-	| distance count |
-	distance := 0.
-	count := 0.
-
-	self sample do: [ :vertex |
-		vertex breadthFirstSearch distances valuesDo: [ :dist |
-			distance := distance + dist.
-			count := count + 1 ] ].
-
-	^ count > 0
-		  ifTrue: [ (distance / count) asFloat ]
-		  ifFalse: [ Float infinity ]
-]
-
 { #category : 'accessing' }
 PNRRFruitMBitCoinSampleForAverageDistance >> sampleVertex: each bfs: bfs crossDistances: cross [
 

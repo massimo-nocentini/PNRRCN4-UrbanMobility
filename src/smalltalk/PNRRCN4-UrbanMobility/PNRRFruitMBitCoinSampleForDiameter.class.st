@@ -6,21 +6,6 @@ Class {
 	#tag : 'DLT Fruit - Bitcoin'
 }
 
-{ #category : 'estimation' }
-PNRRFruitMBitCoinSampleForDiameter >> estimate [
-
-	| sum count |
-	sum := 0.
-	count := 0.
-	originalVertices do: [ :vertex |
-		vertex breadthFirstSearch distances keysAndValuesDo: [ :v :d |
-			sum := sum + d ].
-
-		count := count + vertex breadthFirstSearch distances size ].
-
-	^ (sum / count) asFloat
-]
-
 { #category : 'accessing' }
 PNRRFruitMBitCoinSampleForDiameter >> sampleVertex: each bfs: bfs crossDistances: cross [
 

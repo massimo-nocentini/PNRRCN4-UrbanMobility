@@ -27,7 +27,16 @@ PNRRFruitMBitCoinSample >> epsilon: anObject [
 { #category : 'estimation' }
 PNRRFruitMBitCoinSample >> estimate [
 
-	self subclassResponsibility
+	| sum count |
+	sum := 0.
+	count := 0.
+
+	self sample do: [ :vertex |
+		vertex breadthFirstSearch distances keysAndValuesDo: [ :v :d |
+			sum := sum + d.
+			count := count + 1 ] ].
+
+	^ (sum / count) asFloat
 ]
 
 { #category : 'initialization' }
