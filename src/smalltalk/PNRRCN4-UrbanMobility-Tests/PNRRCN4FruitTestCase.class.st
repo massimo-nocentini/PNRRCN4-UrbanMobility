@@ -11,28 +11,40 @@ Class {
 PNRRCN4FruitTestCase >> exampleFor001p [
 
 	<script: 'PNRRCN4FruitTestCase new exampleFor001p'>
-	PNRRFruitMBitCoinBench new
-		filenames:
-			{ 'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/100-0.001p.txt'.
-			'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/200-0.001p.txt'.
-			'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/500-0.001p.txt'.
-			'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/800-0.001p.txt'.
-			'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/1k-0.001p.txt' };
-		bench
+	| elapsedTime |
+	elapsedTime := [
+	               PNRRFruitMBitCoinBench new
+		               filenames:
+			               { 'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/100-0.001p.txt'.
+			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/200-0.001p.txt'.
+			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/500-0.001p.txt'.
+			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/800-0.001p.txt'.
+			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/1k-0.001p.txt' };
+		               bench ] timeToRun.
+	
+	Transcript
+		cr;
+		nextPutAll: elapsedTime asString
 ]
 
 { #category : 'benchmarking' }
 PNRRCN4FruitTestCase >> exampleFor01p [
 
 	<script: 'PNRRCN4FruitTestCase new exampleFor01p'>
-	PNRRFruitMBitCoinBench new
-		filenames:
-			{ 'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/100-0.01p.txt'.
-			'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/200-0.01p.txt'.
-			'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/500-0.01p.txt'.
-			'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/800-0.01p.txt'.
-			'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/1k-0.01p.txt' };
-		bench
+	| elapsedTime |
+	elapsedTime := [
+	               PNRRFruitMBitCoinBench new
+		               filenames:
+			               { 'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/100-0.01p.txt'.
+			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/200-0.01p.txt'.
+			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/500-0.01p.txt'.
+			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/800-0.01p.txt'.
+			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/1k-0.01p.txt' };
+		               bench ] timeToRun.
+
+	Transcript
+		cr;
+		nextPutAll: elapsedTime asString
 ]
 
 { #category : 'tests' }
@@ -49,7 +61,7 @@ PNRRCN4FruitTestCase >> testExportCompiledMethods [
 
 	self
 		exportSlotsGraphOf:
-		PNRRFruitMBitCoinVertex >> #breadthFirstSearchBackwardDo:
+		PNRRFruitMBitCoinVertex >> #breadthFirstSearchBackward
 		pathSuffix: 'bfs-back'.
 
 

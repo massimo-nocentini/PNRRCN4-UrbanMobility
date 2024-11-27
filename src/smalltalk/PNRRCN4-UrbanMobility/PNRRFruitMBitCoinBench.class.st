@@ -80,11 +80,11 @@ PNRRFruitMBitCoinBench >> bench [
 	self filenames do: [ :filename |
 		self epsilons do: [ :epsilon |
 			self repetitions do: [ :n |
-				| g |
-				g := PNRRFruitMBitCoinGraph onFileReference:
-					     filename asFileReference.
+				| g r |
+				r := filename asFileReference.
+				g := PNRRFruitMBitCoinGraph onFileReference: r.
 				self
-					filename: filename
+					filename: r basename
 					graph: g
 					epsilon: epsilon
 					n: n ] ] ]

@@ -18,7 +18,9 @@ PNRRFruitMBitCoinSampleForAverageDistance >> estimate [
 			distance := distance + dist.
 			count := count + 1 ] ].
 
-	^ (distance / count) asFloat
+	^ count > 0
+		  ifTrue: [ (distance / count) asFloat ]
+		  ifFalse: [ Float infinity ]
 ]
 
 { #category : 'accessing' }

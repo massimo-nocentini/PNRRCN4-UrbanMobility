@@ -6,6 +6,7 @@ Class {
 		'outgoingNeighborhood',
 		'incomingNeighborhood',
 		'bfs',
+		'bfsBackward',
 		'index'
 	],
 	#category : 'PNRRCN4-UrbanMobility-DLT Fruit - Bitcoin',
@@ -16,25 +17,21 @@ Class {
 { #category : 'breadth first search' }
 PNRRFruitMBitCoinVertex >> breadthFirstSearch [
 
-	^ self
-		  breadthFirstSearchDo: nil
-		  neighborhoodBlock: #outgoingNeighborhood
-		  edgeAccessor: #to
+	^ bfs ifNil: [
+		  bfs := self
+			         breadthFirstSearchDo: nil
+			         neighborhoodBlock: #outgoingNeighborhood
+			         edgeAccessor: #to ]
 ]
 
 { #category : 'breadth first search' }
 PNRRFruitMBitCoinVertex >> breadthFirstSearchBackward [
 
-	^ self breadthFirstSearchBackwardDo: nil
-]
-
-{ #category : 'breadth first search' }
-PNRRFruitMBitCoinVertex >> breadthFirstSearchBackwardDo: aBlock [
-
-	^ self
-		  breadthFirstSearchDo: aBlock
-		  neighborhoodBlock: #incomingNeighborhood
-		  edgeAccessor: #from
+	^ bfsBackward ifNil: [
+		  bfsBackward := self
+			                 breadthFirstSearchDo: nil
+			                 neighborhoodBlock: #incomingNeighborhood
+			                 edgeAccessor: #from ]
 ]
 
 { #category : 'breadth first search' }
