@@ -13,7 +13,7 @@ Class {
 	#tag : 'DLT Fruit - Bitcoin'
 }
 
-{ #category : 'visiting' }
+{ #category : 'breadth first search' }
 PNRRFruitMBitCoinVertex >> breadthFirstSearch [
 
 	^ self
@@ -22,13 +22,13 @@ PNRRFruitMBitCoinVertex >> breadthFirstSearch [
 		  edgeAccessor: #to
 ]
 
-{ #category : 'visiting' }
+{ #category : 'breadth first search' }
 PNRRFruitMBitCoinVertex >> breadthFirstSearchBackward [
 
 	^ self breadthFirstSearchBackwardDo: nil
 ]
 
-{ #category : 'visiting' }
+{ #category : 'breadth first search' }
 PNRRFruitMBitCoinVertex >> breadthFirstSearchBackwardDo: aBlock [
 
 	^ self
@@ -37,7 +37,7 @@ PNRRFruitMBitCoinVertex >> breadthFirstSearchBackwardDo: aBlock [
 		  edgeAccessor: #from
 ]
 
-{ #category : 'visiting' }
+{ #category : 'breadth first search' }
 PNRRFruitMBitCoinVertex >> breadthFirstSearchDo: doBlock neighborhoodBlock: nBlock edgeAccessor: eBlock [
 
 	| seen queue layers |
