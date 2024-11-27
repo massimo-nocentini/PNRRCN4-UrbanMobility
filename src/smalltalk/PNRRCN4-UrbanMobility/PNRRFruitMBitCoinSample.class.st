@@ -36,7 +36,7 @@ PNRRFruitMBitCoinSample >> initialize [
 
 	self
 		epsilon: 0.1;
-		random: Random new "(RSRandom seed: Number firstCarmichaelNumber)"
+		random: (RSRandom seed: Number firstCarmichaelNumber)
 ]
 
 { #category : 'printing' }
