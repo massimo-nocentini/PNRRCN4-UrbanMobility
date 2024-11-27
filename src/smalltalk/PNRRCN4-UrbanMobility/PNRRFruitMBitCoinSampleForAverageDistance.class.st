@@ -25,13 +25,21 @@ PNRRFruitMBitCoinSampleForAverageDistance >> estimate [
 PNRRFruitMBitCoinSampleForAverageDistance >> sampleVertex: each bfs: bfs crossDistances: cross [
 
 	^ cross ifEmpty: [ each ] ifNotEmpty: [
-		  | init distances |
-		  distances := OrderedCollection new: cross size.
-		  init := 0.
+		  | init distances j size |
+		  size := cross size.
+		  distances := OrderedCollection new: size.
 
+		  init := 0.
 		  cross keysAndValuesDo: [ :v :ds |
 			  init := init + ds size.
 			  distances add: v -> init ].
 
-		  (distances weightedSample: #value random: random) key ]
+		  j := random nextInteger: init.
+
+		  j := distances
+			       findBinaryIndex: [ :assoc |
+			       j threeWayCompareTo: assoc value ]
+			       ifNone: [ :l :h | h min: size max: 1 ].
+
+		  (distances at: j) key ]
 ]
