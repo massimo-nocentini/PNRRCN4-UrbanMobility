@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'epsilons',
 		'filenames',
-		'repetitions'
+		'repetitions',
+		'random'
 	],
 	#category : 'PNRRCN4-UrbanMobility-DLT Fruit - Bitcoin',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -35,25 +36,66 @@ PNRRFruitMBitCoinBench >> epsilons: anObject [
 { #category : 'benchmarking' }
 PNRRFruitMBitCoinBench >> filename: filename epsilon: epsilon n: n [
 
-	| g vertices td d ta a |
+	| g vertices td d ta a ds as interval trued truea ttrued ttruea |
+	interval := 1 to: n.
 	g := PNRRFruitMBitCoinGraph onFileReference: filename asFileReference.
 
 	vertices := g asVerticesArray.
 
 	td := [
-	      d := PNRRFruitMBitCoinSampleForDiameter new
-		           sample: vertices;
-		           estimate ] timeToRun.
+	      d := (interval collect: [ :i |
+		            ds := PNRRFruitMBitCoinSampleForDiameter new
+			                  random: self random;
+			                  epsilon: epsilon;
+			                  sample: vertices;
+			                  yourself.
+		            ds estimate ]) average ] timeToRun.
 
 	ta := [
-	      a := PNRRFruitMBitCoinSampleForAverageDistance new
-		           sample: vertices;
-		           estimate ] timeToRun.
+	      a := (interval collect: [ :i |
+		            as := PNRRFruitMBitCoinSampleForAverageDistance new
+			                  random: self random;
+			                  epsilon: epsilon;
+			                  sample: vertices;
+			                  yourself.
+		            as estimate ]) average ] timeToRun.
+
+
+	ttrued := [ trued := g diameter ] timeToRun.
+
+	ttruea := [ truea := g averageDistance ] timeToRun.
+
 
 	Transcript
+		cr;
+		nextPutAll: '|';
 		nextPutAll: filename;
-		tab;
-		nextPutAll: vertices size asString
+		nextPutAll: '|';
+		nextPutAll: vertices size asString;
+		nextPutAll: '|';
+		nextPutAll: epsilon asString;
+		nextPutAll: '|';
+		nextPutAll: ds sample size asString;
+		nextPutAll: '|';
+		nextPutAll: n asString;
+		nextPutAll: '|';
+		nextPutAll: d asString;
+		nextPutAll: '|';
+		nextPutAll: td asString;
+		nextPutAll: '|';
+		nextPutAll: a asString;
+		nextPutAll: '|';
+		nextPutAll: ta asString;
+		nextPutAll: '|';
+		nextPutAll: trued asString;
+		nextPutAll: '|';
+		nextPutAll: ttrued asString;
+		nextPutAll: '|';
+		nextPutAll: truea asString;
+		nextPutAll: '|';
+		nextPutAll: ttruea asString;
+		nextPutAll: '|';
+		flush
 ]
 
 { #category : 'accessing' }
@@ -76,7 +118,20 @@ PNRRFruitMBitCoinBench >> initialize [
 	self
 		filenames: {  };
 		epsilons: { 1. 0.8. 0.2. 0.1 };
-		repetitions: { 1. 10. 30 }
+		repetitions: { 1. 10. 30 };
+		random: (RSRandom seed: Number firstCarmichaelNumber)
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinBench >> random [
+
+	^ random
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinBench >> random: anObject [
+
+	random := anObject
 ]
 
 { #category : 'accessing' }
