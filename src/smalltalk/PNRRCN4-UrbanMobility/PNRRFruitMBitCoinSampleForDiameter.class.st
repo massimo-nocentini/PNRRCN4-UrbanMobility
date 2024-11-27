@@ -11,5 +11,5 @@ PNRRFruitMBitCoinSampleForDiameter >> sampleVertex: each bfs: bfs crossDistances
 
 	^ bfs layers
 		  ifEmpty: [ each ]
-		  ifNotEmpty: [ :ls | bfs distances keys atRandom: random ]
+		  ifNotEmpty: [ :layers | layers first atRandom: random ]
 ]
