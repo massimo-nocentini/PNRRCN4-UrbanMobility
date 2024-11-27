@@ -15,10 +15,79 @@ Class {
 { #category : 'benchmarking' }
 PNRRFruitMBitCoinBench >> bench [
 
+	Transcript
+		cr;
+		nextPutAll: '|';
+		nextPutAll: 'filename';
+		nextPutAll: '|';
+		nextPutAll: 'vertices';
+		nextPutAll: '|';
+		nextPutAll: 'epsilon';
+		nextPutAll: '|';
+		nextPutAll: 'sample size';
+		nextPutAll: '|';
+		nextPutAll: 'repetitions';
+		nextPutAll: '|';
+		nextPutAll: 'estim diameter';
+		nextPutAll: '|';
+		nextPutAll: 'elapsed time';
+		nextPutAll: '|';
+		nextPutAll: 'estim avg distance';
+		nextPutAll: '|';
+		nextPutAll: 'elapsed time';
+		nextPutAll: '|';
+		nextPutAll: 'true diameter';
+		nextPutAll: '|';
+		nextPutAll: 'elapsed time';
+		nextPutAll: '|';
+		nextPutAll: 'true avg distance';
+		nextPutAll: '|';
+		nextPutAll: 'elapsed time';
+		nextPutAll: '|';
+		flush.
+
+	Transcript
+		cr;
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		flush.
+
 	self filenames do: [ :filename |
 		self epsilons do: [ :epsilon |
 			self repetitions do: [ :n |
-				self filename: filename epsilon: epsilon n: n ] ] ]
+				| g |
+				g := PNRRFruitMBitCoinGraph onFileReference:
+					     filename asFileReference.
+				self
+					filename: filename
+					graph: g
+					epsilon: epsilon
+					n: n ] ] ]
 ]
 
 { #category : 'accessing' }
@@ -34,11 +103,10 @@ PNRRFruitMBitCoinBench >> epsilons: anObject [
 ]
 
 { #category : 'benchmarking' }
-PNRRFruitMBitCoinBench >> filename: filename epsilon: epsilon n: n [
+PNRRFruitMBitCoinBench >> filename: filename graph: g epsilon: epsilon n: n [
 
-	| g vertices td d ta a ds as interval trued truea ttrued ttruea |
+	| vertices td d ta a ds as interval trued truea ttrued ttruea |
 	interval := 1 to: n.
-	g := PNRRFruitMBitCoinGraph onFileReference: filename asFileReference.
 
 	vertices := g asVerticesArray.
 
