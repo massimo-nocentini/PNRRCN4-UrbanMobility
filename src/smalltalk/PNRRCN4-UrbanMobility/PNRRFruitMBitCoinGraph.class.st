@@ -3,7 +3,9 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'vertices',
-		'edges'
+		'edges',
+		'diameter',
+		'averageDistance'
 	],
 	#classVars : [
 		'Instance'
@@ -207,26 +209,29 @@ PNRRFruitMBitCoinGraph >> asVerticesArray [
 { #category : 'measuring' }
 PNRRFruitMBitCoinGraph >> averageDistance [
 
-	| distance count |
-	distance := 0.
-	count := 0.
+	^ averageDistance ifNil: [
+		  | distance count |
+		  distance := 0.
+		  count := 0.
 
-	vertices valuesDo: [ :v |
-		| bfs |
-		bfs := v breadthFirstSearch.
-		bfs distances valuesDo: [ :vd |
-			distance := distance + vd.
-			count := count + 1 ] ].
+		  vertices valuesDo: [ :v |
+			  | bfs |
+			  bfs := v breadthFirstSearch.
+			  bfs distances valuesDo: [ :vd |
+				  distance := distance + vd.
+				  count := count + 1 ] ].
 
-	^ (distance / count) asFloat
+		  averageDistance := (distance / count) asFloat ]
 ]
 
 { #category : 'measuring' }
 PNRRFruitMBitCoinGraph >> diameter [
 
-	^ vertices values
-		  foldr: [ :v :d | d max: v breadthFirstSearch layers size ]
-		  init: 0
+	^ diameter ifNil: [
+		  diameter := vertices values
+			              foldr: [ :v :d |
+			              d max: v breadthFirstSearch layers size ]
+			              init: 0 ]
 ]
 
 { #category : 'initialization' }
