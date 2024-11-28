@@ -113,7 +113,7 @@ PNRRFruitMBitCoinBench >> graph: g epsilon: epsilon n: n [
 
 	td := [
 	      d := (interval collect: [ :i |
-		            ds := PNRRFruitMBitCoinSampleForDiameter new
+		            ds := PNRRFruitMBitCoinSampleByBfsLayers new
 			                  random: self random;
 			                  epsilon: epsilon;
 			                  sample: vertices;
@@ -122,7 +122,7 @@ PNRRFruitMBitCoinBench >> graph: g epsilon: epsilon n: n [
 
 	ta := [
 	      a := (interval collect: [ :i |
-		            as := PNRRFruitMBitCoinSampleForAverageDistance new
+		            as := PNRRFruitMBitCoinSampleByBfsCross new
 			                  random: self random;
 			                  epsilon: epsilon;
 			                  sample: vertices;

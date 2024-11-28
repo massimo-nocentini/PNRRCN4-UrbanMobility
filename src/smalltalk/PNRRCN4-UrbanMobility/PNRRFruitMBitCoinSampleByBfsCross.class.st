@@ -1,5 +1,5 @@
 Class {
-	#name : 'PNRRFruitMBitCoinSampleForAverageDistance',
+	#name : 'PNRRFruitMBitCoinSampleByBfsCross',
 	#superclass : 'PNRRFruitMBitCoinSample',
 	#category : 'PNRRCN4-UrbanMobility-DLT Fruit - Bitcoin',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -7,7 +7,7 @@ Class {
 }
 
 { #category : 'accessing' }
-PNRRFruitMBitCoinSampleForAverageDistance >> sampleVertex: each bfs: bfs crossDistances: cross [
+PNRRFruitMBitCoinSampleByBfsCross >> sampleVertex: each bfs: bfs crossDistances: cross [
 
 	^ cross ifEmpty: [ each ] ifNotEmpty: [
 		  | init distances j size |
