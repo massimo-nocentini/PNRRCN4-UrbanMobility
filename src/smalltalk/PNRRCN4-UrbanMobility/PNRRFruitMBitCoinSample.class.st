@@ -91,10 +91,7 @@ PNRRFruitMBitCoinSample >> sample: aCollection [
 			          bfs := each breadthFirstSearchBackward.
 
 			          bfs distances keysAndValuesDo: [ :v :d |
-				          cross
-					          at: v
-					          ifPresent: [ :col | col add: d ]
-					          ifAbsentPut: [ OrderedCollection with: d ] ].
+				          cross at: v update: [ :dd | dd min: d ] initial: d ].
 
 			          each -> bfs ].
 

@@ -15,8 +15,8 @@ PNRRFruitMBitCoinSampleByBfsCross >> sampleVertex: each bfs: bfs crossDistances:
 		  distances := OrderedCollection new: size.
 
 		  init := 0.
-		  cross keysAndValuesDo: [ :v :ds |
-			  init := init + ds min.
+		  cross keysAndValuesDo: [ :v :d |
+			  init := init + d.
 			  distances add: v -> init ].
 
 		  j := random nextInteger: init.
