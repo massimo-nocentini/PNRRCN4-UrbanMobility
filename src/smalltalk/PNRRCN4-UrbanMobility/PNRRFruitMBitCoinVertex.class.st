@@ -52,14 +52,11 @@ PNRRFruitMBitCoinVertex >> breadthFirstSearchDo: doBlock neighborhoodBlock: nBlo
 		dist := assoc value.
 
 		seen at: vertex ifAbsentPut: [
-			| neighborhood layer |
-			neighborhood := (nBlock value: vertex) collect: [ :edge |
-				                (eBlock value: edge) -> (dist + 1) ].
+			(nBlock value: vertex) do: [ :edge |
+				queue add: (eBlock value: edge) -> (dist + 1) ].
 
-			queue addAll: neighborhood.
-
-			layer := layers at: dist ifAbsentPut: [ OrderedCollection new ].
-			layer add: vertex.
+			(layers at: dist ifAbsentPut: [ OrderedCollection new ]) add:
+				vertex.
 
 			doBlock ifNotNil: [ doBlock value: vertex value: dist ].
 

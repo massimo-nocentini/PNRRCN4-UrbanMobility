@@ -5,7 +5,8 @@ Class {
 		'vertices',
 		'edges',
 		'diameter',
-		'averageDistance'
+		'averageDistance',
+		'basename'
 	],
 	#classVars : [
 		'Instance'
@@ -138,6 +139,8 @@ PNRRFruitMBitCoinGraph class >> onFileReference: aFileReference [
 	graph := self new.
 
 	aFileReference exists ifTrue: [
+		graph basename: aFileReference basename.
+
 		aFileReference readStreamDo: [ :fileStream |
 			[ fileStream atEnd ] whileFalse: [
 				| line i |
@@ -222,6 +225,18 @@ PNRRFruitMBitCoinGraph >> averageDistance [
 				  count := count + 1 ] ].
 
 		  averageDistance := (distance / count) asFloat ]
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinGraph >> basename [
+
+	^ basename
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinGraph >> basename: anObject [
+
+	basename := anObject
 ]
 
 { #category : 'measuring' }

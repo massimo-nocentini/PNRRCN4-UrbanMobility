@@ -28,15 +28,11 @@ PNRRFruitMBitCoinBench >> bench [
 		nextPutAll: '|';
 		nextPutAll: 'repetitions';
 		nextPutAll: '|';
-		nextPutAll: 'estim diameter';
+		nextPutAll: 'avg dist by linear';
 		nextPutAll: '|';
 		nextPutAll: 'elapsed time';
 		nextPutAll: '|';
-		nextPutAll: 'estim avg distance';
-		nextPutAll: '|';
-		nextPutAll: 'elapsed time';
-		nextPutAll: '|';
-		nextPutAll: 'true diameter';
+		nextPutAll: 'avg dist by cross';
 		nextPutAll: '|';
 		nextPutAll: 'elapsed time';
 		nextPutAll: '|';
@@ -71,23 +67,16 @@ PNRRFruitMBitCoinBench >> bench [
 		nextPutAll: '|';
 		nextPutAll: '---';
 		nextPutAll: '|';
-		nextPutAll: '---';
-		nextPutAll: '|';
-		nextPutAll: '---';
-		nextPutAll: '|';
 		flush.
 
 	self filenames do: [ :filename |
 		self epsilons do: [ :epsilon |
 			self repetitions do: [ :n |
-				| g r |
-				r := filename asFileReference.
-				g := PNRRFruitMBitCoinGraph onFileReference: r.
-				self
-					filename: r basename
-					graph: g
-					epsilon: epsilon
-					n: n ] ] ]
+				| g |
+				g := PNRRFruitMBitCoinGraph onFileReference:
+					     filename asFileReference.
+					
+				self graph: g epsilon: epsilon n: n ] ] ]
 ]
 
 { #category : 'accessing' }
@@ -102,10 +91,22 @@ PNRRFruitMBitCoinBench >> epsilons: anObject [
 	epsilons := anObject
 ]
 
-{ #category : 'benchmarking' }
-PNRRFruitMBitCoinBench >> filename: filename graph: g epsilon: epsilon n: n [
+{ #category : 'accessing' }
+PNRRFruitMBitCoinBench >> filenames [
 
-	| vertices td d ta a ds as interval trued truea ttrued ttruea |
+	^ filenames
+]
+
+{ #category : 'accessing' }
+PNRRFruitMBitCoinBench >> filenames: anObject [
+
+	filenames := anObject
+]
+
+{ #category : 'benchmarking' }
+PNRRFruitMBitCoinBench >> graph: g epsilon: epsilon n: n [
+
+	| vertices td d ta a ds as interval  truea  ttruea |
 	interval := 1 to: n.
 
 	vertices := g asVerticesArray.
@@ -128,16 +129,13 @@ PNRRFruitMBitCoinBench >> filename: filename graph: g epsilon: epsilon n: n [
 			                  yourself.
 		            as estimate ]) average ] timeToRun.
 
-
-	ttrued := [ trued := g diameter ] timeToRun.
-
 	ttruea := [ truea := g averageDistance ] timeToRun.
 
 
 	Transcript
 		cr;
 		nextPutAll: '|';
-		nextPutAll: filename;
+		nextPutAll: g basename;
 		nextPutAll: '|';
 		nextPutAll: vertices size asString;
 		nextPutAll: '|';
@@ -147,35 +145,19 @@ PNRRFruitMBitCoinBench >> filename: filename graph: g epsilon: epsilon n: n [
 		nextPutAll: '|';
 		nextPutAll: n asString;
 		nextPutAll: '|';
-		nextPutAll: d asString;
+		nextPutAll: (d printShowingDecimalPlaces: 4);
 		nextPutAll: '|';
 		nextPutAll: td asString;
 		nextPutAll: '|';
-		nextPutAll: a asString;
+		nextPutAll: (a printShowingDecimalPlaces: 4);
 		nextPutAll: '|';
 		nextPutAll: ta asString;
 		nextPutAll: '|';
-		nextPutAll: trued asString;
-		nextPutAll: '|';
-		nextPutAll: ttrued asString;
-		nextPutAll: '|';
-		nextPutAll: truea asString;
+		nextPutAll: (truea printShowingDecimalPlaces: 4);
 		nextPutAll: '|';
 		nextPutAll: ttruea asString;
 		nextPutAll: '|';
 		flush
-]
-
-{ #category : 'accessing' }
-PNRRFruitMBitCoinBench >> filenames [
-
-	^ filenames
-]
-
-{ #category : 'accessing' }
-PNRRFruitMBitCoinBench >> filenames: anObject [
-
-	filenames := anObject
 ]
 
 { #category : 'initialization' }

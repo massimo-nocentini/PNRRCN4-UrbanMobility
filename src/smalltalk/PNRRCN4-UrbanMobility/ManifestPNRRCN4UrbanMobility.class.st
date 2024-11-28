@@ -10,6 +10,13 @@ Class {
 }
 
 { #category : 'code-critics' }
+ManifestPNRRCN4UrbanMobility class >> ruleCollectionProtocolRuleV1FalsePositive [
+
+	<ignoreForCoverage>
+	^ #(#(#(#RGMethodDefinition #(#PNRRFruitMBitCoinVertex #breadthFirstSearchDo:neighborhoodBlock:edgeAccessor: #false)) #'2024-11-28T09:21:24.760754+01:00') )
+]
+
+{ #category : 'code-critics' }
 ManifestPNRRCN4UrbanMobility class >> ruleToDoCollectRuleV1FalsePositive [
 
 	<ignoreForCoverage>
