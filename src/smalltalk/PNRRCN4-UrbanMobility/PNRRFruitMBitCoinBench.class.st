@@ -36,6 +36,10 @@ PNRRFruitMBitCoinBench >> bench [
 		nextPutAll: '|';
 		nextPutAll: 'elapsed time';
 		nextPutAll: '|';
+		nextPutAll: 'avg dist by uniform';
+		nextPutAll: '|';
+		nextPutAll: 'elapsed time';
+		nextPutAll: '|';
 		nextPutAll: 'true avg distance';
 		nextPutAll: '|';
 		nextPutAll: 'elapsed time';
@@ -75,7 +79,7 @@ PNRRFruitMBitCoinBench >> bench [
 				| g |
 				g := PNRRFruitMBitCoinGraph onFileReference:
 					     filename asFileReference.
-					
+
 				self graph: g epsilon: epsilon n: n ] ] ]
 ]
 
@@ -106,7 +110,7 @@ PNRRFruitMBitCoinBench >> filenames: anObject [
 { #category : 'benchmarking' }
 PNRRFruitMBitCoinBench >> graph: g epsilon: epsilon n: n [
 
-	| vertices td d ta a ds as interval  truea  ttruea |
+	| vertices td d ta a ds as interval truea ttruea u tu us |
 	interval := 1 to: n.
 
 	vertices := g asVerticesArray.
@@ -128,6 +132,15 @@ PNRRFruitMBitCoinBench >> graph: g epsilon: epsilon n: n [
 			                  sample: vertices;
 			                  yourself.
 		            as estimate ]) average ] timeToRun.
+
+	tu := [
+	      u := (interval collect: [ :i |
+		            us := PNRRFruitMBitCoinSampleByBfsUniform new
+			                  random: self random;
+			                  epsilon: epsilon;
+			                  sample: vertices;
+			                  yourself.
+		            us estimate ]) average ] timeToRun.
 
 	ttruea := [ truea := g averageDistance ] timeToRun.
 
@@ -152,6 +165,10 @@ PNRRFruitMBitCoinBench >> graph: g epsilon: epsilon n: n [
 		nextPutAll: (a printShowingDecimalPlaces: 4);
 		nextPutAll: '|';
 		nextPutAll: ta asString;
+		nextPutAll: '|';
+		nextPutAll: (u printShowingDecimalPlaces: 4);
+		nextPutAll: '|';
+		nextPutAll: tu asString;
 		nextPutAll: '|';
 		nextPutAll: (truea printShowingDecimalPlaces: 4);
 		nextPutAll: '|';

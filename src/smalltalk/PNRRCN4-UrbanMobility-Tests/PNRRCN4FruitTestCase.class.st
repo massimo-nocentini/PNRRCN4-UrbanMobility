@@ -20,7 +20,7 @@ PNRRCN4FruitTestCase >> exampleFor001p [
 			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/500-0.001p.txt'.
 			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/800-0.001p.txt'.
 			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/1k-0.001p.txt'.
-			               "'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/2k-0.001p.txt'" };
+			               'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/erdos-renyi/2k-0.001p.txt' };
 		               bench ] timeToRun.
 
 	Transcript
