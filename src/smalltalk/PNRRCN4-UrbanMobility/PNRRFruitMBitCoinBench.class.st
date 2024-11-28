@@ -71,6 +71,10 @@ PNRRFruitMBitCoinBench >> bench [
 		nextPutAll: '|';
 		nextPutAll: '---';
 		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
+		nextPutAll: '---';
+		nextPutAll: '|';
 		flush.
 
 	self filenames do: [ :filename |
