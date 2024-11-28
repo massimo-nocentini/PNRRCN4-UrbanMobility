@@ -169,6 +169,21 @@ PNRRFruitMBitCoinGraph class >> smallInstance [
 ]
 
 { #category : 'accessing' }
+PNRRFruitMBitCoinGraph class >> star: n [
+
+	| graph nAsString |
+	nAsString := n asString.
+
+	graph := self new
+		         basename: 'star ' , nAsString;
+		         yourself.
+
+	1 to: n - 1 do: [ :i | graph addEdgeFrom: i asString to: nAsString ].
+
+	^ graph
+]
+
+{ #category : 'accessing' }
 PNRRFruitMBitCoinGraph >> addEdgeFrom: fromId to: toId [
 
 	| edge from to |

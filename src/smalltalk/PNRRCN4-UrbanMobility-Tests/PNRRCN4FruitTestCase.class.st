@@ -79,3 +79,16 @@ PNRRCN4FruitTestCase >> testExportCompiledMethods [
 
 	self exportSlotsGraphOf: pdf pages pathSuffix: 'pdf'
 ]
+
+{ #category : 'tests' }
+PNRRCN4FruitTestCase >> testStar [
+
+	| g s |
+	g := PNRRFruitMBitCoinGraph star: 1000.
+
+	s := PNRRFruitMBitCoinSampleByBfsUniform new
+		     sample: g asVerticesArray;
+		     yourself.
+
+	self assert: s estimate closeTo: 1.0
+]
