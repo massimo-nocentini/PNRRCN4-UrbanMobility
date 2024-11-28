@@ -36,7 +36,7 @@ PNRRFruitMBitCoinSample >> estimate [
 			sum := sum + d.
 			count := count + 1 ] ].
 
-	^ (sum / count) asFloat
+	^ sum asFloat / count asFloat
 ]
 
 { #category : 'initialization' }
@@ -80,6 +80,7 @@ PNRRFruitMBitCoinSample >> sample: aCollection [
 
 	| cross c |
 	originalVertices := aCollection.
+
 	cross := Dictionary new.
 
 	c := aCollection

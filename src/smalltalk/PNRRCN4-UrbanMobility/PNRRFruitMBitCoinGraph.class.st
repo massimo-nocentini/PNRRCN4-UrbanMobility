@@ -224,7 +224,7 @@ PNRRFruitMBitCoinGraph >> averageDistance [
 				  distance := distance + vd.
 				  count := count + 1 ] ].
 
-		  averageDistance := (distance / count) asFloat ]
+		  averageDistance := distance asFloat / count asFloat ]
 ]
 
 { #category : 'accessing' }
@@ -256,10 +256,4 @@ PNRRFruitMBitCoinGraph >> initialize [
 
 	vertices := Dictionary new.
 	edges := OrderedCollection new
-]
-
-{ #category : 'accessing' }
-PNRRFruitMBitCoinGraph >> vertexAt: anObject [
-
-	^ vertices at: anObject
 ]
