@@ -7,8 +7,7 @@ local function bfs (v, borhoodSelector)
 	local key = 'bfs' .. borhoodSelector
 	
 	if not v[key] then
-		local seen = {}
-		local maxdistance = {vertex = nil, distance = 0}
+		local seen = {layers = {}}
 		local queue = {} for i, w in ipairs (v[borhoodSelector]) do queue[i] = {vertex = w, distance = 1} end
 
 		while #queue > 0 do
@@ -18,17 +17,15 @@ local function bfs (v, borhoodSelector)
 				seen[vertex] = distance
 				table.insert(seen, vertex)
 
-				if distance > maxdistance.distance then
-					maxdistance.distance = distance
-					maxdistance.vertex = vertex
-				end
+				local l = seen.layers[distance]
+				if not l then l = {}; seen.layers[distance] = l end
+				table.insert (l, vertex)
 
 				local d = distance + 1
 				for i, w in ipairs (vertex[borhoodSelector]) do table.insert (queue, {vertex = w, distance = d}) end
 			end
 		end
 
-		seen.maxdistance_vertex = maxdistance.vertex
 		v[key] = seen
 	end
 
@@ -54,30 +51,19 @@ local function sample (vertices, k)
 		local vbfs = bfs (v, 'inhood')
 
 		--local n = #vbfs if n > 0 then S[i] = vbfs[math.random (n)] else S[i] = v end
-		if vbfs.maxdistance_vertex then S[i] = vbfs.maxdistance_vertex else S[i] = v end
+		local n = #vbfs.layers 
+		if n > 0 then 
+			local l = vbfs.layers[n] 
+			S[i] = l[math.random (#l)]
+		else S[i] = v end
 	end
 
 	return S
 
 end
 
-local function diameter (S)
-	local sum, count, B = 0, 0, {}
 
-	for i, v in ipairs (S) do
-
-		local vbfs = bfs (v, 'outhood')
-		for i, w in ipairs (vbfs) do
-			local d = vbfs[w]
-			sum = sum + d
-			count = count + 1
-		end
-	end
-
-	return sum / count
-end
-
-local function diameter_true (V)
+local function diameter (V)
 
 	local d = 0
 
@@ -146,7 +132,7 @@ function module.diameter (filename, graph, n, epsilon)
 		k,
 		n,
 		t,
-		diameter_true(graph.vertices),
+		diameter (graph.vertices),
 		avg,
 	}
 end
