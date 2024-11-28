@@ -78,31 +78,34 @@ PNRRFruitMBitCoinSample >> sample [
 { #category : 'accessing' }
 PNRRFruitMBitCoinSample >> sample: aCollection [
 
-	| cross c |
+	| cross |
 	originalVertices := aCollection.
 
 	cross := Dictionary new.
 
-	c := aCollection
-		     samplingWithEpsilon: epsilon
-		     random: random
-		     collect: [ :each |
-			     | bfs |
-			     bfs := each breadthFirstSearchBackward.
+	sample := aCollection
+		          samplingWithEpsilon: epsilon
+		          random: random
+		          collect: [ :each |
+			          | bfs |
+			          bfs := each breadthFirstSearchBackward.
 
-			     bfs distances keysAndValuesDo: [ :v :d |
-				     cross
-					     at: v
-					     ifPresent: [ :col | col add: d ]
-					     ifAbsentPut: [ OrderedCollection with: d ] ].
+			          bfs distances keysAndValuesDo: [ :v :d |
+				          cross
+					          at: v
+					          ifPresent: [ :col | col add: d ]
+					          ifAbsentPut: [ OrderedCollection with: d ] ].
 
-			     each -> bfs ].
+			          each -> bfs ].
 
-	sample := c collect: [ :assoc |
-		          self
-			          sampleVertex: assoc key
-			          bfs: assoc value
-			          crossDistances: cross ]
+	sample withIndexDo: [ :assoc :i |
+		| v |
+		v := self
+			     sampleVertex: assoc key
+			     bfs: assoc value
+			     crossDistances: cross.
+
+		sample at: i put: v ]
 ]
 
 { #category : 'accessing' }
