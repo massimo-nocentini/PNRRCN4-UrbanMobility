@@ -35,6 +35,7 @@ local function bfs (v, borhoodSelector)
 			local w = v.graph.vertices[k]
 			seen[k] = w	-- by position
 			seen[w] = d -- by key
+			
 			local l = seen.layers[d]
 			if not l then l = {}; seen.layers[d] = l end
 			table.insert (l, w)
