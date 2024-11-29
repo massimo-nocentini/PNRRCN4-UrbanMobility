@@ -35,6 +35,7 @@ local filename = {
 	]]
 }
 
+-- collectgarbage ('stop')
 for _, f in pairs (filename) do
 	local g = D.parse_graph (f)
 	for _, e in pairs (epsilon) do

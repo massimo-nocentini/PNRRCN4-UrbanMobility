@@ -226,28 +226,28 @@ void cb(pennant_node_t *node, void *ud)
 
 void process_layer(pbfs_data_t *); // prototype
 
-void *thread(void *args)
+void *thread(void *arg)
 {
-	pbfs_data_t *data = args;
+	process_layer(arg);
 
-	process_layer(data);
+	pthread_exit(arg);
 
-	return args;
+	return arg;
 }
 
 void process_layer(pbfs_data_t *data)
 {
-	if (0 && bag_len(data->frontier) > 128)
+	if (bag_len(data->frontier) > 4)
 	{
-
 		pthread_t thread_a, thread_b;
 
-		pbfs_data_t splitdata = *data;
+		pbfs_data_t dataa = *data;
+		pbfs_data_t datab = *data;
 
-		splitdata.frontier = bag_split(data->frontier);
+		datab.frontier = bag_split(data->frontier);
 
-		pthread_create(&thread_a, NULL, thread, data);
-		pthread_create(&thread_b, NULL, thread, &splitdata);
+		pthread_create(&thread_a, NULL, &thread, &dataa);
+		pthread_create(&thread_b, NULL, &thread, &datab);
 
 		pthread_join(thread_a, NULL);
 		pthread_join(thread_b, NULL);
