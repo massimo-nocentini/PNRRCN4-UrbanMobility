@@ -1,6 +1,7 @@
 
 -- the following script allows us to test the main algorithm over the whole file.
 
+local libluabag = require 'libluabag'
 
 local function bfs (v, borhoodSelector)
 
@@ -25,6 +26,9 @@ local function bfs (v, borhoodSelector)
 				for i, w in ipairs (vertex[borhoodSelector]) do table.insert (queue, {vertex = w, distance = d}) end
 			end
 		end
+
+		local B = libluabag.pbfs (v, borhoodSelector)
+		for k, v in pairs (B) do print (k, v) end
 
 		v[key] = seen
 	end
@@ -91,8 +95,13 @@ function module.parse_graph (filename)
 		local vs = graph.vertices
 
 		if not vs[id] then
-			local v = {id = id, progressive = #vs + 1, outhood = {}, inhood = {}} -- a very simple table that represents a vertex.
-			vs[v.progressive] = v -- to allow access by position
+			local v = {
+				graph = graph,
+				id = id,
+				index = #vs + 1, 
+				outhood = {}, inhood = {}
+			}
+			vs[v.index] = v -- to allow access by position
 			vs[id] = v -- and by id.
 		end
 
