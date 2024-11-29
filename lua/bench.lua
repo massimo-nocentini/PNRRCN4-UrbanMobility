@@ -14,25 +14,28 @@ local filename = {
 	'../data/erdos-renyi/500-0.001p.txt',
 	'../data/erdos-renyi/800-0.001p.txt',
 	'../data/erdos-renyi/1k-0.001p.txt',
+	'../data/erdos-renyi/2k-0.001p.txt',
 
 	'../data/erdos-renyi/100-0.01p.txt',
 	'../data/erdos-renyi/200-0.01p.txt',
 	'../data/erdos-renyi/500-0.01p.txt',
 	'../data/erdos-renyi/800-0.01p.txt',
 	'../data/erdos-renyi/1k-0.01p.txt',
+	'../data/erdos-renyi/2k-0.01p.txt',
 
 	'../data/erdos-renyi/100-0.1p.txt',
 	'../data/erdos-renyi/200-0.1p.txt',
 	'../data/erdos-renyi/500-0.1p.txt',
 	'../data/erdos-renyi/800-0.1p.txt',
 	'../data/erdos-renyi/1k-0.1p.txt',
+	'../data/erdos-renyi/2k-0.1p.txt',
 }
 
 for _, f in pairs (filename) do
 	local g = D.parse_graph (f)
 	for _, e in pairs (epsilon) do
 		for _, n in pairs (size) do
-			print (table.unpack (D.diameter (f, g, n, e)))
+			print (table.unpack (D.average_distance (f, g, n, e)))
 		end
 	end
 end

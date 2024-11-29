@@ -9,7 +9,7 @@ local function bfs (v, borhoodSelector)
 	
 	if not v[key] then
 		local seen = {layers = {}}
-		--[[
+		---[[
 		local queue = {} for i, w in ipairs (v[borhoodSelector]) do queue[i] = {vertex = w, distance = 1} end
 
 		while #queue > 0 do
@@ -27,8 +27,9 @@ local function bfs (v, borhoodSelector)
 				for i, w in ipairs (vertex[borhoodSelector]) do table.insert (queue, {vertex = w, distance = d}) end
 			end
 		end
-		]]
+		--]]
 
+		--[[
 		local B = libluabag.pbfs (v, borhoodSelector)
 		for k, d in ipairs (B) do
 			local w = v.graph.vertices[k]
@@ -38,6 +39,7 @@ local function bfs (v, borhoodSelector)
 			if not l then l = {}; seen.layers[d] = l end
 			table.insert (l, w)
 		end
+		]]
 
 		v[key] = seen
 	end
@@ -63,32 +65,47 @@ local function sample (vertices, k)
 		local v = V[i]
 		local vbfs = bfs (v, 'inhood')
 
-		--local n = #vbfs if n > 0 then S[i] = vbfs[math.random (n)] else S[i] = v end
-		local n = #vbfs.layers 
-		if n > 0 then 
-			local l = vbfs.layers[n] 
-			S[i] = l[math.random (#l)]
-		else S[i] = v end
+		for j = 1, #vbfs do
+			local w = vbfs[j]
+			if not S[w] then
+				S[w] = 0
+				table.insert (S, w)
+			end
+			S[w] = S[w] + vbfs[w]
+		end
+
+		if #vbfs == 0 then 
+			if not S[v] then 
+				S[v] = 1
+				table.insert (S, v) 
+			end
+		end
 	end
 
-	return S
+	local SS = {} 
+	for j=1, k do
+		if #S == 0 then SS[j] = V[j] 
+		else SS[j] = table.remove (S, math.random (#S)) end
+	end
+
+	return SS
 
 end
 
 
-local function diameter (V)
+local function average_distance (V)
 
-	local d = 0
+	local d, c = 0, 0
 
 	for i, v in ipairs (V) do
 		local vbfs = bfs (v, 'outhood')
-		for i, w in ipairs (vbfs) do 
-			local dist = vbfs[w]
-			d = math.max(d, dist) 
+		for i, w in ipairs (vbfs) do
+			d = d + vbfs[w]
+			c = c + 1 
 		end
 	end
 
-	return d
+	return d / c
 end
 
 --------------------------------------------------------------------------------
@@ -108,7 +125,8 @@ function module.parse_graph (filename)
 				graph = graph,
 				id = id,
 				index = #vs + 1, 
-				outhood = {}, inhood = {}
+				outhood = {}, 
+				inhood = {}
 			}
 			vs[v.index] = v -- to allow access by position
 			vs[id] = v -- and by id.
@@ -130,14 +148,14 @@ function module.parse_graph (filename)
 	return graph
 end
 
-function module.diameter (filename, graph, n, epsilon)
+function module.average_distance (filename, graph, n, epsilon)
 
 	local t = os.time ()
 	local avg = 0.0
 	local k = sample_size (graph.vertices, epsilon) 
 	for i = 1, n do
 		local S = sample (graph.vertices, k)
-		avg = avg + diameter(S)
+		avg = avg + average_distance(S)
 	end
 	avg = avg / n
 	t = os.difftime (os.time(), t)
@@ -150,7 +168,7 @@ function module.diameter (filename, graph, n, epsilon)
 		k,
 		n,
 		t,
-		diameter (graph.vertices),
+		average_distance (graph.vertices),
 		avg,
 	}
 end
