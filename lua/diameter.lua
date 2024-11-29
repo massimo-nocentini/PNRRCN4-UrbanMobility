@@ -9,6 +9,7 @@ local function bfs (v, borhoodSelector)
 	
 	if not v[key] then
 		local seen = {layers = {}}
+		--[[
 		local queue = {} for i, w in ipairs (v[borhoodSelector]) do queue[i] = {vertex = w, distance = 1} end
 
 		while #queue > 0 do
@@ -26,9 +27,17 @@ local function bfs (v, borhoodSelector)
 				for i, w in ipairs (vertex[borhoodSelector]) do table.insert (queue, {vertex = w, distance = d}) end
 			end
 		end
+		]]
 
 		local B = libluabag.pbfs (v, borhoodSelector)
-		for k, v in pairs (B) do print (k, v) end
+		for k, d in ipairs (B) do
+			local w = v.graph.vertices[k]
+			seen[k] = w	-- by position
+			seen[w] = d -- by key
+			local l = seen.layers[d]
+			if not l then l = {}; seen.layers[d] = l end
+			table.insert (l, w)
+		end
 
 		v[key] = seen
 	end

@@ -172,7 +172,6 @@ void cb(pennant_node_t *node, void *ud)
 
 	lua_getfield(L, 1, data->neighborhoodSelector);
 
-	/* table is in the stack at index 't' */
 	lua_pushnil(L); /* first key */
 	while (lua_next(L, -2) != 0)
 	{
@@ -184,13 +183,15 @@ void cb(pennant_node_t *node, void *ud)
 
 		if (!D[index])
 		{
-			data->D[index] = data->layer + 1;
-
+			D[index] = data->layer + 1;
+			
 			bag_insert(data->f1, pennant_create(index));
 		}
 
 		lua_pop(L, 1); /* removes 'value'; keeps 'key' for next iteration */
 	}
+
+	lua_pop (L, 1);
 }
 
 void process_layer(pbfs_data_t *data)
@@ -208,10 +209,8 @@ int l_pbfs(lua_State *L)
 	lua_Integer n = lua_tointeger(L, -1);
 	lua_pop(L, 3);
 
-	printf("Allocating %lld\n", n);
+	
 	lua_Integer *D = calloc(n, sizeof(lua_Integer));
-
-	lua_newtable(L);
 
 	lua_Integer l = 1;
 
@@ -221,25 +220,22 @@ int l_pbfs(lua_State *L)
 	lua_getfield(L, 1, "index");
 	bag_insert(f0, pennant_create(lua_tointeger(L, -1)));
 	lua_pop(L, 1);
-	lua_pushlightuserdata(L, f0);
-	lua_seti(L, -2, l);
-
+	
 	pbfs_data_t data;
 	data.neighborhoodSelector = neighborhoodSelector;
 	data.L = L;
 	data.D = D;
 
-	while (lua_geti(L, -1, l), f0 = lua_touserdata(L, -1), lua_pop(L, 1), bag_len(f0) > 0)
+	while (bag_len(f0) > 0)
 	{
 		f1 = bag_create(n);
-		lua_pushlightuserdata(L, f1);
-		lua_seti(L, -2, l + 1);
-
+		
 		data.f0 = f0;
 		data.f1 = f1;
 		data.layer = l;
 		process_layer(&data);
 
+		f0 = f1;
 		l++;
 	}
 
