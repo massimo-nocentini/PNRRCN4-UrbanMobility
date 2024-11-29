@@ -228,6 +228,7 @@ void process_layer(pbfs_data_t *); // prototype
 
 void *thread(void *arg)
 {
+	//printf("spawned\n");
 	process_layer(arg);
 
 	pthread_exit(arg);
@@ -237,7 +238,7 @@ void *thread(void *arg)
 
 void process_layer(pbfs_data_t *data)
 {
-	if (bag_len(data->frontier) > 4)
+	if (bag_len(data->frontier) > 128)
 	{
 		pthread_t thread_a, thread_b;
 
@@ -247,10 +248,11 @@ void process_layer(pbfs_data_t *data)
 		datab.frontier = bag_split(data->frontier);
 
 		pthread_create(&thread_a, NULL, &thread, &dataa);
-		pthread_create(&thread_b, NULL, &thread, &datab);
-
 		pthread_join(thread_a, NULL);
+		//printf("joined\n");
+		pthread_create(&thread_b, NULL, &thread, &datab);
 		pthread_join(thread_b, NULL);
+		//printf("joined\n");
 	}
 	else
 	{
