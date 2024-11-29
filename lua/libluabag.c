@@ -9,6 +9,7 @@
 #include <lauxlib.h>
 #include <time.h>
 #include <math.h>
+#include <pthread.h>
 
 typedef struct pennant_node_s pennant_node_t;
 typedef void (*pennant_callback_t)(pennant_node_t *, void *);
@@ -95,11 +96,13 @@ typedef struct bag_s
 {
 	pennant_node_t **S;
 	size_t r;
+	size_t n;
 } bag_t;
 
 bag_t *bag_create(size_t nel)
 {
 	bag_t *bag = malloc(sizeof(bag_t));
+	bag->n = nel;
 	bag->r = ((size_t)ceil(log2(nel)));
 	bag->S = calloc(bag->r, sizeof(pennant_node_t));
 
@@ -145,6 +148,27 @@ bag_t *bag_union(bag_t *S, bag_t *R)
 	return S;
 }
 
+bag_t *bag_split(bag_t *b)
+{
+	bag_t *S = bag_create(b->n);
+	pennant_node_t *y = b->S[0];
+	b->S[0] = NULL;
+	for (size_t k = 1; k < b->r; k++)
+	{
+		if (!b->S[k])
+			continue;
+
+		S->S[k - 1] = pennant_split(b->S[k]);
+		b->S[k - 1] = b->S[k];
+		b->S[k] = NULL;
+	}
+
+	if (y)
+		bag_insert(b, y);
+
+	return S;
+}
+
 void bag_visit(bag_t *b, pennant_callback_t cb, void *ud)
 {
 	for (size_t k = 0; k < b->r; k++)
@@ -156,6 +180,7 @@ void bag_visit(bag_t *b, pennant_callback_t cb, void *ud)
 typedef struct pbfs_data_s
 {
 	lua_State *L;
+	bag_t *frontier;
 	bag_t *next_frontier;
 	size_t *D;
 	size_t nvertices;
@@ -199,9 +224,38 @@ void cb(pennant_node_t *node, void *ud)
 	lua_pop(L, 4);
 }
 
-void process_layer(bag_t *frontier, pbfs_data_t *data)
+void process_layer(pbfs_data_t *); // prototype
+
+void *thread(void *args)
 {
-	bag_visit(frontier, &cb, data);
+	pbfs_data_t *data = args;
+
+	process_layer(data);
+
+	return args;
+}
+
+void process_layer(pbfs_data_t *data)
+{
+	if (0 && bag_len(data->frontier) > 128)
+	{
+
+		pthread_t thread_a, thread_b;
+
+		pbfs_data_t splitdata = *data;
+
+		splitdata.frontier = bag_split(data->frontier);
+
+		pthread_create(&thread_a, NULL, thread, data);
+		pthread_create(&thread_b, NULL, thread, &splitdata);
+
+		pthread_join(thread_a, NULL);
+		pthread_join(thread_b, NULL);
+	}
+	else
+	{
+		bag_visit(data->frontier, &cb, data);
+	}
 }
 
 int l_pbfs(lua_State *L)
@@ -223,21 +277,21 @@ int l_pbfs(lua_State *L)
 	data.startingVertex = lua_tointeger(L, -1);
 	lua_pop(L, 1);
 
-	bag_t *frontier = bag_create(data.nvertices);
-	bag_insert(frontier, pennant_create(data.startingVertex));
+	data.frontier = bag_create(data.nvertices);
+	bag_insert(data.frontier, pennant_create(data.startingVertex));
 
 	data.layer = 1;
 	data.neighborhoodSelector = neighborhoodSelector;
 	data.L = L;
 	data.D = D;
 
-	while (bag_len(frontier) > 0)
+	while (bag_len(data.frontier) > 0)
 	{
 		data.next_frontier = bag_create(data.nvertices);
 
-		process_layer(frontier, &data);
+		process_layer(&data);
 
-		frontier = data.next_frontier;
+		data.frontier = data.next_frontier;
 		data.layer++;
 	}
 

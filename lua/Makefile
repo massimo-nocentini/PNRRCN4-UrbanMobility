@@ -1,6 +1,6 @@
 
 linux:
-	clang -O3 -fPIC -Wall -shared -o libluabag.so libluabag.c -llua
+	clang -O3 -fPIC -Wall -shared -o libluabag.so libluabag.c -llua -pthread
 	
 	
 install:
