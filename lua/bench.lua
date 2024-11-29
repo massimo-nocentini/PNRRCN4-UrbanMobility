@@ -15,6 +15,7 @@ local filename = {
 	'../data/erdos-renyi/800-0.001p.txt',
 	'../data/erdos-renyi/1k-0.001p.txt',
 	'../data/erdos-renyi/2k-0.001p.txt',
+	'../data/erdos-renyi/5k-0.001p.txt',
 
 	'../data/erdos-renyi/100-0.01p.txt',
 	'../data/erdos-renyi/200-0.01p.txt',
@@ -22,13 +23,16 @@ local filename = {
 	'../data/erdos-renyi/800-0.01p.txt',
 	'../data/erdos-renyi/1k-0.01p.txt',
 	'../data/erdos-renyi/2k-0.01p.txt',
+	'../data/erdos-renyi/5k-0.01p.txt',
 
+	--[[
 	'../data/erdos-renyi/100-0.1p.txt',
 	'../data/erdos-renyi/200-0.1p.txt',
 	'../data/erdos-renyi/500-0.1p.txt',
 	'../data/erdos-renyi/800-0.1p.txt',
 	'../data/erdos-renyi/1k-0.1p.txt',
 	'../data/erdos-renyi/2k-0.1p.txt',
+	]]
 }
 
 for _, f in pairs (filename) do

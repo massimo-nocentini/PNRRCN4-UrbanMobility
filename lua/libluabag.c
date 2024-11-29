@@ -100,7 +100,7 @@ typedef struct bag_s
 bag_t *bag_create(size_t nel)
 {
 	bag_t *bag = malloc(sizeof(bag_t));
-	bag->r = ((size_t)ceil(log2(nel))) + 1;
+	bag->r = ((size_t)ceil(log2(nel)));
 	bag->S = calloc(bag->r, sizeof(pennant_node_t));
 
 	return bag;
@@ -157,29 +157,25 @@ typedef struct pbfs_data_s
 {
 	lua_State *L;
 	bag_t *next_frontier;
-	lua_Integer *D;
-	lua_Integer layer;
+	size_t *D;
+	size_t nvertices;
+	size_t layer;
 	const char *neighborhoodSelector;
+	lua_Integer startingVertex;
 } pbfs_data_t;
 
 void cb(pennant_node_t *node, void *ud)
 {
-	lua_Integer index, c, cf;
+	lua_Integer index;
 	size_t cindex;
 	pbfs_data_t *data = ud;
 	lua_State *L = data->L;
-	lua_Integer *D = data->D;
+	size_t *D = data->D;
 
 	lua_getfield(L, 1, "graph");
 	lua_getfield(L, -1, "vertices");
 	lua_geti(L, -1, node->payload);
 	lua_getfield(L, -1, data->neighborhoodSelector);
-
-	lua_len(L, -1);
-	c = lua_tointeger(L, -1);
-	lua_pop(L, 1);
-
-	cf = 0;
 
 	lua_pushnil(L); /* first key */
 	while (lua_next(L, -2) != 0)
@@ -188,22 +184,17 @@ void cb(pennant_node_t *node, void *ud)
 
 		lua_getfield(L, -1, "index"); // the vertex to be explored is w at -1 in the stack.
 		index = lua_tointeger(L, -1);
-		// printf("%lld -> %lld\n", node->payload, index);
 		cindex = (size_t)(index - 1);
 		lua_pop(L, 1);
 
-		if (D[cindex] == 0)
+		if (data->startingVertex != index && !D[cindex])
 		{
 			D[cindex] = data->layer;
-
 			bag_insert(data->next_frontier, pennant_create(index));
 		}
 
 		lua_pop(L, 1); /* removes 'value'; keeps 'key' for next iteration */
-		cf += 1;
 	}
-
-	assert(c == cf);
 
 	lua_pop(L, 4);
 }
@@ -217,52 +208,61 @@ int l_pbfs(lua_State *L)
 {
 	// the first argument is a table denoting the vertex from where we want to start.
 	const char *neighborhoodSelector = lua_tostring(L, 2);
+
+	pbfs_data_t data;
+
 	lua_getfield(L, 1, "graph");
 	lua_getfield(L, -1, "vertices");
 	lua_len(L, -1);
-	size_t n = (size_t)lua_tointeger(L, -1);
+	data.nvertices = (size_t)lua_tointeger(L, -1);
 	lua_pop(L, 3);
 
-	lua_Integer *D = calloc(n, sizeof(lua_Integer));
+	size_t *D = calloc(data.nvertices, sizeof(size_t));
 
-	lua_Integer l;
-
-	bag_t *f0, *f1;
-
-	f0 = bag_create(n);
 	lua_getfield(L, 1, "index");
-	l = lua_tointeger(L, -1);
+	data.startingVertex = lua_tointeger(L, -1);
 	lua_pop(L, 1);
 
-	bag_insert(f0, pennant_create(l));
-	D[l - 1] = -1;
+	bag_t *frontier = bag_create(data.nvertices);
+	bag_insert(frontier, pennant_create(data.startingVertex));
 
-	pbfs_data_t data;
 	data.layer = 1;
 	data.neighborhoodSelector = neighborhoodSelector;
 	data.L = L;
 	data.D = D;
 
-	while (bag_len(f0) > 0)
+	while (bag_len(frontier) > 0)
 	{
-		f1 = bag_create(n);
-		assert(bag_len(f1) == 0);
+		data.next_frontier = bag_create(data.nvertices);
 
-		data.next_frontier = f1;
-		process_layer(f0, &data);
+		process_layer(frontier, &data);
 
-		f0 = f1;
+		frontier = data.next_frontier;
 		data.layer++;
 	}
 
-	D[l - 1] = 0;
+	lua_getfield(L, 1, "graph");
+	lua_getfield(L, -1, "vertices");
 
-	lua_createtable(L, n, 0);
+	lua_newtable(L);
 
-	for (size_t k = 0; k < n; k++)
+	size_t dist;
+	lua_Integer i = 0;
+	for (size_t k = 0; k < data.nvertices; k++)
 	{
-		lua_pushinteger(L, D[k]);
-		lua_seti(L, -2, k + 1);
+		dist = D[k];
+
+		if (dist)
+		{
+			lua_geti(L, -2, k + 1);
+			lua_pushinteger(L, dist);
+
+			lua_settable(L, -3);
+
+			i++;
+			lua_geti(L, -2, k + 1);
+			lua_seti(L, -2, i);
+		}
 	}
 
 	return 1;
