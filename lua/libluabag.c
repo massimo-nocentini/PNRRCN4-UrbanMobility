@@ -101,7 +101,7 @@ typedef struct bag_s
 bag_t *bag_create(size_t nel)
 {
 	bag_t *bag = malloc(sizeof(bag_t));
-	bag->r = 1 + ((int)ceil(log2(nel)));
+	bag->r = ((int)ceil(log2(nel)));
 	bag->S = calloc(bag->r, sizeof(pennant_node_t));
 
 	return bag;
@@ -165,11 +165,14 @@ typedef struct pbfs_data_s
 
 void cb(pennant_node_t *node, void *ud)
 {
-	lua_Integer index;
+	lua_Integer index, cindex;
 	pbfs_data_t *data = ud;
 	lua_State *L = data->L;
 	lua_Integer *D = data->D;
 
+	lua_getfield(L, 1, "graph");
+	lua_getfield(L, -1, "vertices");
+	lua_geti(L, -1, node->payload);
 	lua_getfield(L, 1, data->neighborhoodSelector);
 
 	lua_pushnil(L); /* first key */
@@ -179,19 +182,20 @@ void cb(pennant_node_t *node, void *ud)
 
 		lua_getfield(L, -1, "index"); // the vertex to be explored is w at -1 in the stack.
 		index = lua_tointeger(L, -1);
+		cindex = index - 1;
 		lua_pop(L, 1);
 
-		if (!D[index])
+		if (!D[cindex])
 		{
-			D[index] = data->layer + 1;
-			
+			D[cindex] = data->layer;
+
 			bag_insert(data->f1, pennant_create(index));
 		}
 
 		lua_pop(L, 1); /* removes 'value'; keeps 'key' for next iteration */
 	}
 
-	lua_pop (L, 1);
+	lua_pop(L, 4);
 }
 
 void process_layer(pbfs_data_t *data)
@@ -209,7 +213,6 @@ int l_pbfs(lua_State *L)
 	lua_Integer n = lua_tointeger(L, -1);
 	lua_pop(L, 3);
 
-	
 	lua_Integer *D = calloc(n, sizeof(lua_Integer));
 
 	lua_Integer l = 1;
@@ -220,7 +223,7 @@ int l_pbfs(lua_State *L)
 	lua_getfield(L, 1, "index");
 	bag_insert(f0, pennant_create(lua_tointeger(L, -1)));
 	lua_pop(L, 1);
-	
+
 	pbfs_data_t data;
 	data.neighborhoodSelector = neighborhoodSelector;
 	data.L = L;
@@ -229,7 +232,7 @@ int l_pbfs(lua_State *L)
 	while (bag_len(f0) > 0)
 	{
 		f1 = bag_create(n);
-		
+
 		data.f0 = f0;
 		data.f1 = f1;
 		data.layer = l;
