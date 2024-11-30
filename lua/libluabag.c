@@ -238,7 +238,7 @@ void *thread(void *arg)
 
 void process_layer(pbfs_data_t *data)
 {
-	if (bag_len(data->frontier) > 16)
+	if (bag_len(data->frontier) > 128)
 	{
 		/*
 				lua_State *L = data->L;
