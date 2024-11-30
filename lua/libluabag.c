@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <lua.h>
-#include <lauxlib.h>
+#include "/home/mnocentini/Developer/snapshots/lua/lua-5.4.7/src/lua.h"
+#include "/home/mnocentini/Developer/snapshots/lua/lua-5.4.7/src/lauxlib.h"
 #include <time.h>
 #include <math.h>
 #include <pthread.h>

@@ -1,6 +1,6 @@
 
 linux:
-	clang -O3 -fPIC -Wall -shared -o libluabag.so libluabag.c -llua -lpthread
+	gcc -O3 -fPIC -Wall -shared -o libluabag.so libluabag.c -L/home/mnocentini/Developer/snapshots/lua/lua-5.4.7/src -llua -lpthread
 	
 macos:
 	clang -O3 -fPIC -Wall -dynamiclib -o libluabag.dylib libluabag.c -llua -pthread
