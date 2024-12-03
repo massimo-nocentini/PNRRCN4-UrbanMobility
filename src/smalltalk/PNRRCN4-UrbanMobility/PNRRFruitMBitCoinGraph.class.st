@@ -174,9 +174,9 @@ PNRRFruitMBitCoinGraph class >> star: n [
 	| graph nAsString |
 	nAsString := n asString.
 
-	graph := self new
-		         basename: 'star ' , nAsString;
-		         yourself.
+	graph := self new.
+
+	graph basename: 'star ' , nAsString.
 
 	1 to: n - 1 do: [ :i | graph addEdgeFrom: i asString to: nAsString ].
 
