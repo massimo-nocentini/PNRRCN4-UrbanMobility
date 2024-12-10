@@ -17,10 +17,10 @@ typedef void (*pennant_callback_t)(pennant_node_t *, void *);
 struct pennant_node_s
 {
 	pennant_node_t *left, *right;
-	lua_Integer payload;
+	size_t payload;
 };
 
-pennant_node_t *pennant_create(lua_Integer payload)
+pennant_node_t *pennant_create(size_t payload)
 {
 	pennant_node_t *node = calloc(1, sizeof(pennant_node_t));
 	node->payload = payload;
@@ -177,6 +177,13 @@ void bag_visit(bag_t *b, pennant_callback_t cb, void *ud)
 	}
 }
 
+typedef struct bin_repr_s
+{
+	size_t vertex;
+	size_t n;
+	size_t *borhood;
+} bin_repr_t;
+
 typedef struct pbfs_data_s
 {
 	lua_State *L;
@@ -186,7 +193,8 @@ typedef struct pbfs_data_s
 	size_t nvertices;
 	size_t layer;
 	const char *neighborhoodSelector;
-	lua_Integer startingVertex;
+	size_t startingVertex;
+	bin_repr_t *graph;
 } pbfs_data_t;
 
 void cb(pennant_node_t *node, void *ud)
@@ -339,13 +347,6 @@ int l_pbfs(lua_State *L)
 	return 1;
 }
 
-typedef struct bin_repr_s
-{
-	size_t vertex;
-	size_t n;
-	size_t *borhood;
-} bin_repr_t;
-
 size_t read_size_t(size_t *buffer, FILE *file)
 {
 	return fread(buffer, sizeof(size_t), 1, file);
@@ -367,6 +368,12 @@ bin_repr_t *read_graph(const char *filename, size_t *nvertices)
 
 	for (size_t i = 0; i < *nvertices; i++)
 	{
+		if (i % 1000 == 0)
+		{
+			printf(".");
+			fflush(stdout);
+		}
+
 		read_size_t(&vertex, file);
 		each = &repr[vertex];
 		each->vertex = vertex;
@@ -405,6 +412,112 @@ int l_load_binary_repr(lua_State *L)
 	return 2;
 }
 
+void cb_bin(pennant_node_t *node, void *ud)
+{
+	size_t index;
+	pbfs_data_t *data = ud;
+	size_t *D = data->D;
+
+	bin_repr_t *each = &data->graph[node->payload];
+	for (size_t j = 0; j < each->n; j++)
+	{
+		index = each->borhood[j];
+
+		if (data->startingVertex != index && D[index] == 0)
+		{
+			D[index] = data->layer;
+			bag_insert(data->next_frontier, pennant_create(index));
+		}
+	}
+}
+
+void process_layer_bin(pbfs_data_t *data)
+{
+	if (bag_len(data->frontier) > 128)
+	{
+		/*
+				lua_State *L = data->L;
+
+				pthread_t threadb;
+
+				lua_State *Lb = lua_newthread(L);
+				lua_pushvalue(L, 1);
+				lua_xmove(L, Lb, 1);
+				lua_pop(L, 1);
+
+				pbfs_data_t datab = *data;
+				datab.frontier = bag_split(data->frontier);
+				datab.L = Lb;
+
+				pthread_create(&threadb, NULL, thread, &datab);
+
+				process_layer(data);
+
+				pthread_join(threadb, NULL);
+				// lua_closethread(Lb, L);
+				// printf("joined\n");
+		*/
+
+		pbfs_data_t datab = *data;
+		datab.frontier = bag_split(data->frontier);
+
+		process_layer_bin(&datab);
+		process_layer_bin(data);
+	}
+	else
+	{
+		bag_visit(data->frontier, &cb_bin, data);
+	}
+}
+
+int l_bin_bfs(lua_State *L)
+{
+
+	pbfs_data_t data;
+	data.startingVertex = lua_tonumber(L, 1);
+	data.nvertices = lua_tonumber(L, 2);
+	data.graph = lua_touserdata(L, 3);
+	data.layer = 0;
+	data.neighborhoodSelector = NULL;
+	data.L = NULL;
+	data.D = calloc(data.nvertices, sizeof(size_t));
+	data.frontier = bag_create(data.nvertices);
+	bag_insert(data.frontier, pennant_create(data.startingVertex));
+
+	while (bag_len(data.frontier) > 0)
+	{
+		data.layer++;
+		data.next_frontier = bag_create(data.nvertices);
+
+		process_layer_bin(&data);
+
+		data.frontier = data.next_frontier;
+	}
+
+	lua_newtable(L);
+
+	size_t dist;
+	lua_Integer i = 0;
+	for (size_t k = 0; k < data.nvertices; k++)
+	{
+		dist = data.D[k];
+
+		if (dist)
+		{
+			lua_pushinteger(L, k);
+			lua_pushinteger(L, dist);
+
+			lua_settable(L, -3);
+
+			i++;
+			lua_pushinteger(L, k);
+			lua_seti(L, -2, i);
+		}
+	}
+
+	return 1;
+}
+
 int l_free_binary_repr(lua_State *L)
 {
 	size_t nvertices = lua_tonumber(L, 1);
@@ -425,6 +538,7 @@ const struct luaL_Reg luabag_reg[] = {
 	{"pbfs", l_pbfs},
 	{"load_binary_repr", l_load_binary_repr},
 	{"free_binary_repr", l_free_binary_repr},
+	{"bin_bfs", l_bin_bfs},
 	{NULL, NULL} /* sentinel */
 };
 
