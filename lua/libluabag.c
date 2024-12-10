@@ -548,7 +548,7 @@ int l_write_graph(lua_State *L)
 	const char *borhood = lua_tostring(L, 3);
 
 	lua_len(L, 1);
-	size_t nvertices = lua_tointeger(L, -1);
+	size_t nvertices = lua_tointeger(L, 1);
 	lua_pop(L, 1);
 
 	FILE *file = fopen(filename, "wb");
