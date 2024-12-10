@@ -434,10 +434,11 @@ void cb_bin(pennant_node_t *node, void *ud)
 	{
 		index = each->borhood[j];
 
-		if (!each->visited)
+		if (!data->graph[index].visited)
 		{
-			each->distance = data->layer;
-			each->visited = 1;
+			data->graph[index].visited = 1;
+			data->graph[index].distance = data->layer;
+
 			bag_insert(data->next_frontier, pennant_create(index));
 		}
 	}
