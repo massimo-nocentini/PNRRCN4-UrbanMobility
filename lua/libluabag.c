@@ -453,8 +453,16 @@ void process_layer_bin(pbfs_data_t *data)
 {
 	if (bag_len(data->frontier) > 128)
 	{
-		pbfs_data_t datab = *data;
+		pbfs_data_t datab;
+		datab.D = data->D;
 		datab.frontier = bag_split(data->frontier);
+		datab.graph = data->graph;
+		datab.L = data->L;
+		datab.layer = data->layer;
+		datab.neighborhoodSelector = data->neighborhoodSelector;
+		datab.next_frontier = data->next_frontier;
+		datab.nvertices = data->nvertices;
+		datab.startingVertex = data->startingVertex;
 
 		pthread_t threadb;
 
