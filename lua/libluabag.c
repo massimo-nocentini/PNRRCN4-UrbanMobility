@@ -182,6 +182,8 @@ typedef struct bin_repr_s
 	size_t vertex;
 	size_t n;
 	size_t *borhood;
+	char visited;
+	size_t distance;
 } bin_repr_t;
 
 typedef struct pbfs_data_s
@@ -412,20 +414,30 @@ int l_load_binary_repr(lua_State *L)
 	return 2;
 }
 
+void process_layer_bin(pbfs_data_t *data);
+
+void *thread_bin(void *arg)
+{
+
+	process_layer_bin(arg);
+
+	return arg;
+}
+
 void cb_bin(pennant_node_t *node, void *ud)
 {
 	size_t index;
 	pbfs_data_t *data = ud;
-	size_t *D = data->D;
 
 	bin_repr_t *each = &data->graph[node->payload];
 	for (size_t j = 0; j < each->n; j++)
 	{
 		index = each->borhood[j];
 
-		if (data->startingVertex != index && D[index] == 0)
+		if (!each->visited)
 		{
-			D[index] = data->layer;
+			each->distance = data->layer;
+			each->visited = 1;
 			bag_insert(data->next_frontier, pennant_create(index));
 		}
 	}
@@ -435,34 +447,16 @@ void process_layer_bin(pbfs_data_t *data)
 {
 	if (false && bag_len(data->frontier) > 128)
 	{
-		/*
-				lua_State *L = data->L;
-
-				pthread_t threadb;
-
-				lua_State *Lb = lua_newthread(L);
-				lua_pushvalue(L, 1);
-				lua_xmove(L, Lb, 1);
-				lua_pop(L, 1);
-
-				pbfs_data_t datab = *data;
-				datab.frontier = bag_split(data->frontier);
-				datab.L = Lb;
-
-				pthread_create(&threadb, NULL, thread, &datab);
-
-				process_layer(data);
-
-				pthread_join(threadb, NULL);
-				// lua_closethread(Lb, L);
-				// printf("joined\n");
-		*/
-
 		pbfs_data_t datab = *data;
 		datab.frontier = bag_split(data->frontier);
 
-		process_layer_bin(&datab);
+		pthread_t threadb;
+
+		pthread_create(&threadb, NULL, &thread_bin, &datab);
+
 		process_layer_bin(data);
+
+		pthread_join(threadb, NULL);
 	}
 	else
 	{
@@ -483,6 +477,8 @@ int l_bin_bfs(lua_State *L)
 	data.D = calloc(data.nvertices, sizeof(size_t));
 	data.frontier = bag_create(data.nvertices);
 	bag_insert(data.frontier, pennant_create(data.startingVertex));
+
+	data.graph[data.startingVertex].visited = 1;
 
 	while (bag_len(data.frontier) > 0)
 	{
@@ -507,7 +503,6 @@ int l_bin_bfs(lua_State *L)
 			lua_pushinteger(L, dist);
 
 			lua_settable(L, -3);
-
 		}
 	}
 
