@@ -15,3 +15,5 @@ print ('Loaded in ', os.difftime(os.time(), t))
 
 libluabag.free_binary_repr (nvertices, graph)
 libluabag.free_binary_repr (nvertices, graph_t)
+
+print 'freed.'
