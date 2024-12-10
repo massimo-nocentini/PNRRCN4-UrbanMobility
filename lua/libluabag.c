@@ -368,7 +368,7 @@ bin_repr_t *read_graph(const char *filename, size_t *nvertices)
 
 	for (size_t i = 0; i < *nvertices; i++)
 	{
-		if (i % 1000 == 0)
+		if (i % 1000000 == 0)
 		{
 			printf(".");
 			fflush(stdout);
