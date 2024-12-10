@@ -474,7 +474,7 @@ int l_bin_bfs(lua_State *L)
 	data.layer = 0;
 	data.neighborhoodSelector = NULL;
 	data.L = NULL;
-	data.D = calloc(data.nvertices, sizeof(size_t));
+	data.D = NULL;
 	data.frontier = bag_create(data.nvertices);
 	bag_insert(data.frontier, pennant_create(data.startingVertex));
 
@@ -491,22 +491,24 @@ int l_bin_bfs(lua_State *L)
 	}
 
 	lua_newtable(L);
+	lua_newtable(L);
 
-	size_t dist;
+	size_t dist = 0, d, i;
+
 	for (size_t k = 0; k < data.nvertices; k++)
 	{
-		dist = data.D[k];
+		i = k + 1;
+		d = data.graph[k].distance;
+		dist += d;
 
-		if (dist)
-		{
-			lua_pushinteger(L, k);
-			lua_pushinteger(L, dist);
+		lua_pushinteger(L, d);
+		lua_seti(L, -3, i);
 
-			lua_settable(L, -3);
-		}
+		lua_pushinteger(L, dist);
+		lua_seti(L, -2, i);
 	}
 
-	return 1;
+	return 2;
 }
 
 int l_free_binary_repr(lua_State *L)
