@@ -423,28 +423,31 @@ void process_layer_bin(pbfs_data_t *data);
 
 void *thread_bin(void *arg)
 {
-
+	printf("Forked.\n");
 	process_layer_bin(arg);
 
+	pthread_exit(arg);
 	return arg;
 }
 
 void cb_bin(pennant_node_t *node, void *ud)
 {
-	size_t index;
+
 	pbfs_data_t *data = ud;
 
-	bin_repr_t *each = &data->graph[node->payload];
-	for (size_t j = 0; j < each->n; j++)
+	bin_repr_t *vertex = &data->graph[node->payload];
+	bin_repr_t *each;
+
+	for (size_t j = 0; j < vertex->n; j++)
 	{
-		index = each->borhood[j];
+		each = &data->graph[vertex->borhood[j]];
 
-		if (!data->graph[index].visited)
+		if (!each->visited)
 		{
-			data->graph[index].visited = 1;
-			data->graph[index].distance = data->layer;
+			each->visited = 1;
+			each->distance = data->layer;
 
-			bag_insert(data->next_frontier, pennant_create(index));
+			bag_insert(data->next_frontier, pennant_create(each->vertex));
 		}
 	}
 }
@@ -453,16 +456,16 @@ void process_layer_bin(pbfs_data_t *data)
 {
 	if (bag_len(data->frontier) > 128)
 	{
-		pbfs_data_t datab;
-		datab.D = data->D;
+		pbfs_data_t datab = *data;
+		// datab.D = data->D;
+		// datab.graph = data->graph;
+		// datab.L = data->L;
+		// datab.layer = data->layer;
+		// datab.neighborhoodSelector = data->neighborhoodSelector;
+		// datab.next_frontier = data->next_frontier;
+		// datab.nvertices = data->nvertices;
+		// datab.startingVertex = data->startingVertex;
 		datab.frontier = bag_split(data->frontier);
-		datab.graph = data->graph;
-		datab.L = data->L;
-		datab.layer = data->layer;
-		datab.neighborhoodSelector = data->neighborhoodSelector;
-		datab.next_frontier = data->next_frontier;
-		datab.nvertices = data->nvertices;
-		datab.startingVertex = data->startingVertex;
 
 		pthread_t threadb;
 
@@ -471,6 +474,7 @@ void process_layer_bin(pbfs_data_t *data)
 		process_layer_bin(data);
 
 		pthread_join(threadb, NULL);
+		printf("Joined.\n");
 	}
 	else
 	{
@@ -548,7 +552,7 @@ int l_write_graph(lua_State *L)
 	const char *borhood = lua_tostring(L, 3);
 
 	lua_len(L, 1);
-	size_t nvertices = lua_tointeger(L, 1);
+	size_t nvertices = lua_tointeger(L, -1);
 	lua_pop(L, 1);
 
 	FILE *file = fopen(filename, "wb");
@@ -576,7 +580,7 @@ int l_write_graph(lua_State *L)
 
 		/* table is in the stack at index 't' */
 		lua_pushnil(L); /* first key */
-		while (lua_next(L, -1) != 0)
+		while (lua_next(L, -2) != 0)
 		{
 			/* uses 'key' (at index -2) and 'value' (at index -1) */
 
