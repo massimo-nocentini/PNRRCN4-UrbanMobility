@@ -433,7 +433,7 @@ void cb_bin(pennant_node_t *node, void *ud)
 
 void process_layer_bin(pbfs_data_t *data)
 {
-	if (bag_len(data->frontier) > 128)
+	if (false && bag_len(data->frontier) > 128)
 	{
 		/*
 				lua_State *L = data->L;
