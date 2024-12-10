@@ -446,7 +446,7 @@ void cb_bin(pennant_node_t *node, void *ud)
 
 void process_layer_bin(pbfs_data_t *data)
 {
-	if (false && bag_len(data->frontier) > 128)
+	if (bag_len(data->frontier) > 128)
 	{
 		pbfs_data_t datab = *data;
 		datab.frontier = bag_split(data->frontier);
