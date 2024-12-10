@@ -176,4 +176,6 @@ function module.average_distance (filename, graph, n, epsilon)
 	}
 end
 
+module.write_graph = libluabag.write_graph
+
 return module

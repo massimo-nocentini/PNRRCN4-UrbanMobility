@@ -354,6 +354,11 @@ size_t read_size_t(size_t *buffer, FILE *file)
 	return fread(buffer, sizeof(size_t), 1, file);
 }
 
+size_t write_size_t(size_t *buffer, FILE *file)
+{
+	return fwrite(buffer, sizeof(size_t), 1, file);
+}
+
 bin_repr_t *read_graph(const char *filename, size_t *nvertices)
 {
 	FILE *file = fopen(filename, "rb");
@@ -528,11 +533,72 @@ int l_free_binary_repr(lua_State *L)
 	return 0;
 }
 
+int l_write_graph(lua_State *L)
+{
+	// at the first position there is the vertices table.
+	const char *filename = lua_tostring(L, 2);
+	const char *borhood = lua_tostring(L, 3);
+
+	lua_len(L, 1);
+	size_t nvertices = lua_tointeger(L, -1);
+	lua_pop(L, 1);
+
+	FILE *file = fopen(filename, "wb");
+
+	write_size_t(&nvertices, file);
+
+	size_t buffer;
+
+	for (size_t i = 1; i <= nvertices; i++)
+	{
+		lua_geti(L, 1, i);
+
+		lua_getfield(L, -1, "index");
+		buffer = lua_tointeger(L, -1) - 1;
+		lua_pop(L, 1);
+		write_size_t(&buffer, file);
+
+		lua_getfield(L, -1, borhood);
+
+		lua_len(L, -1);
+		buffer = lua_tointeger(L, -1);
+		lua_pop(L, 1);
+
+		write_size_t(&buffer, file);
+
+		/* table is in the stack at index 't' */
+		lua_pushnil(L); /* first key */
+		while (lua_next(L, -1) != 0)
+		{
+			/* uses 'key' (at index -2) and 'value' (at index -1) */
+
+			if (lua_type(L, -2) == LUA_TNUMBER)
+			{
+				lua_getfield(L, -1, "index");
+				buffer = lua_tointeger(L, -1) - 1;
+				lua_pop(L, 1);
+				write_size_t(&buffer, file);
+			}
+
+			lua_pop(L, 1);
+		}
+
+		lua_pop(L, 2);
+	}
+
+	fflush(file);
+
+	fclose(file);
+
+	return 0;
+}
+
 const struct luaL_Reg luabag_reg[] = {
 	{"pbfs", l_pbfs},
 	{"load_binary_repr", l_load_binary_repr},
 	{"free_binary_repr", l_free_binary_repr},
 	{"bin_bfs", l_bin_bfs},
+	{"write_graph", l_write_graph},
 	{NULL, NULL} /* sentinel */
 };
 
