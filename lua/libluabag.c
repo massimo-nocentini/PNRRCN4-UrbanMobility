@@ -497,7 +497,6 @@ int l_bin_bfs(lua_State *L)
 	lua_newtable(L);
 
 	size_t dist;
-	lua_Integer i = 0;
 	for (size_t k = 0; k < data.nvertices; k++)
 	{
 		dist = data.D[k];
@@ -509,9 +508,6 @@ int l_bin_bfs(lua_State *L)
 
 			lua_settable(L, -3);
 
-			i++;
-			lua_pushinteger(L, k);
-			lua_seti(L, -2, i);
 		}
 	}
 
