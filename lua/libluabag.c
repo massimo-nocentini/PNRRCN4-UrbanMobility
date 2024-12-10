@@ -391,6 +391,8 @@ int l_load_binary_repr(lua_State *L)
 
 	size_t nvertices, nvertices_t;
 
+	printf("sizeof(size_t): %lu", sizeof(size_t));
+
 	bin_repr_t *graph = read_graph(graph_filename, &nvertices);
 	bin_repr_t *graph_t = read_graph(graph_t_filename, &nvertices_t);
 
