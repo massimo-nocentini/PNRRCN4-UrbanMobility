@@ -265,7 +265,7 @@ void process_layer(pbfs_data_t *data)
 
 		pbfs_data_t datab = *data;
 		datab.frontier = bag_split(data->frontier);
-		
+
 		process_layer(&datab);
 		process_layer(data);
 	}
@@ -339,8 +339,90 @@ int l_pbfs(lua_State *L)
 	return 1;
 }
 
+typedef struct bin_repr_s
+{
+	size_t vertex;
+	size_t n;
+	size_t *borhood;
+} bin_repr_t;
+
+size_t read_size_t(size_t *buffer, FILE *file)
+{
+	return fread(buffer, sizeof(size_t), 1, file);
+}
+
+bin_repr_t *read_graph(const char *filename, size_t *nvertices)
+{
+	FILE *file = fopen(filename, "rb");
+
+	size_t vertex, n, w;
+
+	read_size_t(nvertices, file);
+
+	bin_repr_t *repr = calloc(*nvertices, sizeof(bin_repr_t));
+	bin_repr_t *each = NULL;
+
+	for (size_t i = 0; i < *nvertices; i++)
+	{
+		read_size_t(&vertex, file);
+		each = &repr[vertex];
+		each->vertex = vertex;
+
+		read_size_t(&n, file);
+		each->n = n;
+		each->borhood = calloc(n, sizeof(size_t));
+
+		for (size_t j = 0; j < n; j++)
+		{
+			read_size_t(&w, file);
+			each->borhood[j] = w;
+		}
+	}
+
+	fclose(file);
+
+	return repr;
+}
+
+int l_load_binary_repr(lua_State *L)
+{
+	const char *graph_filename = lua_tostring(L, 1);
+	const char *graph_t_filename = lua_tostring(L, 2);
+
+	size_t nvertices, nvertices_t;
+
+	bin_repr_t *graph = read_graph(graph_filename, &nvertices);
+	bin_repr_t *graph_t = read_graph(graph_t_filename, &nvertices_t);
+
+	assert(nvertices == nvertices_t);
+
+	lua_pushinteger(L, nvertices);
+	lua_pushlightuserdata(L, graph);
+	lua_pushlightuserdata(L, graph_t);
+
+	return 3;
+}
+
+int l_free_binary_repr(lua_State *L)
+{
+	size_t nvertices = lua_tonumber(L, 1);
+
+	bin_repr_t *graph = lua_touserdata(L, 2);
+
+	for (size_t i = 0; i < nvertices; i++)
+	{
+		free(graph[i].borhood);
+	}
+
+	free(graph);
+
+	return 1;
+}
+
 const struct luaL_Reg luabag_reg[] = {
 	{"pbfs", l_pbfs},
+	{"load_binary_repr", l_load_binary_repr},
+	{"free_binary_repr", l_free_binary_repr},
 	{NULL, NULL} /* sentinel */
 };
 
