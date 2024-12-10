@@ -1,10 +1,9 @@
 
 local D = require 'diameter'
 
-local f = '../data/dummy/d1.txt'
-local n = arg[2] or 1
-local e = arg[3] or 0.1
+local f = '../data/erdos-renyi/5k-0.001p.txt'
 
 
 local g = D.parse_graph (f)
-print (table.unpack (D.average_distance (f, g, n, e)))
+
+D.write_graph (g,  '../data/erdos-renyi/5k-0.001p.data', 'outhood')
