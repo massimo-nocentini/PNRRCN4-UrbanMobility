@@ -392,22 +392,17 @@ bin_repr_t *read_graph(const char *filename, size_t *nvertices)
 int l_load_binary_repr(lua_State *L)
 {
 	const char *graph_filename = lua_tostring(L, 1);
-	const char *graph_t_filename = lua_tostring(L, 2);
 
-	size_t nvertices, nvertices_t;
+	size_t nvertices;
 
 	// printf("sizeof(size_t): %lu\n", sizeof(size_t));
 
 	bin_repr_t *graph = read_graph(graph_filename, &nvertices);
-	bin_repr_t *graph_t = read_graph(graph_t_filename, &nvertices_t);
-
-	assert(nvertices == nvertices_t);
 
 	lua_pushinteger(L, nvertices);
 	lua_pushlightuserdata(L, graph);
-	lua_pushlightuserdata(L, graph_t);
 
-	return 3;
+	return 2;
 }
 
 int l_free_binary_repr(lua_State *L)
@@ -423,7 +418,7 @@ int l_free_binary_repr(lua_State *L)
 
 	free(graph);
 
-	return 1;
+	return 0;
 }
 
 const struct luaL_Reg luabag_reg[] = {
