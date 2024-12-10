@@ -11,11 +11,11 @@ print ('Loaded in ', os.difftime(os.time(), t))
 
 t = os.time ()
 
-local distances = libluabag.bin_bfs (0, nvertices, graph)
+local distances = libluabag.bin_bfs (math.random(nvertices) - 1, nvertices, graph)
 
 print ('bfs in ', os.difftime(os.time(), t))
 
-for k, v in ipairs (distances) do
+for k, v in pairs (distances) do
 
 	print (k, v)
 
