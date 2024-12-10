@@ -355,10 +355,13 @@ bin_repr_t *read_graph(const char *filename, size_t *nvertices)
 {
 	FILE *file = fopen(filename, "rb");
 
+	assert(file != NULL);
+
 	size_t vertex, n, w;
 
 	read_size_t(nvertices, file);
 
+	printf("The graph has %lu vertices.\n", *nvertices);
 	bin_repr_t *repr = calloc(*nvertices, sizeof(bin_repr_t));
 	bin_repr_t *each = NULL;
 
@@ -371,6 +374,8 @@ bin_repr_t *read_graph(const char *filename, size_t *nvertices)
 		read_size_t(&n, file);
 		each->n = n;
 		each->borhood = calloc(n, sizeof(size_t));
+
+		printf("The vertex %lu has %lu neighbors.\n", vertex, n);
 
 		for (size_t j = 0; j < n; j++)
 		{
