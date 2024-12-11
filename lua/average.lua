@@ -12,11 +12,10 @@ print ('Loaded in ', os.difftime(os.time(), t))
 
 t = os.time ()
 
-local distances, cdistances = libluabag.bin_bfs (math.random(nvertices) - 1, nvertices, graph)
+local distances = libluabag.bin_bfs (math.random(nvertices), nvertices, graph)
 
 print ('bfs in ', os.difftime(os.time(), t))
 
-print (cdistances[#cdistances])
 
 libluabag.free_binary_repr (nvertices, graph)
 
