@@ -202,6 +202,7 @@ typedef struct pbfs_data_s
 	const char *neighborhoodSelector;
 	size_t startingVertex;
 	bin_repr_t *graph;
+	pthread_mutex_t *mutex;
 } pbfs_data_t;
 
 void cb(pennant_node_t *node, void *ud)
@@ -428,7 +429,6 @@ void process_layer_bin(pbfs_data_t *data);
 
 void *thread_bin(void *arg)
 {
-	printf("Forked.\n");
 	process_layer_bin(arg);
 
 	return arg;
@@ -446,6 +446,8 @@ void cb_bin(pennant_node_t *node, void *ud)
 	{
 		each = &data->graph[vertex->borhood[j]];
 
+		pthread_mutex_lock(data->mutex);
+
 		if (!each->visited)
 		{
 			each->visited = 1;
@@ -453,6 +455,8 @@ void cb_bin(pennant_node_t *node, void *ud)
 
 			bag_insert(data->next_frontier, pennant_create(each->vertex));
 		}
+
+		pthread_mutex_unlock(data->mutex);
 	}
 }
 
@@ -461,14 +465,6 @@ void process_layer_bin(pbfs_data_t *data)
 	if (bag_len(data->frontier) > 128)
 	{
 		pbfs_data_t datab = *data;
-		// datab.D = data->D;
-		// datab.graph = data->graph;
-		// datab.L = data->L;
-		// datab.layer = data->layer;
-		// datab.neighborhoodSelector = data->neighborhoodSelector;
-		// datab.next_frontier = data->next_frontier;
-		// datab.nvertices = data->nvertices;
-		// datab.startingVertex = data->startingVertex;
 		datab.frontier = bag_split(data->frontier);
 
 		pthread_t threadb;
@@ -478,7 +474,6 @@ void process_layer_bin(pbfs_data_t *data)
 		process_layer_bin(data);
 
 		pthread_join(threadb, NULL);
-		printf("Joined.\n");
 	}
 	else
 	{
@@ -488,9 +483,12 @@ void process_layer_bin(pbfs_data_t *data)
 
 int l_bin_bfs(lua_State *L)
 {
+	pthread_mutex_t mutex;
+	pthread_mutex_init(&mutex, NULL);
 
 	pbfs_data_t data;
-	data.startingVertex = lua_tonumber(L, 1);
+	data.mutex = &mutex;
+	data.startingVertex = lua_tonumber(L, 1) - 1;
 	data.nvertices = lua_tonumber(L, 2);
 	data.graph = lua_touserdata(L, 3);
 	data.layer = 0;
@@ -507,33 +505,29 @@ int l_bin_bfs(lua_State *L)
 		data.layer++;
 		data.next_frontier = bag_create(data.nvertices);
 
-		printf("> %lu\n", data.layer);
 		process_layer_bin(&data);
-		
+
 		data.frontier = data.next_frontier;
-		printf("< %lu\n", bag_len(data.frontier));
 	}
 
-	printf("Finished.\n");
-	lua_newtable(L);
+	pthread_mutex_destroy(&mutex);
+
 	lua_newtable(L);
 
-	size_t dist = 0, d, i;
+	size_t dist = 0;
 
 	for (size_t k = 0; k < data.nvertices; k++)
 	{
-		i = k + 1;
-		d = data.graph[k].distance;
-		dist += d;
+		dist = data.graph[k].distance;
 
-		lua_pushinteger(L, d);
-		lua_seti(L, -3, i);
-
-		lua_pushinteger(L, dist);
-		lua_seti(L, -2, i);
+		if (dist > 0)
+		{
+			lua_pushinteger(L, dist);
+			lua_seti(L, -2, k + 1);
+		}
 	}
 
-	return 2;
+	return 1;
 }
 
 int l_free_binary_repr(lua_State *L)
