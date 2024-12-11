@@ -1,5 +1,6 @@
 
 linux:
+	clang -O3 -fPIC -Wall -o average average.c -lm
 	clang -O3 -fPIC -Wall -shared -o libluabag.so libluabag.c -llua -lpthread
 	
 macos:
