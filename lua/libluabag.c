@@ -103,14 +103,15 @@ bag_t *bag_create(size_t nel)
 {
 	bag_t *bag = malloc(sizeof(bag_t));
 	bag->n = nel;
-	bag->r = ((size_t)ceil(log2(nel)));
-	bag->S = calloc(bag->r, sizeof(pennant_node_t));
+	bag->r = ((size_t)ceil(log2(nel))) + 1;
+	bag->S = calloc(bag->r, sizeof(pennant_node_t *));
 
 	return bag;
 }
 
 size_t bag_len(bag_t *b)
 {
+	assert(b);
 	size_t len = 0;
 
 	for (size_t k = 0; k < b->r; k++)
@@ -123,6 +124,7 @@ size_t bag_len(bag_t *b)
 
 void bag_insert(bag_t *b, pennant_node_t *x)
 {
+	assert(b);
 	size_t k = 0;
 	while (b->S[k])
 	{
@@ -130,6 +132,7 @@ void bag_insert(bag_t *b, pennant_node_t *x)
 		b->S[k] = NULL;
 		k++;
 	}
+	assert(k < b->r);
 	b->S[k] = x;
 }
 
@@ -150,6 +153,7 @@ bag_t *bag_union(bag_t *S, bag_t *R)
 
 bag_t *bag_split(bag_t *b)
 {
+	assert(b);
 	bag_t *S = bag_create(b->n);
 	pennant_node_t *y = b->S[0];
 	b->S[0] = NULL;
@@ -171,6 +175,7 @@ bag_t *bag_split(bag_t *b)
 
 void bag_visit(bag_t *b, pennant_callback_t cb, void *ud)
 {
+	assert(b);
 	for (size_t k = 0; k < b->r; k++)
 	{
 		pennant_visit(b->S[k], cb, ud);
@@ -426,7 +431,6 @@ void *thread_bin(void *arg)
 	printf("Forked.\n");
 	process_layer_bin(arg);
 
-	pthread_exit(arg);
 	return arg;
 }
 
@@ -503,11 +507,14 @@ int l_bin_bfs(lua_State *L)
 		data.layer++;
 		data.next_frontier = bag_create(data.nvertices);
 
+		printf("> %lu\n", data.layer);
 		process_layer_bin(&data);
-
+		
 		data.frontier = data.next_frontier;
+		printf("< %lu\n", bag_len(data.frontier));
 	}
 
+	printf("Finished.\n");
 	lua_newtable(L);
 	lua_newtable(L);
 
