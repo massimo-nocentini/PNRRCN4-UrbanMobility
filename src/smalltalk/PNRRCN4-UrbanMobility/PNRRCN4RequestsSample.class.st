@@ -87,12 +87,11 @@ PNRRCN4RequestsSample >> occupancy: oMatrix crowding: cVector [
 			c := cVector at: edge ifAbsentPut: 0.0.
 			cVector at: edge put: c + multiplicity.
 
-			at := at + (edge duration asFloatSeconds * multiplicity).
+			at := at + (edge duration * multiplicity).
 
 			edge trip = nextEdge trip ifFalse: [
-				edge arrivalTime asFloatSeconds + timeStep to:
-					nextEdge departureTime asFloatSeconds - timeStep by: timeStep do: [
-					:secs |
+				edge arrivalTime + timeStep to: nextEdge departureTime - timeStep
+					by: timeStep do: [ :secs |
 					| col |
 					col := oMatrix at: secs ceiling ifAbsentPut: newDictionaryBlock.
 
@@ -126,7 +125,7 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 		  averageTime: (Duration seconds: pair first);
 		  averageWaiting: pair second;
 		  occupancyMatrix:
-			  (res associations timsort: [ :assoc | assoc key asFloatSeconds ]);
+			  (res associations timsort: [ :assoc | assoc key asUnixTime ]);
 		  crowdingVector:
 			  (cVector associations timsort: #value reverse: true);
 		  yourself

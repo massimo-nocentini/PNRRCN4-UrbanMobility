@@ -60,11 +60,11 @@ PNRRCN4TemporalEdge >> duration [
 PNRRCN4TemporalEdge >> earliestArrivalTimeMaxTime: maxTime pathsSoFar: earliestArrivalTimePaths [
 
 	| t tu tv at |
-	at := self arrivalTime asFloatSeconds.
+	at := self arrivalTime.
 
 	at <= maxTime ifFalse: [ ^ self ].
 
-	t := self departureTime asFloatSeconds.
+	t := self departureTime.
 
 	tu := earliestArrivalTimePaths
 		      at: self from
@@ -127,8 +127,7 @@ PNRRCN4TemporalEdge >> printOn: aStream [
 { #category : 'sorting' }
 PNRRCN4TemporalEdge >> timsortSortKey [
 
-	^ self departureTime asFloatSeconds * 86400.0
-	  + self duration asFloatSeconds "1 days asSeconds  "
+	^ (self departureTime + self duration) asUnixTime
 ]
 
 { #category : 'accessing' }

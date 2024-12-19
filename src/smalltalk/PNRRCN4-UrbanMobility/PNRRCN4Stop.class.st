@@ -48,15 +48,13 @@ PNRRCN4Stop >> code: anObject [
 { #category : 'paths - earliest arrival time' }
 PNRRCN4Stop >> earliestArrivalTimePathsFromTime: fromTime toTime: maxTime [
 
-	| paths reified toTimeNanoSeconds |
-	toTimeNanoSeconds := maxTime asFloatSeconds.
-
+	| paths reified |
 	paths := IdentityDictionary new
-		         at: self put: fromTime asFloatSeconds -> nil;
+		         at: self put: fromTime -> nil;
 		         yourself.
 
 	self owner temporalEdges do: [ :edge |
-		edge earliestArrivalTimeMaxTime: toTimeNanoSeconds pathsSoFar: paths ].
+		edge earliestArrivalTimeMaxTime: maxTime pathsSoFar: paths ].
 
 	reified := IdentityDictionary new: paths size.
 
@@ -164,27 +162,6 @@ PNRRCN4Stop >> temporalIncomingNeighborhood [
 PNRRCN4Stop >> temporalOutgoingNeighborhood [
 
 	^ temporalOutgoingNeighborhood
-]
-
-{ #category : 'neighborhoods' }
-PNRRCN4Stop >> temporalOutgoingNeighborhoodGroupedByDestination [
-
-	| map |
-	map := IdentityDictionary new.
-
-	self temporalOutgoingNeighborhood do: [ :edge |
-		| group |
-		group := map at: edge to ifAbsentPut: [ Set new ].
-
-		group add: edge departureTime ].
-
-	map keysDo: [ :stop |
-		map
-			at: stop
-			update: [ :assocs |
-			assocs timsort: [ :time | time asFloatSeconds ] ] ].
-
-	^ map
 ]
 
 { #category : 'accessing' }
