@@ -132,16 +132,19 @@ PNRRCN4Stop >> name: anObject [
 	name := anObject
 ]
 
-{ #category : 'displaying' }
+{ #category : 'printing' }
 PNRRCN4Stop >> printOn: aStream [
 
+	| c |
 	self name displayStringOn: aStream.
 
 	aStream
 		space;
 		<< '('.
 
-	self code displayStringOn: aStream.
+	c := self code ifNil: [ self id ].
+
+	c printOn: aStream.
 
 	aStream << ')'
 ]

@@ -87,7 +87,7 @@ PNRRCN4NotebookTest >> testExportImplementationNotebook [
 PNRRCN4NotebookTest >> testLoadingFlorenceTransportGraph [
 
 	| g |
-	g := PNRRCN4TransportGraph named: #florence.
+	g := PNRRCN4TransportGraph load: #florence.
 
 	self deny: g equals: nil
 ]
