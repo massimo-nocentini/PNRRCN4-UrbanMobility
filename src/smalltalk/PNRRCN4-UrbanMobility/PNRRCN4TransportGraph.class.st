@@ -27,16 +27,36 @@ PNRRCN4TransportGraph class >> initialize [
 { #category : 'instance creation' }
 PNRRCN4TransportGraph class >> load: graphName [
 
-	| stops edges |
+	| stops times routes trips |
 	stops := self loadStopsFromFileReference:
 		         'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/transport'
 			         asFileReference / graphName / 'nodes.csv'.
 
-	edges := self loadStopTimesFromFileReference:
+	times := self loadStopTimesFromFileReference:
 		         'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/transport'
 			         asFileReference / graphName / 'edges.csv'.
 
-	edges inspect
+	routes := Dictionary new.
+	trips := Dictionary new.
+
+	times do: [ :each |
+		routes at: each routeId ifAbsentPut: [
+			PNRRCN4Route new
+				id: each routeId;
+				longName: each routeId;
+				yourself ].
+
+		trips at: each tripId ifAbsentPut: [
+			PNRRCN4Trip new
+				id: each tripId;
+				routeId: each routeId;
+				yourself ] ].
+		
+	^ PNRRCN4System
+		  routes: routes values
+		  stops: stops
+		  times: times
+		  trips: trips values
 ]
 
 { #category : 'instance creation' }

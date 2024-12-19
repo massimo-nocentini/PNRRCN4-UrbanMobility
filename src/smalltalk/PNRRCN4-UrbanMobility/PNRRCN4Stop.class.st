@@ -36,7 +36,7 @@ PNRRCN4Stop class >> onFileReference: fr [
 { #category : 'accessing' }
 PNRRCN4Stop >> code [
 
-	^ code
+	^ code ifNil: [ self id ]
 ]
 
 { #category : 'accessing' }
@@ -135,16 +135,13 @@ PNRRCN4Stop >> name: anObject [
 { #category : 'printing' }
 PNRRCN4Stop >> printOn: aStream [
 
-	| c |
 	self name displayStringOn: aStream.
 
 	aStream
 		space;
 		<< '('.
 
-	c := self code ifNil: [ self id ].
-
-	c printOn: aStream.
+	self code displayStringOn: aStream.
 
 	aStream << ')'
 ]

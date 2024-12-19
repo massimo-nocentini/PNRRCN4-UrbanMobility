@@ -28,7 +28,7 @@ PNRRCN4FromToEdge >> arrivalTime: anObject [
 	arrivalTime := anObject
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'accessing' }
 PNRRCN4FromToEdge >> arrivalTimeAsDateAndTime [
 
 	^ DateAndTime fromUnixTime: self arrivalTime
@@ -46,7 +46,7 @@ PNRRCN4FromToEdge >> departureTime: anObject [
 	departureTime := anObject
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'accessing' }
 PNRRCN4FromToEdge >> departureTimeAsDateAndTime [
 
 	^ DateAndTime fromUnixTime: self departureTime

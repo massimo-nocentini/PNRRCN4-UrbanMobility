@@ -37,7 +37,7 @@ PNRRCN4Trip class >> onFileReference: fr [
 { #category : 'accessing' }
 PNRRCN4Trip >> head [
 
-	^ head
+	^ head ifNil: [ self id ]
 ]
 
 { #category : 'accessing' }
@@ -74,15 +74,16 @@ PNRRCN4Trip >> printOn: aStream [
 		<< ' ('.
 
 	self times size printOn: aStream.
-	aStream << ' stops in '.
+	aStream << ' stops'.
 
-	(Duration seconds: (self times last arrivalTime asFloatSeconds
-		  - self times first departureTime asFloatSeconds) abs) printOn:
-		aStream.
+	self times ifNotEmpty: [
+		aStream << ' in '.
+		(self times last arrivalTime - self times first departureTime)
+			asDuration printOn: aStream.
 
-	aStream << ' at '.
+		aStream << ' at '.
 
-	self times first departureTime printOn: aStream.
+		self times first departureTime printOn: aStream ].
 
 	aStream << ')'
 ]

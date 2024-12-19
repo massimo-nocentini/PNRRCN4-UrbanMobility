@@ -16,21 +16,49 @@ Class {
 { #category : 'instance creation' }
 PNRRCN4System class >> manyToManyTimes: times tripsMap: tripsMap stopsMap: stopsMap onGraph: graph [
 
+	| col |
+	col := OrderedCollection new.
+
 	times
 		select: [ :each |
 		each arrivalTime isNotNil & each departureTime isNotNil ]
 		thenDo: [ :each |
-			| trip stop |
+			| trip from to stoptime |
 			trip := tripsMap at: each tripId.
-			stop := stopsMap at: each stopId.
 
-			each
-				owner: graph;
-				stop: stop;
-				trip: trip.
+			from := stopsMap at: each fromId.
+			stoptime := PNRRCN4StopTime new
+				            owner: graph;
+				            stopId: from id;
+				            stop: from;
+				            tripId: trip id;
+				            trip: trip;
+				            arrivalTime: each departureTimeAsDateAndTime;
+				            departureTime: each departureTimeAsDateAndTime;
+				            sequence: from times size + 1;
+				            yourself.
 
-			trip times add: each.
-			stop times add: each ]
+			trip times add: stoptime.
+			from times add: stoptime.
+			col add: stoptime.
+
+			to := stopsMap at: each toId.
+			stoptime := PNRRCN4StopTime new
+				            owner: graph;
+				            stopId: to id;
+				            stop: to;
+				            tripId: trip id;
+				            trip: trip;
+				            arrivalTime: each arrivalTimeAsDateAndTime;
+				            departureTime: each arrivalTimeAsDateAndTime;
+				            sequence: to times size + 1;
+				            yourself.
+
+			trip times add: stoptime.
+			to times add: stoptime.
+			col add: stoptime ].
+
+	^ col
 ]
 
 { #category : 'instance creation' }
@@ -91,7 +119,7 @@ PNRRCN4System class >> newTemporalEdgeFrom: from to: to trip: trip onGraph: grap
 { #category : 'instance creation' }
 PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
-	| routesMap stopsMap tripsMap temporalEdges graph |
+	| routesMap stopsMap tripsMap temporalEdges graph stoptimes |
 	graph := self new.
 
 	routesMap := self mapOfRoutes: routes onGraph: graph.
@@ -103,11 +131,12 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		            routesMap: routesMap
 		            onGraph: graph.
 
-	self
-		manyToManyTimes: times
-		tripsMap: tripsMap
-		stopsMap: stopsMap
-		onGraph: graph.
+	self halt.
+	stoptimes := self
+		             manyToManyTimes: times
+		             tripsMap: tripsMap
+		             stopsMap: stopsMap
+		             onGraph: graph.
 
 	routes do: [ :route |
 		route trips do: [ :trip |
@@ -133,7 +162,7 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		  temporalEdges: temporalEdges timsort;
 		  routes: routes;
 		  stops: stopsMap;
-		  times: times;
+		  times: stoptimes;
 		  trips: tripsMap;
 		  yourself
 ]
