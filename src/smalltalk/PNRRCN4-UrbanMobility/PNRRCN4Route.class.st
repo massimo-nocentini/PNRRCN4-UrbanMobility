@@ -28,19 +28,6 @@ PNRRCN4Route class >> onFileReference: fr [
 		  upToEnd
 ]
 
-{ #category : 'displaying' }
-PNRRCN4Route >> displayStringOn: aStream [
-
-	aStream
-		<< self longName;
-		space;
-		<< '('.
-		
-	self trips size displayStringOn: aStream.
-
-	aStream << ' trips)'
-]
-
 { #category : 'accessing' }
 PNRRCN4Route >> id [
 
@@ -71,6 +58,19 @@ PNRRCN4Route >> longName [
 PNRRCN4Route >> longName: anObject [
 
 	longName := anObject
+]
+
+{ #category : 'printing' }
+PNRRCN4Route >> printOn: aStream [
+
+	aStream
+		<< self longName;
+		space;
+		<< '('.
+
+	self trips size displayStringOn: aStream.
+
+	aStream << ' trips)'
 ]
 
 { #category : 'accessing' }

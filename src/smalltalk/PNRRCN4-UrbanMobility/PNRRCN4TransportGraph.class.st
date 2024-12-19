@@ -51,7 +51,12 @@ PNRRCN4TransportGraph class >> load: graphName [
 				id: each tripId;
 				routeId: each routeId;
 				yourself ] ].
-		
+
+	times sort: [ :a :b |
+		a departureTime = b departureTime
+			ifTrue: [ a arrivalTime < b arrivalTime ]
+			ifFalse: [ a departureTime = b departureTime ] ].
+
 	^ PNRRCN4System
 		  routes: routes values
 		  stops: stops

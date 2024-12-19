@@ -92,11 +92,12 @@ PNRRCN4StopTime >> displayStringOn: aStream [
 
 	self departureTime displayStringOn: aStream.
 
-	aStream << ' after '.
+	self traveledDistance ifNotNil: [ :td |
+		aStream << ' after '.
 
-	self traveledDistance displayStringOn: aStream.
+		td displayStringOn: aStream.
 
-	aStream << 'km'
+		aStream << 'km' ]
 ]
 
 { #category : 'accessing' }

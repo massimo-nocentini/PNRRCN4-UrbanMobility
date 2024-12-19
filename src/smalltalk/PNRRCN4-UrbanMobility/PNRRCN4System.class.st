@@ -35,7 +35,7 @@ PNRRCN4System class >> manyToManyTimes: times tripsMap: tripsMap stopsMap: stops
 				            trip: trip;
 				            arrivalTime: each departureTimeAsDateAndTime;
 				            departureTime: each departureTimeAsDateAndTime;
-				            sequence: from times size + 1;
+				            sequence: trip times size + 1;
 				            yourself.
 
 			trip times add: stoptime.
@@ -51,7 +51,7 @@ PNRRCN4System class >> manyToManyTimes: times tripsMap: tripsMap stopsMap: stops
 				            trip: trip;
 				            arrivalTime: each arrivalTimeAsDateAndTime;
 				            departureTime: each arrivalTimeAsDateAndTime;
-				            sequence: to times size + 1;
+				            sequence: trip times size + 1;
 				            yourself.
 
 			trip times add: stoptime.
