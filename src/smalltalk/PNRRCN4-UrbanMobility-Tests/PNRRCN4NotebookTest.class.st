@@ -84,6 +84,15 @@ PNRRCN4NotebookTest >> testExportImplementationNotebook [
 ]
 
 { #category : 'tests' }
+PNRRCN4NotebookTest >> testLoadingFlorenceTransportGraph [
+
+	| g |
+	g := PNRRCN4TransportGraph named: #florence.
+
+	self deny: g equals: nil
+]
+
+{ #category : 'tests' }
 PNRRCN4NotebookTest >> testLoadingRequests [
 
 	self
