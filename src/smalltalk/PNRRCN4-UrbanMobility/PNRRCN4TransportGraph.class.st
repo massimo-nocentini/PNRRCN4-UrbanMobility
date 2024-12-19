@@ -27,12 +27,38 @@ PNRRCN4TransportGraph class >> initialize [
 { #category : 'instance creation' }
 PNRRCN4TransportGraph class >> load: graphName [
 
-	| stops |
+	| stops edges |
 	stops := self loadStopsFromFileReference:
 		         'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/transport/'
 			         asFileReference / graphName / 'nodes.csv'.
 
-	stops inspect
+	edges := self loadStopsFromFileReference:
+		         'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/transport/'
+			         asFileReference / graphName / 'edges.csv'.
+
+	edges inspect
+]
+
+{ #category : 'instance creation' }
+PNRRCN4TransportGraph class >> loadStopTimesFromFileReference: fr [
+
+	| converter |
+	converter := [ :s |
+	            self halt. ].
+
+	^ (NeoCSVReader on: fr readStream)
+		  separator: $;;
+		  skipHeader;
+		  recordClass: PNRRCN4FromToEdge;
+		  addField: #fromId:;
+		  addField: #toId:;
+		  addField: #departureTime: converter: converter;
+		  addField: #arrivalTime: converter: converter;
+		  addIntegerField: #routeType:;
+		  addField: #tripId:;
+		  addIntegerField: #sequence:;
+		  addField: #routeId:;
+		  upToEnd
 ]
 
 { #category : 'instance creation' }
