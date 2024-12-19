@@ -22,10 +22,8 @@ PNRRCN4TemporalEdge >> = anObject [
 	^ from = anObject from and: [
 		  to = anObject to and: [
 			  trip = anObject trip and: [
-				  departureTime asFloatSeconds
-				  = anObject departureTime asFloatSeconds and: [
-					  arrivalTime asFloatSeconds
-					  = anObject arrivalTime asFloatSeconds ] ] ] ]
+				  departureTime = anObject departureTime and: [
+					  arrivalTime = anObject arrivalTime ] ] ] ]
 ]
 
 { #category : 'accessing' }
@@ -55,13 +53,7 @@ PNRRCN4TemporalEdge >> departureTime: anObject [
 { #category : 'accessing' }
 PNRRCN4TemporalEdge >> duration [
 
-	| secs |
-	secs := self arrivalTime asFloatSeconds
-	        - self departureTime asFloatSeconds.
-
-	self assert: secs >= 0.
-
-	^ Duration seconds: secs
+	^ (self arrivalTime - self departureTime) asDuration
 ]
 
 { #category : 'paths - earliest arrival time' }

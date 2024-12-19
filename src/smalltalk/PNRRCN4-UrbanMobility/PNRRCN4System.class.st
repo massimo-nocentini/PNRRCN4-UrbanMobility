@@ -131,7 +131,6 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		            routesMap: routesMap
 		            onGraph: graph.
 
-	self halt.
 	stoptimes := self
 		             manyToManyTimes: times
 		             tripsMap: tripsMap
@@ -173,50 +172,6 @@ PNRRCN4System >> acceptSlotDescriptorsVisitor: aVisitor [
 	^ aVisitor visitPNRRCN4Graph: self
 ]
 
-{ #category : 'export' }
-PNRRCN4System >> asTemporalGraphInSexpString [
-
-	^ String streamContents: [ :aStream |
-		  self exportTemporalGraphInSexpFormatOnStream: aStream ]
-]
-
-{ #category : 'export' }
-PNRRCN4System >> exportTemporalGraphInSexpFormatOnStream: aStream [
-
-	aStream
-		<< '(define florenceTemporalGraph ''(';
-		lf.
-
-	self stops valuesDo: [ :stop |
-		aStream
-			<< '(';
-			<< stop code;
-			space.
-
-		stop temporalOutgoingNeighborhoodGroupedByDestination
-			keysAndValuesDo: [ :to :tCol |
-				aStream
-					<< '(';
-					<< to code;
-					space;
-					<< '('.
-
-				tCol do: [ :t |
-					aStream
-						<< t asFloatSeconds asString;
-						space ].
-
-				aStream
-					<< '))';
-					space ].
-
-		aStream
-			<< ')';
-			lf ].
-
-	aStream << '))'
-]
-
 { #category : 'printing' }
 PNRRCN4System >> printOn: aStream [
 
@@ -226,7 +181,7 @@ PNRRCN4System >> printOn: aStream [
 
 	aStream << ' and |E| = '.
 
-	self temporalEdges size printOn: aStream
+	self temporalEdges ifNotNil: [ :te | te size printOn: aStream ]
 ]
 
 { #category : 'accessing' }
