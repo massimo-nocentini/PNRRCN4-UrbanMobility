@@ -193,35 +193,40 @@ PNRRCN4RequestsSample >> weightedSampleAbsoluteError: epsilon prob: p [
 { #category : 'sampling' }
 PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 
-	| random pool sample |
+	| random sample cumulatedMultiplicities count |
 	aSize > self totalCount ifTrue: [
 		Error signal: 'Requested too many people.' ].
 
-	pool := OrderedCollection
-		        new: self totalCount
-		        streamContents: [ :aStream |
-			        self requests do: [ :q |
-				        | qq |
-				        qq := q copy
-					              multiplicity: 1;
-					              yourself.
-
-				        q multiplicity timesRepeat: [ aStream nextPut: qq ] ] ].
+	cumulatedMultiplicities := self requests
+		                           scan: [ :m :each | m + each multiplicity ]
+		                           withoutInit: 0.
 
 	random := RSRandom new.
 
-	sample := IdentityDictionary new: aSize.
-	aSize timesRepeat: [
-		| q i m |
-		i := random nextInteger: pool size.
-		q := pool at: i. "using #at: means sampling with replacement, using #removeAt: means sampling without replacement."
-		m := sample at: q ifAbsentPut: 0.
-		sample at: q put: m + 1 ].
+	count := 0.
+	sample := Array new: aSize streamContents: [ :s |
+		          1 to: aSize do: [ :i |
+			          | hi lo m each |
+			          m := random nextInteger: cumulatedMultiplicities last.
 
-	sample keysAndValuesDo: [ :q :m | q multiplicity: m ].
+			          lo := 1.
+			          hi := cumulatedMultiplicities size.
+
+			          [ lo < hi ] whileTrue: [
+				          | j |
+				          j := lo + hi >> 1.
+				          each := cumulatedMultiplicities at: j.
+
+				          each < m
+					          ifTrue: [ lo := j + 1 ]
+					          ifFalse: [ hi := j ] ].
+
+			          each := self requests at: lo.
+			          s nextPut: each.
+			          count := count + each multiplicity ] ].
 
 	^ self class new
-		  requests: sample keys;
-		  totalCount: aSize;
+		  requests: sample;
+		  totalCount: count;
 		  yourself
 ]
