@@ -18,27 +18,21 @@ PNRRCN4RequestsSample class >> requests: aCollection onSystem: aSystem [
 	stops := aSystem stops.
 	count := 0.
 
-	col := aCollection select: [ :request |
-		       | keep |
-		       keep := true.
-
-		       request
-			       fromStop: (stops at: request fromStopId ifAbsent: [
-						        keep := false.
-						        nil ]);
-			       toStop: (stops at: request toStopId ifAbsent: [
-						        keep := false.
-						        nil ]);
-			       time: (DateAndTime fromUnixTime: request unixTime) asTime.
-
-		       keep ifTrue: [
+	col := aCollection
+		       select: [ :request |
+			       (stops includesKey: request fromStopId) and: [
+				       stops includesKey: request toStopId ] ]
+		       thenCollect: [ :request |
 			       count := count + request multiplicity.
-			       request owner: aSystem ].
-
-		       keep ].
+			
+			       request
+				       owner: aSystem;
+				       fromStop: (stops at: request fromStopId);
+				       toStop: (stops at: request toStopId);
+				       yourself ].
 
 	^ self new
-		  requests: col;
+		  requests: col timsort;
 		  totalCount: count;
 		  yourself
 ]

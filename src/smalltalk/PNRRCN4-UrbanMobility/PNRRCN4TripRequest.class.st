@@ -100,10 +100,10 @@ PNRRCN4TripRequest >> time [
 	^ time
 ]
 
-{ #category : 'accessing' }
-PNRRCN4TripRequest >> time: anObject [
+{ #category : 'sorting' }
+PNRRCN4TripRequest >> timsortSortKey [
 
-	time := anObject
+	^ self unixTime
 ]
 
 { #category : 'accessing' }
@@ -139,5 +139,6 @@ PNRRCN4TripRequest >> unixTime [
 { #category : 'accessing' }
 PNRRCN4TripRequest >> unixTime: anObject [
 
-	unixTime := anObject
+	unixTime := anObject.
+	time := DateAndTime fromUnixTime: unixTime
 ]

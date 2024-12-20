@@ -87,6 +87,8 @@ PNRRCN4NotebookTest >> testExportImplementationNotebook [
 PNRRCN4NotebookTest >> testLoadingFlorenceTransportGraph [
 
 	| g |
+	self timeLimit: 2 minutes.
+
 	g := PNRRCN4TransportGraph load: #florence.
 
 	self deny: g equals: nil

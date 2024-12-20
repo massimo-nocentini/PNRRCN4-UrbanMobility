@@ -27,7 +27,7 @@ PNRRCN4TransportGraph class >> initialize [
 { #category : 'instance creation' }
 PNRRCN4TransportGraph class >> load: graphName [
 
-	| stops times routes trips |
+	| stops times routes trips system |
 	stops := self loadStopsFromFileReference:
 		         'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/transport'
 			         asFileReference / graphName / 'nodes.csv'.
@@ -60,11 +60,15 @@ PNRRCN4TransportGraph class >> load: graphName [
 			ifTrue: [ a arrivalTime < b arrivalTime ]
 			ifFalse: [ da < db ] ].
 
-	^ PNRRCN4System
-		  routes: routes values
-		  stops: stops
-		  times: times
-		  trips: trips values
+	system := PNRRCN4System
+		          routes: routes values
+		          stops: stops
+		          times: times
+		          trips: trips values.
+
+	^ system
+		  name: graphName;
+		  yourself
 ]
 
 { #category : 'instance creation' }
@@ -106,4 +110,15 @@ PNRRCN4TransportGraph class >> loadStopsFromFileReference: fr [
 PNRRCN4TransportGraph class >> named: graphName [
 
 	^ Graphs at: graphName ifAbsentPut: [ self load: graphName ]
+]
+
+{ #category : 'instance creation' }
+PNRRCN4TransportGraph class >> requests: requestsFilename forGraph: graph [
+
+	| requests |
+	requests := PNRRCN4TripRequest onFileReference:
+		            'pharo-local/iceberg/massimo-nocentini/PNRRCN4-UrbanMobility/data/transport'
+			            asFileReference / graph name / requestsFilename.
+
+	^ PNRRCN4RequestsSample requests: requests onSystem: graph
 ]

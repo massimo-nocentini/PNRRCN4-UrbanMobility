@@ -53,7 +53,7 @@ PNRRCN4TemporalEdge >> departureTime: anObject [
 { #category : 'accessing' }
 PNRRCN4TemporalEdge >> duration [
 
-	^ (self arrivalTime - self departureTime) asDuration
+	^ self arrivalTime - self departureTime
 ]
 
 { #category : 'paths - earliest arrival time' }

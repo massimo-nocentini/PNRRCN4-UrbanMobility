@@ -79,11 +79,7 @@ PNRRCN4Trip >> printOn: aStream [
 	self times ifNotEmpty: [
 		aStream << ' in '.
 		self times last arrivalTime - self times first departureTime
-			printOn: aStream.
-
-		aStream << ' at '.
-
-		self times first departureTime printOn: aStream ].
+			printOn: aStream ].
 
 	aStream << ')'
 ]

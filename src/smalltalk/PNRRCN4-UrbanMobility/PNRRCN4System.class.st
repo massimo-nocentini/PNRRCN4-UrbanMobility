@@ -6,7 +6,8 @@ Class {
 		'stops',
 		'times',
 		'trips',
-		'temporalEdges'
+		'temporalEdges',
+		'name'
 	],
 	#category : 'PNRRCN4-UrbanMobility-API',
 	#package : 'PNRRCN4-UrbanMobility',
@@ -189,6 +190,18 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 PNRRCN4System >> acceptSlotDescriptorsVisitor: aVisitor [
 
 	^ aVisitor visitPNRRCN4Graph: self
+]
+
+{ #category : 'accessing' }
+PNRRCN4System >> name [
+
+	^ name
+]
+
+{ #category : 'accessing' }
+PNRRCN4System >> name: anObject [
+
+	name := anObject
 ]
 
 { #category : 'printing' }
