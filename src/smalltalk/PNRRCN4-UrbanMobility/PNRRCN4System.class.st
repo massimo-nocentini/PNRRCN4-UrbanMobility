@@ -150,7 +150,11 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 			aux addFirst: aux first.
 			aux addLast: aux last.
 
-			buffer := aux withIndexSelect: [ :each :i | i even ].
+			buffer := Array streamContents: [ :s |
+				          aux withIndexDo: [ :each :i |
+					          i even ifTrue: [ s nextPut: each ] ] ].
+			buffer last sequence: buffer size.
+
 			aux
 				removeAll;
 				addAll: buffer.
