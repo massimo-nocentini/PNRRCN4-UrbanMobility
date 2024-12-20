@@ -42,7 +42,7 @@ PNRRCN4RequestsSample >> initialize [
 
 	super initialize.
 
-	self timeStepInSeconds: 60
+	self timeStepInSeconds: 1 minute
 ]
 
 { #category : 'testing' }
@@ -60,11 +60,12 @@ PNRRCN4RequestsSample >> occupancy: oMatrix crowding: cVector [
 	newDictionaryBlock := [ Dictionary new ].
 
 	"Some parameters."
-	timeStep := self timeStepInSeconds asFloat.
+	timeStep := self timeStepInSeconds.
 	k := self totalCount asFloat.
 
 	"Output."
-	at := aw := 0.0.
+	at := Duration zero.
+	aw := 0.0.
 
 	"Go!"
 	self requests do: [ :q |
@@ -87,7 +88,9 @@ PNRRCN4RequestsSample >> occupancy: oMatrix crowding: cVector [
 				edge arrivalTime + timeStep to: nextEdge departureTime - timeStep
 					by: timeStep do: [ :secs |
 					| col |
-					col := oMatrix at: secs ceiling ifAbsentPut: newDictionaryBlock.
+					col := oMatrix
+						       at: secs asUnixTime
+						       ifAbsentPut: newDictionaryBlock.
 
 					col
 						at: edge to
@@ -111,12 +114,12 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 	res := Dictionary new.
 	oMatrix keysAndValuesDo: [ :t :dict |
 		res
-			at: (Time seconds: t)
+			at: (DateAndTime fromUnixTime: t)
 			put: (dict associations timsort: #value reverse: true) ].
 
 	^ PNRRCN4OccupancyAndCrowding new
 		  requestsSample: self;
-		  averageTime: (Duration seconds: pair first);
+		  averageTime: pair first;
 		  averageWaiting: pair second;
 		  occupancyMatrix:
 			  (res associations timsort: [ :assoc | assoc key asUnixTime ]);

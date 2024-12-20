@@ -50,7 +50,7 @@ PNRRCN4Stop >> earliestArrivalTimePathsFromTime: fromTime toTime: maxTime [
 
 	| paths reified |
 	paths := IdentityDictionary new
-		         at: self put: fromTime -> nil;
+		         at: self put: fromTime asUnixTime -> nil;
 		         yourself.
 
 	self owner temporalEdges do: [ :edge |

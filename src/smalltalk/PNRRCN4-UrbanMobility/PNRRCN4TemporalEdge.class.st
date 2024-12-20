@@ -59,26 +59,24 @@ PNRRCN4TemporalEdge >> duration [
 { #category : 'paths - earliest arrival time' }
 PNRRCN4TemporalEdge >> earliestArrivalTimeMaxTime: maxTime pathsSoFar: earliestArrivalTimePaths [
 
-	| t tu tv at |
+	| tu tv at |
 	at := self arrivalTime.
 
 	at <= maxTime ifFalse: [ ^ self ].
-
-	t := self departureTime.
 
 	tu := earliestArrivalTimePaths
 		      at: self from
 		      ifAbsentPut: [ Float infinity -> nil ].
 
-	tu key <= t ifFalse: [ ^ self ].
+	tu key <= self departureTime asUnixTime ifFalse: [ ^ self ].
 
 	tv := earliestArrivalTimePaths
 		      at: self to
 		      ifAbsentPut: [ Float infinity -> nil ].
 
-	at < tv key ifFalse: [ ^ self ].
+	at asUnixTime < tv key ifFalse: [ ^ self ].
 
-	tv key: at.
+	tv key: at asUnixTime.
 	tv value: self
 ]
 
