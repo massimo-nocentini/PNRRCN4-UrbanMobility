@@ -78,8 +78,8 @@ PNRRCN4StopTime >> departureTime: anObject [
 	departureTime := anObject
 ]
 
-{ #category : 'displaying' }
-PNRRCN4StopTime >> displayStringOn: aStream [
+{ #category : 'printing' }
+PNRRCN4StopTime >> printOn: aStream [
 
 	aStream
 		<< self stop name;

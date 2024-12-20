@@ -144,7 +144,6 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 	routes do: [ :route |
 		route trips do: [ :trip |
 			| buffer aux |
-			self halt.
 			aux := trip times.
 
 			aux addFirst: aux first.
@@ -159,16 +158,18 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 				removeAll;
 				addAll: buffer.
 
-			aux overlappingPairsDo: [ :from :to |
-				| edge |
-				edge := self
-					        newTemporalEdgeFrom: from
-					        to: to
-					        trip: trip
-					        onGraph: graph.
+			aux
+				sort: [ :a :b | a sequence < b sequence ];
+				overlappingPairsDo: [ :from :to |
+					| edge |
+					edge := self
+						        newTemporalEdgeFrom: from
+						        to: to
+						        trip: trip
+						        onGraph: graph.
 
-				from stop temporalOutgoingNeighborhood add: edge.
-				to stop temporalIncomingNeighborhood add: edge ] ] ].
+					from stop temporalOutgoingNeighborhood add: edge.
+					to stop temporalIncomingNeighborhood add: edge ] ] ].
 
 	temporalEdges := OrderedCollection new.
 	stops do: [ :stop |
