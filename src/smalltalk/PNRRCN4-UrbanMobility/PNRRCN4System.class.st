@@ -137,6 +137,7 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		             stopsMap: stopsMap
 		             onGraph: graph.
 
+	self halt.
 	routes do: [ :route |
 		route trips do: [ :trip |
 			trip times

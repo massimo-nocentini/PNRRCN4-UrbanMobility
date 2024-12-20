@@ -66,7 +66,7 @@ PNRRCN4Trip >> initialize [
 	times := OrderedCollection new
 ]
 
-{ #category : 'displaying' }
+{ #category : 'printing' }
 PNRRCN4Trip >> printOn: aStream [
 
 	aStream
@@ -78,8 +78,8 @@ PNRRCN4Trip >> printOn: aStream [
 
 	self times ifNotEmpty: [
 		aStream << ' in '.
-		(self times last arrivalTime - self times first departureTime)
-			asDuration printOn: aStream.
+		self times last arrivalTime - self times first departureTime
+			printOn: aStream.
 
 		aStream << ' at '.
 
