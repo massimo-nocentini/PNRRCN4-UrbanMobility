@@ -206,14 +206,13 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 	count := 0.
 	sample := Array new: aSize streamContents: [ :s |
 		          1 to: aSize do: [ :i |
-			          | hi lo m each |
+			          | hi lo m each j |
 			          m := random nextInteger: cumulatedMultiplicities last.
 
 			          lo := 1.
 			          hi := cumulatedMultiplicities size.
 
 			          [ lo < hi ] whileTrue: [
-				          | j |
 				          j := lo + hi >> 1.
 				          each := cumulatedMultiplicities at: j.
 
@@ -221,8 +220,12 @@ PNRRCN4RequestsSample >> weightedSampleOfSize: aSize [
 					          ifTrue: [ lo := j + 1 ]
 					          ifFalse: [ hi := j ] ].
 
-			          each := self requests at: lo.
+			          each := (self requests at: lo) copy
+				                  multiplicity: 1;
+				                  yourself.
+
 			          s nextPut: each.
+
 			          count := count + each multiplicity ] ].
 
 	^ self class new
