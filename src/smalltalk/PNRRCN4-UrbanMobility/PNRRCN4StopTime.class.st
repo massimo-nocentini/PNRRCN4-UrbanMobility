@@ -84,11 +84,11 @@ PNRRCN4StopTime >> printOn: aStream [
 	aStream
 		<< self stop name;
 		space;
-		<< ' ('.
+		<< '('.
 
 	self stop code displayStringOn: aStream.
 
-	aStream << ') departs at '.
+	aStream << ') at '.
 
 	self departureTime displayStringOn: aStream.
 
