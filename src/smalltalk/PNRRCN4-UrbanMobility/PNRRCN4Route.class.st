@@ -51,7 +51,7 @@ PNRRCN4Route >> initialize [
 { #category : 'accessing' }
 PNRRCN4Route >> longName [
 
-	^ longName
+	^ longName ifNil: [ self id ]
 ]
 
 { #category : 'accessing' }

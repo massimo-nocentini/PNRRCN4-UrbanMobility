@@ -19,44 +19,48 @@ PNRRCN4System class >> manyToManyTimes: times tripsMap: tripsMap stopsMap: stops
 	| col |
 	col := OrderedCollection new.
 
-	times
-		select: [ :each |
-		each arrivalTime isNotNil & each departureTime isNotNil ]
-		thenDo: [ :each |
-			| trip from to stoptime |
-			trip := tripsMap at: each tripId.
+	times do: [ :each |
+		| trip from to stoptime dt |
+		trip := tripsMap at: each tripId.
 
-			from := stopsMap at: each fromId.
-			stoptime := PNRRCN4StopTime new
-				            owner: graph;
-				            stopId: from id;
-				            stop: from;
-				            tripId: trip id;
-				            trip: trip;
-				            arrivalTime: each departureTimeAsDateAndTime;
-				            departureTime: each departureTimeAsDateAndTime;
-				            sequence: trip times size + 1;
-				            yourself.
+		from := stopsMap at: each fromId.
+		dt := each departureTimeAsDateAndTime.
+		stoptime := PNRRCN4StopTime new
+			            owner: graph;
+			            stopId: from id;
+			            stop: from;
+			            tripId: trip id;
+			            trip: trip;
+			            arrivalTime: dt;
+			            departureTime: dt;
+			            sequence: trip times size + 1;
+			            yourself.
 
-			trip times add: stoptime.
-			from times add: stoptime.
-			col add: stoptime.
+		"many to many tying."
+		trip times add: stoptime.
+		from times add: stoptime.
 
-			to := stopsMap at: each toId.
-			stoptime := PNRRCN4StopTime new
-				            owner: graph;
-				            stopId: to id;
-				            stop: to;
-				            tripId: trip id;
-				            trip: trip;
-				            arrivalTime: each arrivalTimeAsDateAndTime;
-				            departureTime: each arrivalTimeAsDateAndTime;
-				            sequence: trip times size + 1;
-				            yourself.
+		"collect the stoptime."
+		col add: stoptime.
 
-			trip times add: stoptime.
-			to times add: stoptime.
-			col add: stoptime ].
+		to := stopsMap at: each toId.
+		dt := each arrivalTimeAsDateAndTime.
+		stoptime := PNRRCN4StopTime new
+			            owner: graph;
+			            stopId: to id;
+			            stop: to;
+			            tripId: trip id;
+			            trip: trip;
+			            arrivalTime: dt;
+			            departureTime: dt;
+			            sequence: trip times size + 1;
+			            yourself.
+
+		"tying again"
+		trip times add: stoptime.
+		to times add: stoptime.
+
+		col add: stoptime ].
 
 	^ col
 ]
@@ -137,9 +141,9 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		             stopsMap: stopsMap
 		             onGraph: graph.
 
-	self halt.
 	routes do: [ :route |
 		route trips do: [ :trip |
+			self halt.
 			trip times
 				sort: [ :t1 :t2 | t1 sequence < t2 sequence ];
 				overlappingPairsDo: [ :from :to |

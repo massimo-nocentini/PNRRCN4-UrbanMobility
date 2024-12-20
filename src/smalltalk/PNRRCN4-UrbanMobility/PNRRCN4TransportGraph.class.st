@@ -43,7 +43,6 @@ PNRRCN4TransportGraph class >> load: graphName [
 		routes at: each routeId ifAbsentPut: [
 			PNRRCN4Route new
 				id: each routeId;
-				longName: each routeId;
 				yourself ].
 
 		trips at: each tripId ifAbsentPut: [
@@ -53,9 +52,13 @@ PNRRCN4TransportGraph class >> load: graphName [
 				yourself ] ].
 
 	times sort: [ :a :b |
-		a departureTime = b departureTime
+		| da db |
+		da := a departureTime.
+		db := b departureTime.
+
+		da = db
 			ifTrue: [ a arrivalTime < b arrivalTime ]
-			ifFalse: [ a departureTime = b departureTime ] ].
+			ifFalse: [ da < db ] ].
 
 	^ PNRRCN4System
 		  routes: routes values
