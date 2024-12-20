@@ -33,7 +33,7 @@ PNRRCN4System class >> manyToManyTimes: times tripsMap: tripsMap stopsMap: stops
 			            trip: trip;
 			            arrivalTime: dt;
 			            departureTime: dt;
-			            sequence: trip times size + 1;
+			            sequence: each sequence;
 			            yourself.
 
 		"many to many tying."
@@ -53,7 +53,7 @@ PNRRCN4System class >> manyToManyTimes: times tripsMap: tripsMap stopsMap: stops
 			            trip: trip;
 			            arrivalTime: dt;
 			            departureTime: dt;
-			            sequence: trip times size + 1;
+			            sequence: each sequence;
 			            yourself.
 
 		"tying again"
@@ -143,19 +143,28 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 
 	routes do: [ :route |
 		route trips do: [ :trip |
+			| buffer aux |
 			self halt.
-			trip times
-				sort: [ :t1 :t2 | t1 sequence < t2 sequence ];
-				overlappingPairsDo: [ :from :to |
-					| edge |
-					edge := self
-						        newTemporalEdgeFrom: from
-						        to: to
-						        trip: trip
-						        onGraph: graph.
+			aux := trip times.
 
-					from stop temporalOutgoingNeighborhood add: edge.
-					to stop temporalIncomingNeighborhood add: edge ] ] ].
+			aux addFirst: aux first.
+			aux addLast: aux last.
+
+			buffer := aux withIndexSelect: [ :each :i | i even ].
+			aux
+				removeAll;
+				addAll: buffer.
+
+			aux overlappingPairsDo: [ :from :to |
+				| edge |
+				edge := self
+					        newTemporalEdgeFrom: from
+					        to: to
+					        trip: trip
+					        onGraph: graph.
+
+				from stop temporalOutgoingNeighborhood add: edge.
+				to stop temporalIncomingNeighborhood add: edge ] ] ].
 
 	temporalEdges := OrderedCollection new.
 	stops do: [ :stop |
