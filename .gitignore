@@ -2,3 +2,5 @@
 *.DS_Store
 lua/libluabag.so
 lua/average
+
+rust/target/
