@@ -1,11 +1,12 @@
 // Date: 2021-09-26
 
-use std::{collections::HashMap, hash::Hash, usize};
-
-use csv::Error;
+use std::{collections::HashMap, usize};
 
 // from_stop_I;to_stop_I;dep_time_ut;arr_time_ut;route_type;trip_I;seq;route_I
 type EdgeRecord = (String, String, usize, usize, usize, String, usize, usize);
+
+// departure;arrival;starting_time;n_people
+type RequestRecord = (String, String, usize, usize);
 
 #[derive(Debug)]
 struct Edge {
@@ -18,6 +19,14 @@ struct Edge {
     trip_id: usize,
     seq: usize,
     route_id: usize,
+}
+
+#[derive(Debug)]
+struct Request {
+    from_id: usize,
+    to_id: usize,
+    departure_time: usize,
+    multiplicity: usize,
 }
 
 fn parse_edges(scores: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) {
@@ -79,6 +88,38 @@ fn parse_edges(scores: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) {
     }
 
     edges.sort_by(|a, b| a.departure_time.cmp(&b.departure_time));
+}
+
+fn parse_requests(scores: &HashMap<String, usize>, requests: &mut Vec<Request>) {
+    let mut stops_index = 0usize;
+    let mut trip_index = 0usize;
+
+    let rdr = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .delimiter(b';')
+        .from_path("../data/transport/florence/requests_K10747_N30965.csv")
+        .unwrap();
+
+    for result in rdr.into_deserialize() {
+        let record: RequestRecord = result.unwrap();
+
+        if let Some(v) = scores.get(&record.0) {
+            if let Some(w) = scores.get(&record.1) {
+                let req = Request {
+                    from_id: *v,
+                    to_id: *w,
+                    departure_time: record.2,
+                    multiplicity: record.3,
+                };
+
+                requests.push(req);
+            } else {
+                continue;
+            };
+        } else {
+            continue;
+        };
+    }
 }
 
 fn reify_path(from: usize, to: usize, paths: &Vec<Option<usize>>) -> Vec<usize> {
@@ -147,8 +188,10 @@ fn earliest_arrival_paths(
 fn main() {
     let mut scores = HashMap::new();
     let mut edges: Vec<Edge> = Vec::new();
+    let mut requests: Vec<Request> = Vec::new();
 
     parse_edges(&mut scores, &mut edges);
+    parse_requests(&mut scores, &mut requests);
 
-    println!("{:?}", edges);
+    println!("{:?}", requests);
 }
