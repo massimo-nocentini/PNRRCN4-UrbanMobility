@@ -1,5 +1,7 @@
 // Date: 2021-09-26
 
+use rand::thread_rng;
+use rand::{seq::SliceRandom, Rng};
 use std::{collections::HashMap, usize};
 
 // from_stop_I;to_stop_I;dep_time_ut;arr_time_ut;route_type;trip_I;seq;route_I
@@ -90,9 +92,8 @@ fn parse_edges(scores: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) {
     edges.sort_by(|a, b| a.departure_time.cmp(&b.departure_time));
 }
 
-fn parse_requests(scores: &HashMap<String, usize>, requests: &mut Vec<Request>) {
-    let mut stops_index = 0usize;
-    let mut trip_index = 0usize;
+fn parse_requests(scores: &HashMap<String, usize>, requests: &mut Vec<Request>) -> usize {
+    let mut total = 0usize;
 
     let rdr = csv::ReaderBuilder::new()
         .has_headers(true)
@@ -111,7 +112,7 @@ fn parse_requests(scores: &HashMap<String, usize>, requests: &mut Vec<Request>) 
                     departure_time: record.2,
                     multiplicity: record.3,
                 };
-
+                total += req.multiplicity;
                 requests.push(req);
             } else {
                 continue;
@@ -120,6 +121,8 @@ fn parse_requests(scores: &HashMap<String, usize>, requests: &mut Vec<Request>) 
             continue;
         };
     }
+
+    total
 }
 
 fn reify_path(from: usize, to: usize, paths: &Vec<Option<usize>>) -> Vec<usize> {
@@ -183,6 +186,48 @@ fn earliest_arrival_paths(
     }
 
     paths
+}
+
+fn sample(k: usize, requests: &Vec<Request>) -> Vec<Request> {
+    let mut rng = thread_rng();
+    let mut multiplicities = Vec::new();
+    let mut total = 0usize;
+
+    let mut sample = Vec::new();
+
+    for req in requests.iter() {
+        total += req.multiplicity;
+        multiplicities.push(total);
+    }
+
+    for _ in 0..k {
+        let m = rng.gen_range(0..total);
+
+        let (mut lo, mut hi) = (0, multiplicities.len() - 1);
+
+        // Binary search: find the first index lo such that multiplicities[lo] >= m.
+        while lo < hi {
+            let mid = (lo + hi) / 2;
+            if multiplicities[mid] < m {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+
+        let choosen = &requests[lo];
+        
+        let unary_request = Request {
+            from_id: choosen.from_id,
+            to_id: choosen.to_id,
+            departure_time: choosen.departure_time,
+            multiplicity: 1,
+        };
+
+        sample.push(unary_request);
+    }
+
+    sample
 }
 
 fn main() {
