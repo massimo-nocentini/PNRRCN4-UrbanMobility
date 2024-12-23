@@ -1,7 +1,7 @@
 // Date: 2021-09-26
 
 use rand::thread_rng;
-use rand::{seq::SliceRandom, Rng};
+use rand::Rng;
 use std::{collections::HashMap, usize};
 
 // from_stop_I;to_stop_I;dep_time_ut;arr_time_ut;route_type;trip_I;seq;route_I
@@ -216,12 +216,13 @@ fn sample(k: usize, requests: &Vec<Request>) -> Vec<Request> {
         }
 
         let choosen = &requests[lo];
-        
+
         let unary_request = Request {
-            from_id: choosen.from_id,
-            to_id: choosen.to_id,
-            departure_time: choosen.departure_time,
+            // from_id: choosen.from_id,
+            // to_id: choosen.to_id,
+            // departure_time: choosen.departure_time,
             multiplicity: 1,
+            ..*choosen
         };
 
         sample.push(unary_request);
