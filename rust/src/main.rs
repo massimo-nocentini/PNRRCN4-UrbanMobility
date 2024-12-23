@@ -1,6 +1,6 @@
 // Date: 2021-09-26
 
-use std::collections::HashMap;
+use std::{collections::HashMap, hash::Hash, usize};
 
 use csv::Error;
 
@@ -9,27 +9,26 @@ type EdgeRecord = (String, String, usize, usize, usize, String, usize, usize);
 
 #[derive(Debug)]
 struct Edge {
-    from_stop_id: usize,
-    to_stop_id: usize,
+    from_id: usize,
+    to_id: usize,
     departure_time: usize,
     arrival_time: usize,
+    duration: usize,
     route_type: usize,
     trip_id: usize,
     seq: usize,
     route_id: usize,
 }
 
-fn main() {
+fn parse_edges(scores: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) {
+    let mut stops_index = 0usize;
+    let mut trip_index = 0usize;
+
     let rdr = csv::ReaderBuilder::new()
         .has_headers(true)
         .delimiter(b';')
         .from_path("../data/transport/florence/edges.csv")
         .unwrap();
-
-    let mut stops_index = 0usize;
-    let mut trip_index = 0usize;
-    let mut scores = HashMap::new();
-    let mut edges: Vec<Edge> = Vec::new();
 
     for result in rdr.into_deserialize() {
         let record: EdgeRecord = result.unwrap();
@@ -65,18 +64,91 @@ fn main() {
         };
 
         let edge = Edge {
-            from_stop_id: from_id,
-            to_stop_id: to_id,
+            from_id,
+            to_id,
             departure_time: record.2,
             arrival_time: record.3,
             route_type: record.4,
-            trip_id: trip_id,
+            trip_id,
             seq: record.6,
             route_id: record.7,
+            duration: record.3 - record.2,
         };
 
         edges.push(edge);
     }
+
+    edges.sort_by(|a, b| a.departure_time.cmp(&b.departure_time));
+}
+
+fn reify_path(from: usize, to: usize, paths: &Vec<Option<usize>>) -> Vec<usize> {
+    let mut path = Vec::new();
+    let mut w = to;
+
+    path.push(w);
+
+    while let Some(p) = paths[w] {
+        w = p;
+        path.push(w);
+
+        if w == from {
+            break;
+        }
+    }
+
+    path.reverse();
+
+    path
+}
+
+fn earliest_arrival_paths(
+    v: usize,
+    start_t: usize,
+    stop_t: usize,
+    num_nodes: usize,
+    edges: &Vec<Edge>,
+) -> Vec<Option<usize>> {
+    let mut paths = vec![None; num_nodes];
+    let mut t = vec![None; num_nodes];
+
+    paths[v] = Some(v);
+    t[v] = Some(start_t);
+
+    for edge in edges.iter() {
+        let td = edge.departure_time;
+        let ta = edge.arrival_time;
+        if ta <= stop_t {
+            match t[edge.from_id] {
+                None => continue,
+                Some(t0) => {
+                    if td >= t0 {
+                        t[edge.to_id] = match t[edge.to_id] {
+                            None => Some(ta),
+                            Some(t1) => {
+                                if ta < t1 {
+                                    paths[edge.to_id] = Some(edge.from_id);
+                                    Some(ta)
+                                } else {
+                                    Some(t1)
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        } else if td >= stop_t {
+            break;
+        }
+    }
+
+    paths
+}
+
+fn main() {
+    let mut scores = HashMap::new();
+    let mut edges: Vec<Edge> = Vec::new();
+
+    parse_edges(&mut scores, &mut edges);
 
     println!("{:?}", edges);
 }
