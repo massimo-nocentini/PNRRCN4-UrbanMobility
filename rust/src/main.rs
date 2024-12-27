@@ -1,5 +1,6 @@
 // Date: 2021-09-26
 
+use core::time;
 use rand::thread_rng;
 use rand::Rng;
 use std::time::Duration;
@@ -232,38 +233,56 @@ fn sample(k: usize, requests: &Vec<Request>) -> Vec<Request> {
 fn estimate<'a>(
     sample: &Vec<Request>,
     stop_t: usize,
+    time_step: usize,
     num_nodes: usize,
     edges: &'a Vec<Edge>,
-) -> (HashMap<&'a Edge, f64>, f64) {
+) -> (HashMap<&'a Edge, f64>, f64, f64) {
     let mut crowding_vector = HashMap::new();
 
     let mut at = 0;
+    let mut aw = 0;
 
     let total = sample.iter().fold(0, |acc, req| acc + req.multiplicity) as f64;
 
     for req in sample.iter() {
-        let fmul = (req.multiplicity as f64) / total;
+        let m = req.multiplicity;
+        let fmul = (m as f64) / total;
         let paths =
             earliest_arrival_paths(req.from_id, req.departure_time, stop_t, num_nodes, edges);
-        // println!(
-        //     "** {:?}",
-        //     paths.iter().filter(|x| x.is_some()).collect::<Vec<_>>()
-        // );
         let path = reify_path(req.to_id, &paths);
         // println!("* {:?} in {} steps.", req, path.len());
-        for edge in path {
+        if path.is_empty() {
+            continue;
+        }
+        for e in 0..path.len() - 1 {
+            let edge = path[e];
             // println!("*** {:?}", edge);
             let c = crowding_vector.entry(edge).or_insert(0.0);
             *c += fmul;
-            at += req.multiplicity * edge.duration;
+            at += m * edge.duration;
+
+            let next_edge = path[e + 1];
+            if edge.trip_id != next_edge.trip_id {
+                let until_time = next_edge.departure_time - time_step;
+                let mut t = edge.arrival_time + time_step;
+                while t <= until_time {
+                    aw += m;
+                    t += time_step;
+                }
+            }
         }
     }
 
-    (crowding_vector, (at as f64) / total)
+    (
+        crowding_vector,
+        (at as f64) / total,
+        ((aw * time_step) as f64) / total,
+    )
 }
 
 fn main() {
-    let repetitions = 1;
+    let repetitions = 5;
+    let time_step = 60; //  1 minute
 
     let mut vertices = HashMap::new();
     let mut edges: Vec<Edge> = Vec::new();
@@ -279,22 +298,34 @@ fn main() {
         requests.len()
     );
 
-    // let (crowding_vector_true, at_true) = estimate(&requests, max_time, vertices.len(), &edges);
-
     let mut at_true = 0.0;
+    let mut aw_true = 0.0;
+
+    let (crowding_vector_true, at_true, aw_true) =
+        estimate(&requests, max_time, time_step, vertices.len(), &edges);
+
     let mut at = 0.0;
+    let mut aw = 0.0;
 
     for i in 0..repetitions {
         let sampled = sample(381, &requests);
-        let (crowding_vector, at_each) = estimate(&sampled, max_time, vertices.len(), &edges);
+        let (crowding_vector, at_each, aw_each) =
+            estimate(&sampled, max_time, time_step, vertices.len(), &edges);
         at += at_each;
+        aw += aw_each;
     }
 
-    // println!("{:?}", crowding_vector);
+    println!(
+        "Average travelling time: true {:?}, estimated {:?} over {} repetitions.",
+        Duration::from_secs_f64(at_true),
+        Duration::from_secs_f64(at / (repetitions as f64)),
+        repetitions
+    );
 
     println!(
-        "Waiting time: true {:?}, estimated {:?}.",
-        Duration::from_secs_f64(at_true),
-        Duration::from_secs_f64(at / (repetitions as f64))
+        "Average waiting time: true {:?}, estimated {:?} over {} repetitions.",
+        Duration::from_secs_f64(aw_true),
+        Duration::from_secs_f64(aw / (repetitions as f64)),
+        repetitions
     );
 }
