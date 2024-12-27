@@ -2,6 +2,7 @@
 
 use rand::thread_rng;
 use rand::Rng;
+use std::time::Duration;
 use std::{collections::HashMap, usize};
 
 // from_stop_I;to_stop_I;dep_time_ut;arr_time_ut;route_type;trip_I;seq;route_I
@@ -31,9 +32,10 @@ struct Request {
     multiplicity: usize,
 }
 
-fn parse_edges(scores: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) -> usize {
-    let mut stops_index = 0usize;
-    let mut trip_index = 0usize;
+fn parse_edges(vertices: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) -> usize {
+    let mut trips = HashMap::new();
+    let mut vertices_count = 0usize;
+    let mut trips_count = 0usize;
     let mut max_time = 0usize;
 
     let rdr = csv::ReaderBuilder::new()
@@ -45,31 +47,31 @@ fn parse_edges(scores: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) -> us
     for result in rdr.into_deserialize() {
         let record: EdgeRecord = result.unwrap();
 
-        let from_id = match scores.get(&record.0) {
+        let from_id = match vertices.get(&record.0) {
             None => {
-                let v = stops_index;
-                scores.insert(record.0, v);
-                stops_index += 1;
+                let v = vertices_count;
+                vertices.insert(record.0, v);
+                vertices_count += 1;
                 v
             }
             Some(i) => *i,
         };
 
-        let to_id = match scores.get(&record.1) {
+        let to_id = match vertices.get(&record.1) {
             None => {
-                let v = stops_index;
-                scores.insert(record.1, v);
-                stops_index += 1;
+                let v = vertices_count;
+                vertices.insert(record.1, v);
+                vertices_count += 1;
                 v
             }
             Some(i) => *i,
         };
 
-        let trip_id = match scores.get(&record.5) {
+        let trip_id = match trips.get(&record.5) {
             None => {
-                let v = trip_index;
-                scores.insert(record.5, v);
-                trip_index += 1;
+                let v = trips_count;
+                trips.insert(record.5, v);
+                trips_count += 1;
                 v
             }
             Some(i) => *i,
@@ -93,12 +95,13 @@ fn parse_edges(scores: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) -> us
 
     edges.sort_by(|a, b| a.departure_time.cmp(&b.departure_time));
 
+    assert_eq!(vertices.len(), vertices_count);
+    assert_eq!(trips.len(), trips_count);
+
     max_time
 }
 
-fn parse_requests(scores: &HashMap<String, usize>, requests: &mut Vec<Request>) -> usize {
-    let mut total = 0usize;
-
+fn parse_requests(vertices: &HashMap<String, usize>, requests: &mut Vec<Request>) {
     let rdr = csv::ReaderBuilder::new()
         .has_headers(true)
         .delimiter(b';')
@@ -108,15 +111,14 @@ fn parse_requests(scores: &HashMap<String, usize>, requests: &mut Vec<Request>) 
     for result in rdr.into_deserialize() {
         let record: RequestRecord = result.unwrap();
 
-        if let Some(v) = scores.get(&record.0) {
-            if let Some(w) = scores.get(&record.1) {
+        if let Some(v) = vertices.get(&record.0) {
+            if let Some(w) = vertices.get(&record.1) {
                 let req = Request {
                     from_id: *v,
                     to_id: *w,
                     departure_time: record.2,
                     multiplicity: record.3,
                 };
-                total += req.multiplicity;
                 requests.push(req);
             } else {
                 continue;
@@ -125,8 +127,6 @@ fn parse_requests(scores: &HashMap<String, usize>, requests: &mut Vec<Request>) 
             continue;
         };
     }
-
-    total
 }
 
 fn reify_path<'a>(to: usize, paths: &Vec<Option<&'a Edge>>) -> Vec<&'a Edge> {
@@ -165,7 +165,10 @@ fn earliest_arrival_paths(
                 Some(t0) => {
                     if td >= t0 {
                         t[edge.to_id] = match t[edge.to_id] {
-                            None => Some(ta),
+                            None => {
+                                paths[edge.to_id] = Some(edge);
+                                Some(ta)
+                            }
                             Some(t1) => {
                                 if ta < t1 {
                                     paths[edge.to_id] = Some(edge);
@@ -198,10 +201,12 @@ fn sample(k: usize, requests: &Vec<Request>) -> Vec<Request> {
         multiplicities.push(total);
     }
 
-    for _ in 0..k {
-        let m = rng.gen_range(0..total);
+    let sup = multiplicities.len() - 1; // exclusive upper bounds
 
-        let (mut lo, mut hi) = (0, multiplicities.len() - 1);
+    for _ in 0..k {
+        let m = rng.gen_range(0..=total);
+
+        let (mut lo, mut hi) = (0, sup);
 
         // Binary search: find the first index lo such that multiplicities[lo] >= m.
         while lo < hi {
@@ -213,14 +218,9 @@ fn sample(k: usize, requests: &Vec<Request>) -> Vec<Request> {
             }
         }
 
-        let choosen = &requests[lo];
-
         let unary_request = Request {
-            from_id: choosen.from_id,
-            to_id: choosen.to_id,
-            departure_time: choosen.departure_time,
             multiplicity: 1,
-            //..*choosen
+            ..requests[lo]
         };
 
         sample.push(unary_request);
@@ -231,7 +231,7 @@ fn sample(k: usize, requests: &Vec<Request>) -> Vec<Request> {
 
 fn estimate<'a>(
     sample: &Vec<Request>,
-    max_time: usize,
+    stop_t: usize,
     num_nodes: usize,
     edges: &'a Vec<Edge>,
 ) -> (HashMap<&'a Edge, f64>, f64) {
@@ -242,13 +242,17 @@ fn estimate<'a>(
     let total = sample.iter().fold(0, |acc, req| acc + req.multiplicity) as f64;
 
     for req in sample.iter() {
-        println!("*{:?}", req);
         let fmul = (req.multiplicity as f64) / total;
         let paths =
-            earliest_arrival_paths(req.from_id, req.departure_time, max_time, num_nodes, edges);
+            earliest_arrival_paths(req.from_id, req.departure_time, stop_t, num_nodes, edges);
+        // println!(
+        //     "** {:?}",
+        //     paths.iter().filter(|x| x.is_some()).collect::<Vec<_>>()
+        // );
         let path = reify_path(req.to_id, &paths);
+        // println!("* {:?} in {} steps.", req, path.len());
         for edge in path {
-            println!("** {:?}", edge);
+            // println!("*** {:?}", edge);
             let c = crowding_vector.entry(edge).or_insert(0.0);
             *c += fmul;
             at += req.multiplicity * edge.duration;
@@ -259,18 +263,38 @@ fn estimate<'a>(
 }
 
 fn main() {
-    let mut scores = HashMap::new();
+    let repetitions = 1;
+
+    let mut vertices = HashMap::new();
     let mut edges: Vec<Edge> = Vec::new();
     let mut requests: Vec<Request> = Vec::new();
 
-    let max_time = parse_edges(&mut scores, &mut edges);
-    parse_requests(&mut scores, &mut requests);
+    let max_time = parse_edges(&mut vertices, &mut edges);
+    parse_requests(&mut vertices, &mut requests);
 
-    let sampled = sample(381, &requests);
+    println!(
+        "|V| = {}, |E| = {}, |Q| = {}.",
+        vertices.len(),
+        edges.len(),
+        requests.len()
+    );
 
-    let (crowding_vector, at) = estimate(&sampled, max_time, scores.len(), &edges);
+    // let (crowding_vector_true, at_true) = estimate(&requests, max_time, vertices.len(), &edges);
 
-    println!("{:?}", crowding_vector);
+    let mut at_true = 0.0;
+    let mut at = 0.0;
 
-    println!("{:?}", at);
+    for i in 0..repetitions {
+        let sampled = sample(381, &requests);
+        let (crowding_vector, at_each) = estimate(&sampled, max_time, vertices.len(), &edges);
+        at += at_each;
+    }
+
+    // println!("{:?}", crowding_vector);
+
+    println!(
+        "Waiting time: true {:?}, estimated {:?}.",
+        Duration::from_secs_f64(at_true),
+        Duration::from_secs_f64(at / (repetitions as f64))
+    );
 }
