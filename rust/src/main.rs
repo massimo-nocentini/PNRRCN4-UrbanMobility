@@ -1,8 +1,6 @@
-// Date: 2021-09-26
-
-use core::time;
 use rand::thread_rng;
 use rand::Rng;
+use std::hash::Hash;
 use std::time::Duration;
 use std::{collections::HashMap, usize};
 
@@ -236,8 +234,14 @@ fn estimate<'a>(
     time_step: usize,
     num_nodes: usize,
     edges: &'a Vec<Edge>,
-) -> (HashMap<&'a Edge, f64>, f64, f64) {
+) -> (
+    HashMap<(usize, usize), f64>,
+    HashMap<&'a Edge, f64>,
+    f64,
+    f64,
+) {
     let mut crowding_vector = HashMap::new();
+    let mut occupancy = HashMap::new();
 
     let mut at = 0;
     let mut aw = 0;
@@ -257,23 +261,30 @@ fn estimate<'a>(
         for e in 0..path.len() - 1 {
             let edge = path[e];
             // println!("*** {:?}", edge);
-            let c = crowding_vector.entry(edge).or_insert(0.0);
-            *c += fmul;
+            crowding_vector
+                .entry(edge)
+                .and_modify(|e| *e += fmul)
+                .or_insert(fmul);
+
             at += m * edge.duration;
 
             let next_edge = path[e + 1];
             if edge.trip_id != next_edge.trip_id {
-                let until_time = next_edge.departure_time - time_step;
-                let mut t = edge.arrival_time + time_step;
-                while t <= until_time {
+                for t in (edge.arrival_time + time_step..=next_edge.departure_time - time_step)
+                    .step_by(time_step)
+                {
+                    occupancy
+                        .entry((edge.to_id, t))
+                        .and_modify(|e| *e += fmul)
+                        .or_insert(fmul);
                     aw += m;
-                    t += time_step;
                 }
             }
         }
     }
 
     (
+        occupancy,
         crowding_vector,
         (at as f64) / total,
         ((aw * time_step) as f64) / total,
@@ -281,7 +292,7 @@ fn estimate<'a>(
 }
 
 fn main() {
-    let repetitions = 5;
+    let repetitions = 10;
     let time_step = 60; //  1 minute
 
     let mut vertices = HashMap::new();
@@ -298,21 +309,36 @@ fn main() {
         requests.len()
     );
 
-    let mut at_true = 0.0;
-    let mut aw_true = 0.0;
+    let at_true = 0.0;
+    let aw_true = 0.0;
 
-    let (crowding_vector_true, at_true, aw_true) =
-        estimate(&requests, max_time, time_step, vertices.len(), &edges);
+    // let (_occupancy, _crowding_vector_true, at_true, aw_true) =
+    //     estimate(&requests, max_time, time_step, vertices.len(), &edges);
 
     let mut at = 0.0;
     let mut aw = 0.0;
 
-    for i in 0..repetitions {
+    let mut cw = HashMap::new();
+    let mut om = HashMap::new();
+
+    for _ in 0..repetitions {
         let sampled = sample(381, &requests);
-        let (crowding_vector, at_each, aw_each) =
+        let (occupancy, crowding_vector, at_each, aw_each) =
             estimate(&sampled, max_time, time_step, vertices.len(), &edges);
         at += at_each;
         aw += aw_each;
+
+        for (edge, fmul) in crowding_vector {
+            cw.entry(edge)
+                .and_modify(|e| *e = *e + fmul / 2.0)
+                .or_insert(fmul);
+        }
+
+        for (key, fmul) in occupancy {
+            om.entry(key)
+                .and_modify(|e| *e = *e + fmul / 2.0)
+                .or_insert(fmul);
+        }
     }
 
     println!(
@@ -328,4 +354,68 @@ fn main() {
         Duration::from_secs_f64(aw / (repetitions as f64)),
         repetitions
     );
+
+    let mut vertices_rev = HashMap::new();
+    for (k, v) in vertices.iter() {
+        vertices_rev.insert(v, k);
+    }
+
+    let mut cw_named = Vec::new();
+    for (edge, fmul) in cw.iter() {
+        let from_name = vertices_rev.get(&edge.from_id).unwrap();
+        let to_name = vertices_rev.get(&edge.to_id).unwrap();
+        cw_named.push((*from_name, *to_name, edge.departure_time, fmul));
+    }
+
+    cw_named.sort_by(|a, b| b.3.total_cmp(a.3));
+
+    println!("Top 50 crowded edges:");
+    for (from, to, d, fmul) in cw_named.iter().take(50) {
+        println!(
+            "\t{} -> {}: {:.3}% people at {:?}.",
+            from,
+            to,
+            fmul,
+            Duration::from_secs(*d as u64)
+        );
+    }
+
+    let mut om_named = HashMap::new();
+
+    for ((v, t), fmul) in om.iter() {
+        let v_name = vertices_rev.get(v).unwrap();
+
+        match om_named.get_mut(t) {
+            None => {
+                let mut m = HashMap::new();
+                m.insert(*v_name, *fmul);
+                om_named.insert(t, m);
+            }
+            Some(m) => {
+                m.entry(*v_name)
+                    .and_modify(|e| *e += *fmul)
+                    .or_insert(*fmul);
+            }
+        }
+    }
+
+    let mut om_named_vec = Vec::new();
+    for (t, m) in om_named.iter() {
+        let mut m_vec = Vec::new();
+        for (v, fmul) in m.iter() {
+            m_vec.push((*v, *fmul));
+        }
+        m_vec.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        om_named_vec.push((*t, m_vec));
+    }
+
+    om_named_vec.sort_by(|a, b| a.0.cmp(b.0));
+
+    println!("Top 50 crowded stops:");
+    for (t, m) in om_named_vec {
+        println!("\tAt {:?}:", Duration::from_secs(*t as u64));
+        for (v, fmul) in m.iter() {
+            println!("\t\t{}: {:.3}% people.", v, fmul);
+        }
+    }
 }
