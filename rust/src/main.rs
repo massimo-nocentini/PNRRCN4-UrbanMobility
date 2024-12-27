@@ -293,7 +293,7 @@ fn estimate<'a>(
 
 fn main() {
     let repetitions = 10;
-    let time_step = 60; //  1 minute
+    let time_step = 300; //  1 minute
 
     let mut vertices = HashMap::new();
     let mut edges: Vec<Edge> = Vec::new();
@@ -399,23 +399,55 @@ fn main() {
         }
     }
 
-    let mut om_named_vec = Vec::new();
-    for (t, m) in om_named.iter() {
+    let mut om_named_grouped = HashMap::new();
+
+    for (t, m) in om_named {
+        let grouped_t = t / time_step * time_step;
+        let entry = om_named_grouped.entry(grouped_t).or_insert_with(HashMap::new);
+        for (v, fmul) in m.iter() {
+            entry.entry(*v)
+                .and_modify(|e| *e += *fmul)
+                .or_insert(*fmul);
+        }
+    }
+
+    let mut om_named_grouped_vec = Vec::new();
+    for (t, m) in om_named_grouped.iter() {
         let mut m_vec = Vec::new();
         for (v, fmul) in m.iter() {
             m_vec.push((*v, *fmul));
         }
         m_vec.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-        om_named_vec.push((*t, m_vec));
+        om_named_grouped_vec.push((*t, m_vec));
     }
 
-    om_named_vec.sort_by(|a, b| a.0.cmp(b.0));
+    om_named_grouped_vec.sort_by(|a, b| a.0.cmp(&b.0));
 
-    println!("Top 50 crowded stops:");
-    for (t, m) in om_named_vec {
-        println!("\tAt {:?}:", Duration::from_secs(*t as u64));
+    println!("Top 50 crowded stops grouped by time step:");
+    for (t, m) in om_named_grouped_vec {
+        println!("\tAt {:?}:", Duration::from_secs(t as u64));
         for (v, fmul) in m.iter() {
             println!("\t\t{}: {:.3}% people.", v, fmul);
         }
     }
+
+    // let mut om_named_vec = Vec::new();
+    // for (t, m) in om_named.iter() {
+    //     let mut m_vec = Vec::new();
+    //     for (v, fmul) in m.iter() {
+    //         m_vec.push((*v, *fmul));
+    //     }
+    //     m_vec.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+    //     om_named_vec.push((*t, m_vec));
+    // }
+
+    // om_named_vec.sort_by(|a, b| a.0.cmp(b.0));
+
+    // println!("Top 50 crowded stops:");
+    // for (t, m) in om_named_vec {
+    //     println!("\tAt {:?}:", Duration::from_secs(*t as u64));
+    //     for (v, fmul) in m.iter() {
+    //         println!("\t\t{}: {:.3}% people.", v, fmul);
+    //     }
+    // }
 }
