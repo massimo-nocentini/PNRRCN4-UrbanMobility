@@ -10,7 +10,7 @@ type EdgeRecord = (String, String, usize, usize, usize, String, usize, usize);
 // departure;arrival;starting_time;n_people
 type RequestRecord = (String, String, usize, usize);
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 struct Edge {
     from_id: usize,
     to_id: usize,
@@ -31,9 +31,10 @@ struct Request {
     multiplicity: usize,
 }
 
-fn parse_edges(scores: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) {
+fn parse_edges(scores: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) -> usize {
     let mut stops_index = 0usize;
     let mut trip_index = 0usize;
+    let mut max_time = 0usize;
 
     let rdr = csv::ReaderBuilder::new()
         .has_headers(true)
@@ -86,10 +87,13 @@ fn parse_edges(scores: &mut HashMap<String, usize>, edges: &mut Vec<Edge>) {
             duration: record.3 - record.2,
         };
 
+        max_time = max_time.max(edge.arrival_time);
         edges.push(edge);
     }
 
     edges.sort_by(|a, b| a.departure_time.cmp(&b.departure_time));
+
+    max_time
 }
 
 fn parse_requests(scores: &HashMap<String, usize>, requests: &mut Vec<Request>) -> usize {
@@ -125,19 +129,14 @@ fn parse_requests(scores: &HashMap<String, usize>, requests: &mut Vec<Request>) 
     total
 }
 
-fn reify_path(from: usize, to: usize, paths: &Vec<Option<usize>>) -> Vec<usize> {
+fn reify_path<'a>(to: usize, paths: &Vec<Option<&'a Edge>>) -> Vec<&'a Edge> {
     let mut path = Vec::new();
     let mut w = to;
 
-    path.push(w);
-
     while let Some(p) = paths[w] {
-        w = p;
-        path.push(w);
+        path.push(p);
 
-        if w == from {
-            break;
-        }
+        w = p.from_id;
     }
 
     path.reverse();
@@ -151,11 +150,10 @@ fn earliest_arrival_paths(
     stop_t: usize,
     num_nodes: usize,
     edges: &Vec<Edge>,
-) -> Vec<Option<usize>> {
+) -> Vec<Option<&Edge>> {
     let mut paths = vec![None; num_nodes];
     let mut t = vec![None; num_nodes];
 
-    paths[v] = Some(v);
     t[v] = Some(start_t);
 
     for edge in edges.iter() {
@@ -170,7 +168,7 @@ fn earliest_arrival_paths(
                             None => Some(ta),
                             Some(t1) => {
                                 if ta < t1 {
-                                    paths[edge.to_id] = Some(edge.from_id);
+                                    paths[edge.to_id] = Some(edge);
                                     Some(ta)
                                 } else {
                                     Some(t1)
@@ -207,7 +205,7 @@ fn sample(k: usize, requests: &Vec<Request>) -> Vec<Request> {
 
         // Binary search: find the first index lo such that multiplicities[lo] >= m.
         while lo < hi {
-            let mid = (lo + hi) / 2;
+            let mid = (lo + hi) >> 1;
             if multiplicities[mid] < m {
                 lo = mid + 1;
             } else {
@@ -218,11 +216,11 @@ fn sample(k: usize, requests: &Vec<Request>) -> Vec<Request> {
         let choosen = &requests[lo];
 
         let unary_request = Request {
-            // from_id: choosen.from_id,
-            // to_id: choosen.to_id,
-            // departure_time: choosen.departure_time,
+            from_id: choosen.from_id,
+            to_id: choosen.to_id,
+            departure_time: choosen.departure_time,
             multiplicity: 1,
-            ..*choosen
+            //..*choosen
         };
 
         sample.push(unary_request);
@@ -231,13 +229,48 @@ fn sample(k: usize, requests: &Vec<Request>) -> Vec<Request> {
     sample
 }
 
+fn estimate<'a>(
+    sample: &Vec<Request>,
+    max_time: usize,
+    num_nodes: usize,
+    edges: &'a Vec<Edge>,
+) -> (HashMap<&'a Edge, f64>, f64) {
+    let mut crowding_vector = HashMap::new();
+
+    let mut at = 0;
+
+    let total = sample.iter().fold(0, |acc, req| acc + req.multiplicity) as f64;
+
+    for req in sample.iter() {
+        println!("*{:?}", req);
+        let fmul = (req.multiplicity as f64) / total;
+        let paths =
+            earliest_arrival_paths(req.from_id, req.departure_time, max_time, num_nodes, edges);
+        let path = reify_path(req.to_id, &paths);
+        for edge in path {
+            println!("** {:?}", edge);
+            let c = crowding_vector.entry(edge).or_insert(0.0);
+            *c += fmul;
+            at += req.multiplicity * edge.duration;
+        }
+    }
+
+    (crowding_vector, (at as f64) / total)
+}
+
 fn main() {
     let mut scores = HashMap::new();
     let mut edges: Vec<Edge> = Vec::new();
     let mut requests: Vec<Request> = Vec::new();
 
-    parse_edges(&mut scores, &mut edges);
+    let max_time = parse_edges(&mut scores, &mut edges);
     parse_requests(&mut scores, &mut requests);
 
-    println!("{:?}", requests);
+    let sampled = sample(381, &requests);
+
+    let (crowding_vector, at) = estimate(&sampled, max_time, scores.len(), &edges);
+
+    println!("{:?}", crowding_vector);
+
+    println!("{:?}", at);
 }
