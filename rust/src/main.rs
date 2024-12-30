@@ -1,6 +1,7 @@
 use rand::thread_rng;
 use rand::Rng;
 use std::hash::Hash;
+use std::path;
 use std::time::Duration;
 use std::{collections::HashMap, usize};
 
@@ -9,6 +10,8 @@ type EdgeRecord = (String, String, usize, usize, usize, String, usize, usize);
 
 // departure;arrival;starting_time;n_people
 type RequestRecord = (String, String, usize, usize);
+
+type TemporalPaths<'a> = HashMap<usize, Vec<Option<&'a Edge>>>;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 struct Edge {
@@ -44,77 +47,170 @@ struct Estimation<'a> {
     time_step: usize,
 }
 
-fn parse_edges(
-    filename: &str,
-    vertices: &mut HashMap<String, usize>,
-    edges: &mut Vec<Edge>,
-) -> usize {
-    let mut trips = HashMap::new();
-    let mut vertices_count = 0usize;
-    let mut trips_count = 0usize;
-    let mut max_time = 0usize;
+struct TemporalGraph {
+    vertices: HashMap<String, usize>,
+    vertices_rev: HashMap<usize, String>,
+    edges: Vec<Edge>,
+    max_time: usize,
+}
 
-    let rdr = csv::ReaderBuilder::new()
-        .has_headers(true)
-        .delimiter(b';')
-        .from_path(filename)
-        .unwrap();
+impl TemporalGraph {
+    fn parse(filename: &str) -> TemporalGraph {
+        let mut vertices = HashMap::new();
+        let mut vertices_rev = HashMap::new();
+        let mut edges = Vec::new();
 
-    for result in rdr.into_deserialize() {
-        let record: EdgeRecord = result.unwrap();
+        let mut trips = HashMap::new();
+        let mut vertices_count = 0usize;
+        let mut trips_count = 0usize;
+        let mut max_time = 0usize;
 
-        let from_id = match vertices.get(&record.0) {
-            None => {
-                let v = vertices_count;
-                vertices.insert(record.0, v);
-                vertices_count += 1;
-                v
-            }
-            Some(i) => *i,
-        };
+        let rdr = csv::ReaderBuilder::new()
+            .has_headers(true)
+            .delimiter(b';')
+            .from_path(filename)
+            .unwrap();
 
-        let to_id = match vertices.get(&record.1) {
-            None => {
-                let v = vertices_count;
-                vertices.insert(record.1, v);
-                vertices_count += 1;
-                v
-            }
-            Some(i) => *i,
-        };
+        for result in rdr.into_deserialize() {
+            let record: EdgeRecord = result.unwrap();
 
-        let trip_id = match trips.get(&record.5) {
-            None => {
-                let v = trips_count;
-                trips.insert(record.5, v);
-                trips_count += 1;
-                v
-            }
-            Some(i) => *i,
-        };
+            let k_from = record.0;
+            let from_id = match vertices.get(&k_from) {
+                None => {
+                    let v = vertices_count;
+                    vertices_rev.insert(v, k_from.clone());
+                    vertices.insert(k_from, v);
+                    vertices_count += 1;
+                    v
+                }
+                Some(i) => *i,
+            };
 
-        let edge = Edge {
-            from_id,
-            to_id,
-            departure_time: record.2,
-            arrival_time: record.3,
-            route_type: record.4,
-            trip_id,
-            seq: record.6,
-            route_id: record.7,
-            duration: record.3 - record.2,
-        };
+            let k_to = record.1;
+            let to_id = match vertices.get(&k_to) {
+                None => {
+                    let v = vertices_count;
+                    vertices_rev.insert(v, k_to.clone());
+                    vertices.insert(k_to, v);
+                    vertices_count += 1;
+                    v
+                }
+                Some(i) => *i,
+            };
 
-        max_time = max_time.max(edge.arrival_time);
-        edges.push(edge);
+            let trip_id = match trips.get(&record.5) {
+                None => {
+                    let v = trips_count;
+                    trips.insert(record.5, v);
+                    trips_count += 1;
+                    v
+                }
+                Some(i) => *i,
+            };
+
+            let edge = Edge {
+                from_id,
+                to_id,
+                departure_time: record.2,
+                arrival_time: record.3,
+                route_type: record.4,
+                trip_id,
+                seq: record.6,
+                route_id: record.7,
+                duration: record.3 - record.2,
+            };
+
+            max_time = max_time.max(edge.arrival_time);
+            edges.push(edge);
+        }
+
+        edges.sort_by(|a, b| a.departure_time.cmp(&b.departure_time));
+
+        assert_eq!(vertices.len(), vertices_count);
+        assert_eq!(trips.len(), trips_count);
+
+        TemporalGraph {
+            vertices,
+            vertices_rev,
+            edges,
+            max_time,
+        }
     }
 
-    edges.sort_by(|a, b| a.departure_time.cmp(&b.departure_time));
+    fn earliest_arrival_paths(
+        self: &TemporalGraph,
+        v: usize,
+        start_t: usize,
+        stop_t: usize,
+    ) -> Vec<Option<&Edge>> {
+        let num_nodes = self.vertices.len();
+        let mut paths = vec![None; num_nodes];
+        let mut t = vec![None; num_nodes];
 
-    assert_eq!(vertices.len(), vertices_count);
-    assert_eq!(trips.len(), trips_count);
+        t[v] = Some(start_t);
 
-    max_time
+        for edge in self.edges.iter() {
+            let td = edge.departure_time;
+            let ta = edge.arrival_time;
+            if ta <= stop_t {
+                if let Some(td0) = t[edge.from_id] {
+                    if td >= td0 {
+                        t[edge.to_id] = if let Some(ta0) = t[edge.to_id] {
+                            if ta < ta0 {
+                                paths[edge.to_id] = Some(edge);
+                                Some(ta)
+                            } else {
+                                Some(ta0)
+                            }
+                        } else {
+                            paths[edge.to_id] = Some(edge);
+                            Some(ta)
+                        }
+                    }
+                };
+            } else if td >= stop_t {
+                break;
+            }
+        }
+
+        paths
+    }
+
+    fn reify_path<'a>(to: usize, paths: &Vec<Option<&'a Edge>>) -> Vec<&'a Edge> {
+        let mut path = Vec::new();
+        let mut w = to;
+
+        while let Some(p) = paths[w] {
+            path.push(p);
+
+            w = p.from_id;
+        }
+
+        path.reverse();
+
+        path
+    }
+
+    fn earliest_arrival_path<'a>(
+        self: &'a TemporalGraph,
+        from: usize,
+        to: usize,
+        start_t: usize,
+        stop_t: usize,
+        temporal_paths: &mut TemporalPaths<'a>,
+    ) -> Vec<&'a Edge> {
+        match temporal_paths.get(&from) {
+            None => {
+                let paths = self.earliest_arrival_paths(from, start_t, stop_t);
+                let path = Self::reify_path(to, &paths);
+
+                temporal_paths.insert(from, paths);
+
+                path
+            }
+            Some(p) => Self::reify_path(to, p),
+        }
+    }
 }
 
 impl Request {
@@ -129,7 +225,7 @@ impl Request {
 }
 
 impl RequestSample {
-    fn parse(filename: &str, vertices: &HashMap<String, usize>) -> RequestSample {
+    fn parse(filename: &str, graph: &TemporalGraph) -> RequestSample {
         let rdr = csv::ReaderBuilder::new()
             .has_headers(true)
             .delimiter(b';')
@@ -142,8 +238,8 @@ impl RequestSample {
         for result in rdr.into_deserialize() {
             let record: RequestRecord = result.unwrap();
 
-            if let Some(v) = vertices.get(&record.0) {
-                if let Some(w) = vertices.get(&record.1) {
+            if let Some(v) = graph.vertices.get(&record.0) {
+                if let Some(w) = graph.vertices.get(&record.1) {
                     let req = Request::new(*v, *w, record.2, record.3);
                     total += req.multiplicity;
                     requests.push(req);
@@ -205,10 +301,9 @@ impl RequestSample {
 
     fn estimate<'a>(
         self: &RequestSample,
-        stop_t: usize,
         time_step: usize,
-        num_nodes: usize,
-        edges: &'a Vec<Edge>,
+        graph: &'a TemporalGraph,
+        temporal_paths: &mut TemporalPaths<'a>,
     ) -> Estimation<'a> {
         let mut crowding_vector = HashMap::new();
         let mut occupancy = HashMap::new();
@@ -218,9 +313,14 @@ impl RequestSample {
 
         for req in self.requests.iter() {
             let mul = req.multiplicity;
-            let paths =
-                earliest_arrival_paths(req.from_id, req.departure_time, stop_t, num_nodes, edges);
-            let path = reify_path(req.to_id, &paths);
+
+            let path = graph.earliest_arrival_path(
+                req.from_id,
+                req.to_id,
+                req.departure_time,
+                graph.max_time,
+                temporal_paths,
+            );
 
             // println!("* {:?} in {} steps.", req, path.len());
             if path.is_empty() {
@@ -237,20 +337,21 @@ impl RequestSample {
 
                 at += mul * edge.duration;
 
-                let next_edge = path[e + 1];
-                if edge.trip_id != next_edge.trip_id {
-                    let time_window = (edge.arrival_time + time_step
-                        ..=next_edge.departure_time - time_step)
-                        .step_by(time_step);
+                if let Some(next_edge) = path.get(e + 1) {
+                    if edge.trip_id != next_edge.trip_id {
+                        let time_window = (edge.arrival_time + time_step
+                            ..=next_edge.departure_time - time_step)
+                            .step_by(time_step);
 
-                    for t in time_window {
-                        occupancy
-                            .entry((edge.to_id, t))
-                            .and_modify(|e| *e += mul)
-                            .or_insert(mul);
-                        aw += mul;
+                        for t in time_window {
+                            occupancy
+                                .entry((edge.to_id, t))
+                                .and_modify(|e| *e += mul)
+                                .or_insert(mul);
+                            aw += mul;
+                        }
                     }
-                }
+                };
             }
         }
 
@@ -266,91 +367,33 @@ impl RequestSample {
     }
 }
 
-fn reify_path<'a>(to: usize, paths: &Vec<Option<&'a Edge>>) -> Vec<&'a Edge> {
-    let mut path = Vec::new();
-    let mut w = to;
-
-    while let Some(p) = paths[w] {
-        path.push(p);
-
-        w = p.from_id;
-    }
-
-    path.reverse();
-
-    path
-}
-
-fn earliest_arrival_paths(
-    v: usize,
-    start_t: usize,
-    stop_t: usize,
-    num_nodes: usize,
-    edges: &Vec<Edge>,
-) -> Vec<Option<&Edge>> {
-    let mut paths = vec![None; num_nodes];
-    let mut t = vec![None; num_nodes];
-
-    t[v] = Some(start_t);
-
-    for edge in edges.iter() {
-        let td = edge.departure_time;
-        let ta = edge.arrival_time;
-        if ta <= stop_t {
-            if let Some(td0) = t[edge.from_id] {
-                if td >= td0 {
-                    t[edge.to_id] = if let Some(ta0) = t[edge.to_id] {
-                        if ta < ta0 {
-                            paths[edge.to_id] = Some(edge);
-                            Some(ta)
-                        } else {
-                            Some(ta0)
-                        }
-                    } else {
-                        paths[edge.to_id] = Some(edge);
-                        Some(ta)
-                    }
-                }
-            };
-        } else if td >= stop_t {
-            break;
-        }
-    }
-
-    paths
-}
-
 fn main() {
     let repetitions = 10;
     let time_step = 300; //  1 minute
 
-    let mut vertices = HashMap::new();
-    let mut edges: Vec<Edge> = Vec::new();
-
-    let max_time = parse_edges(
-        "../data/transport/florence/edges.csv",
-        &mut vertices,
-        &mut edges,
-    );
+    let graph = TemporalGraph::parse("../data/transport/florence/edges.csv");
+    let mut temporal_paths = HashMap::new();
 
     let requests = RequestSample::parse(
         "../data/transport/florence/requests_K10747_N30965.csv",
-        &vertices,
+        &graph,
     );
 
     println!(
         "|V| = {}, |E| = {}, |Q| = {}, |P| = {}.",
-        vertices.len(),
-        edges.len(),
+        graph.vertices.len(),
+        graph.edges.len(),
         requests.requests.len(),
         requests.total
     );
 
-    let at_true = 0.0;
-    let aw_true = 0.0;
+    // let at_true = 0.0;
+    // let aw_true = 0.0;
 
-    // let (_occupancy, _crowding_vector_true, at_true, aw_true) =
-    //     estimate(&requests, max_time, time_step, vertices.len(), &edges);
+    let exact = requests.estimate(time_step, &graph, &mut temporal_paths);
+
+    let at_true = exact.average_travelling_time;
+    let aw_true = exact.average_waiting_time;
 
     let mut at = 0.0;
     let mut aw = 0.0;
@@ -360,7 +403,7 @@ fn main() {
 
     for _ in 0..repetitions {
         let sampled = requests.sample(381);
-        let estimation = sampled.estimate(max_time, time_step, vertices.len(), &edges);
+        let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
 
         at += estimation.average_travelling_time;
         aw += estimation.average_waiting_time;
@@ -390,16 +433,11 @@ fn main() {
         repetitions
     );
 
-    let mut vertices_rev = HashMap::new();
-    for (k, v) in vertices.iter() {
-        vertices_rev.insert(v, k);
-    }
-
     let mut cw_named = Vec::new();
     for (edge, fmul) in cw.iter() {
-        let from_name = vertices_rev.get(&edge.from_id).unwrap();
-        let to_name = vertices_rev.get(&edge.to_id).unwrap();
-        cw_named.push((*from_name, *to_name, edge.departure_time, fmul));
+        let from_name = graph.vertices_rev.get(&edge.from_id).unwrap();
+        let to_name = graph.vertices_rev.get(&edge.to_id).unwrap();
+        cw_named.push((from_name, to_name, edge.departure_time, fmul));
     }
 
     cw_named.sort_by(|a, b| b.3.cmp(a.3));
@@ -407,10 +445,10 @@ fn main() {
     println!("Top 50 crowded edges:");
     for (from, to, d, fmul) in cw_named.iter().take(50) {
         println!(
-            "\t{} -> {}: {:.3}% people at {:?}.",
+            "\t{} -> {}: {:.3} people at {:?}.",
             from,
             to,
-            fmul,
+            (**fmul as f64) / (repetitions as f64),
             Duration::from_secs(*d as u64)
         );
     }
@@ -418,18 +456,16 @@ fn main() {
     let mut om_named = HashMap::new();
 
     for ((v, t), fmul) in om.iter() {
-        let v_name = vertices_rev.get(v).unwrap();
+        let v_name = graph.vertices_rev.get(v).unwrap();
 
         match om_named.get_mut(t) {
             None => {
                 let mut m = HashMap::new();
-                m.insert(*v_name, *fmul);
+                m.insert(v_name, *fmul);
                 om_named.insert(t, m);
             }
             Some(m) => {
-                m.entry(*v_name)
-                    .and_modify(|e| *e += *fmul)
-                    .or_insert(*fmul);
+                m.entry(v_name).and_modify(|e| *e += *fmul).or_insert(*fmul);
             }
         }
     }
@@ -458,31 +494,15 @@ fn main() {
 
     om_named_grouped_vec.sort_by(|a, b| a.0.cmp(&b.0));
 
-    println!("Top 50 crowded stops grouped by time step:");
+    println!("Ordered crowded stops grouped by time step:");
     for (t, m) in om_named_grouped_vec {
-        println!("\tAt {:?}:", Duration::from_secs(t as u64));
+        println!("\tAfter {:?}:", Duration::from_secs(t as u64));
         for (v, fmul) in m.iter() {
-            println!("\t\t{}: {:.3}% people.", v, fmul);
+            println!(
+                "\t\t{}: {:.3} people.",
+                v,
+                (*fmul as f64) / (repetitions as f64)
+            );
         }
     }
-
-    // let mut om_named_vec = Vec::new();
-    // for (t, m) in om_named.iter() {
-    //     let mut m_vec = Vec::new();
-    //     for (v, fmul) in m.iter() {
-    //         m_vec.push((*v, *fmul));
-    //     }
-    //     m_vec.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-    //     om_named_vec.push((*t, m_vec));
-    // }
-
-    // om_named_vec.sort_by(|a, b| a.0.cmp(b.0));
-
-    // println!("Top 50 crowded stops:");
-    // for (t, m) in om_named_vec {
-    //     println!("\tAt {:?}:", Duration::from_secs(*t as u64));
-    //     for (v, fmul) in m.iter() {
-    //         println!("\t\t{}: {:.3}% people.", v, fmul);
-    //     }
-    // }
 }
