@@ -5,6 +5,12 @@ echo:
 batch:
 	time cargo run --release --bin batch -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 300 > ../data/transport/florence/analysis.csv
 	
+single:
+	time cargo run --release --bin single -- ../data/transport/adelaide/edges.csv ../data/transport/adelaide/requests_K75480_N754800.csv 300 Adelaide > ../data/transport/single.csv
+	time cargo run --release --bin single -- ../data/transport/belfast/edges.csv ../data/transport/belfast/requests_K19170_N191700.csv 300 Belfast >> ../data/transport/single.csv
+	time cargo run --release --bin single -- ../data/transport/berlin/edges.csv ../data/transport/berlin/requests_K46010_N460100.csv 300 Berlin >> ../data/transport/single.csv
+	time cargo run --release --bin single -- ../data/transport/bordeaux/edges.csv ../data/transport/bordeaux/requests_K34350_N343500.csv 300 Bordeaux >> ../data/transport/single.csv
+	time cargo run --release --bin single -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 300 Florence >> ../data/transport/single.csv
 
 run:
 	#time cargo run --release -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 0.1 1 300 > ../data/transport/florence/analysis-0.1e-1reps-300s.txt

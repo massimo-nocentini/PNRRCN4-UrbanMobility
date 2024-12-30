@@ -1,6 +1,5 @@
 use rust::temporal_graph::{RequestSample, TemporalGraph};
 use std::env;
-use std::time::Duration;
 use std::{collections::HashMap, usize};
 
 fn main() {
