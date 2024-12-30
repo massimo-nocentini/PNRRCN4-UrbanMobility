@@ -1,0 +1,366 @@
+|V| = 3205, |E| = 1425406, |Q| = 10573, |P| = 30540, k = 24.
+Average travelling time: true 1758.256712508s, estimated 1846.983333333s over 10 repetitions.
+Average waiting time: true 621.73870334s, estimated 412.5s over 10 repetitions.
+Top 50 crowded edges:
+	CBI209_600 -> CBI210_600: 0.700 people at 1717399800s.
+	CBI210_600 -> CBI861_600: 0.700 people at 1717399801s.
+	CBI861_600 -> CBI657_600: 0.700 people at 1717399980s.
+	CBI013_600 -> CBI209_600: 0.700 people at 1717399680s.
+	CBI055_600 -> CBI922_600: 0.600 people at 1717395660s.
+	CBI065_600 -> CBI066_600: 0.600 people at 1717396260s.
+	CBI001_600 -> CBI170_600: 0.600 people at 1717395360s.
+	SFN067_600 -> SFN068_600: 0.600 people at 1717396380s.
+	CBI066_600 -> SFN067_600: 0.600 people at 1717396320s.
+	SFN068_600 -> SFN069_600: 0.600 people at 1717396500s.
+	CBI691_600 -> CBI055_600: 0.600 people at 1717395540s.
+	7@FM1936_600 -> CBI065_600: 0.600 people at 1717396140s.
+	CBI922_600 -> CBI629_600: 0.600 people at 1717395840s.
+	SFN070_600 -> SFN071_600: 0.600 people at 1717396561s.
+	SFN069_600 -> SFN070_600: 0.600 people at 1717396560s.
+	CBI924_600 -> 7@FM1936_600: 0.600 people at 1717396080s.
+	CBI170_600 -> CBI691_600: 0.600 people at 1717395361s.
+	CBI629_600 -> CBI924_600: 0.600 people at 1717395900s.
+	7@FM1021_600 -> 7@FM1022_600: 0.500 people at 1717396740s.
+	FI1025_600 -> 7@FM1026_600: 0.500 people at 1717396921s.
+	SFN071_600 -> SFN120_600: 0.500 people at 1717396621s.
+	7@FM1026_600 -> FI0176_600: 0.500 people at 1717397100s.
+	FI1028_600 -> FI1847_600: 0.500 people at 1717397400s.
+	FI1847_600 -> 7@FM1029_600: 0.500 people at 1717397460s.
+	7@FM1024_600 -> FI1025_600: 0.500 people at 1717396920s.
+	FI0176_600 -> FI1027_600: 0.500 people at 1717397220s.
+	7@FM1022_600 -> 7@FM1023_600: 0.500 people at 1717396800s.
+	FI1027_600 -> FI1028_600: 0.500 people at 1717397280s.
+	SFN120_600 -> 7@FM1021_600: 0.500 people at 1717396680s.
+	7@FM1023_600 -> 7@FM1024_600: 0.500 people at 1717396860s.
+	CBI059_600 -> CBI060_600: 0.400 people at 1717398780s.
+	CBI022_600 -> CBI001_600: 0.400 people at 1717395300s.
+	SFN015_600 -> SFN014_600: 0.400 people at 1717394220s.
+	SFN978_600 -> 7@FM5999_600: 0.400 people at 1717394040s.
+	SFN023_600 -> SFN015_600: 0.400 people at 1717394160s.
+	7@FM2172_600 -> CBI001_600: 0.400 people at 1717395300s.
+	PO1860_600 -> CBI022_600: 0.400 people at 1717395060s.
+	7@FM5999_600 -> SFN023_600: 0.400 people at 1717394100s.
+	7@FM1882_600 -> SFN833_600: 0.400 people at 1717393800s.
+	7@FM1860_600 -> 7@FM2172_600: 0.400 people at 1717395060s.
+	SFN969_600 -> SFN978_600: 0.400 people at 1717393980s.
+	SFN833_600 -> SFN969_600: 0.400 people at 1717393920s.
+	SFN014_600 -> SFN992_600: 0.400 people at 1717394340s.
+	FI0187_600 -> FI0274_600: 0.300 people at 1717408680s.
+	7@FM0099_600 -> 7@FM0100_600: 0.300 people at 1717407720s.
+	SFN156_600 -> SFN157_600: 0.300 people at 1717394580s.
+	SIG204_600 -> SIG737_600: 0.300 people at 1717398060s.
+	FI1720_600 -> FI0856_600: 0.300 people at 1717395600s.
+	VAG832_600 -> VAG833_600: 0.300 people at 1717394580s.
+	7@FM1890_600 -> 7@FM1882_600: 0.300 people at 1717393740s.
+Ordered crowded stops grouped by time step:
+	After 1717392000s:
+		7@FM2204_600: 0.100 people.
+	After 1717392300s:
+		SIG723_600: 0.100 people.
+	After 1717392600s:
+		SIG723_600: 0.100 people.
+	After 1717392900s:
+		SIG723_600: 0.100 people.
+	After 1717393200s:
+		SIG723_600: 0.100 people.
+	After 1717393500s:
+		SIG723_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717393800s:
+		SIG723_600: 0.100 people.
+		CBI013_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		7@FM1675_600: 0.100 people.
+	After 1717394100s:
+		IMT213_600: 0.200 people.
+		SIG723_600: 0.100 people.
+		CBI013_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		FI1217_600: 0.100 people.
+		7@FM1675_600: 0.100 people.
+	After 1717394400s:
+		CBI013_600: 0.300 people.
+		IMT213_600: 0.200 people.
+		FI0500_600: 0.200 people.
+		SIG723_600: 0.100 people.
+		FI1217_600: 0.100 people.
+		7@FM1675_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717394700s:
+		CBI013_600: 0.300 people.
+		7@FM1675_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		SIG723_600: 0.100 people.
+		SCD921_600: 0.100 people.
+		FI1217_600: 0.100 people.
+		FI2022_600: 0.100 people.
+	After 1717395000s:
+		CBI013_600: 0.400 people.
+		SIG723_600: 0.100 people.
+		SFN257_600: 0.100 people.
+		SCD921_600: 0.100 people.
+		FI1217_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717395300s:
+		CBI013_600: 0.400 people.
+		FI0589_600: 0.100 people.
+		SCD921_600: 0.100 people.
+		FI1217_600: 0.100 people.
+	After 1717395600s:
+		CBI013_600: 0.400 people.
+		FI0500_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		FI1217_600: 0.100 people.
+		SCD439_600: 0.100 people.
+		SCD921_600: 0.100 people.
+	After 1717395900s:
+		CBI013_600: 0.500 people.
+		BRP185_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		SCD921_600: 0.100 people.
+		FI1217_600: 0.100 people.
+	After 1717396200s:
+		CBI013_600: 0.500 people.
+		FI0589_600: 0.100 people.
+		BRP185_600: 0.100 people.
+		IMT003_600: 0.100 people.
+		SFN071_600: 0.100 people.
+		SCD921_600: 0.100 people.
+	After 1717396500s:
+		CBI013_600: 0.500 people.
+		CAL800_600: 0.200 people.
+		IMT003_600: 0.100 people.
+		7@FM1007_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		BRP185_600: 0.100 people.
+		CBI048_600: 0.100 people.
+	After 1717396800s:
+		CBI013_600: 0.500 people.
+		BRP185_600: 0.100 people.
+		7@FM1007_600: 0.100 people.
+		IMT003_600: 0.100 people.
+		FI0585_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717397100s:
+		CBI013_600: 0.500 people.
+		SIG172_600: 0.200 people.
+		IMT003_600: 0.100 people.
+		FI0585_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		FSL010_600: 0.100 people.
+	After 1717397400s:
+		CBI013_600: 0.500 people.
+		IMT003_600: 0.100 people.
+		LSG893_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		FI0585_600: 0.100 people.
+	After 1717397700s:
+		CBI013_600: 0.500 people.
+		LSG893_600: 0.100 people.
+		7@FM1944_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		SCD893_600: 0.100 people.
+		FI0585_600: 0.100 people.
+	After 1717398000s:
+		CBI013_600: 0.600 people.
+		SCD893_600: 0.100 people.
+		LSG893_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		FI0585_600: 0.100 people.
+		7@FM1944_600: 0.100 people.
+	After 1717398300s:
+		CBI013_600: 0.600 people.
+		FSL028_600: 0.100 people.
+		7@FM1944_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		SCD893_600: 0.100 people.
+		7@FM1048_600: 0.100 people.
+		LSG893_600: 0.100 people.
+		7@FM1688_600: 0.100 people.
+	After 1717398600s:
+		CBI013_600: 0.600 people.
+		SCD893_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		7@FM1944_600: 0.100 people.
+		LSG893_600: 0.100 people.
+		7@FM1688_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717398900s:
+		CBI013_600: 0.600 people.
+		6@IMT49B_600: 0.100 people.
+		7@FM1944_600: 0.100 people.
+		FSL028_600: 0.100 people.
+		LSG893_600: 0.100 people.
+		SCD893_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717399200s:
+		CBI013_600: 0.500 people.
+		7@FM1944_600: 0.100 people.
+		FSL028_600: 0.100 people.
+		SCD893_600: 0.100 people.
+		LSG893_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717399500s:
+		7@FM2407_600: 0.200 people.
+		SCD893_600: 0.100 people.
+		LSG893_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		7@FM1944_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717399800s:
+		7@FM2407_600: 0.200 people.
+		FSL028_600: 0.100 people.
+		7@FM1944_600: 0.100 people.
+		LSG893_600: 0.100 people.
+		SCD893_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717400100s:
+		CBI657_600: 0.700 people.
+		7@FM2407_600: 0.200 people.
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+		LSG893_600: 0.100 people.
+		SCD893_600: 0.100 people.
+		7@FM1657_600: 0.100 people.
+	After 1717400400s:
+		7@FM2407_600: 0.200 people.
+		FSL028_600: 0.100 people.
+		SCD893_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717400700s:
+		7@FM2407_600: 0.200 people.
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		SCD893_600: 0.100 people.
+		FI2312_600: 0.100 people.
+	After 1717401000s:
+		7@FM2407_600: 0.300 people.
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717401300s:
+		7@FM2407_600: 0.300 people.
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717401600s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717401900s:
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717402200s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717402500s:
+		FI0589_600: 0.100 people.
+		CBI603_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717402800s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717403100s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717403400s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		IMT213_600: 0.100 people.
+	After 1717403700s:
+		FSL028_600: 0.100 people.
+		IMT213_600: 0.100 people.
+		FI1217_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717404000s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		IMT213_600: 0.100 people.
+	After 1717404300s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+		IMT213_600: 0.100 people.
+	After 1717404600s:
+		FI0585_600: 0.200 people.
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717404900s:
+		FI0585_600: 0.200 people.
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717405200s:
+		FI0585_600: 0.200 people.
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717405500s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717405800s:
+		7@FM2007_600: 0.200 people.
+		CBI865_600: 0.100 people.
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717406100s:
+		7@FM2007_600: 0.200 people.
+		CBI865_600: 0.100 people.
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717406400s:
+		7@FM2007_600: 0.200 people.
+		FSL028_600: 0.100 people.
+		CBI865_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717406700s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717407000s:
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717407300s:
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717407600s:
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717407900s:
+		FI0589_600: 0.100 people.
+		SIG697_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717408200s:
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717408500s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717408800s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717409100s:
+		FSL028_600: 0.100 people.
+		FI0589_600: 0.100 people.
+	After 1717409400s:
+		FI0589_600: 0.100 people.
+		FSL028_600: 0.100 people.
+	After 1717409700s:
+		FSL028_600: 0.100 people.
+	After 1717410000s:
+		FSL028_600: 0.100 people.
+	After 1717410300s:
+		FSL028_600: 0.100 people.
+	After 1717410600s:
+		FSL028_600: 0.100 people.
+	After 1717410900s:
+		FSL028_600: 0.100 people.
+	After 1717411200s:
+		FSL028_600: 0.100 people.
+	After 1717411500s:
+		FSL028_600: 0.100 people.
+	After 1717411800s:
+		FSL028_600: 0.100 people.
+	After 1717417500s:
+		SFN300_600: 0.100 people.
+	After 1717417800s:
+		SFN300_600: 0.100 people.
+	After 1717418100s:
+		SFN300_600: 0.100 people.
+	After 1717419300s:
+		FI8860_600: 0.100 people.
+	After 1717419600s:
+		FI8860_600: 0.100 people.

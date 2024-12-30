@@ -1,7 +1,7 @@
 use rand::thread_rng;
 use rand::Rng;
+use std::env;
 use std::hash::Hash;
-use std::path;
 use std::time::Duration;
 use std::{collections::HashMap, usize};
 
@@ -368,23 +368,30 @@ impl RequestSample {
 }
 
 fn main() {
-    let repetitions = 10;
-    let time_step = 300; //  1 minute
+    let args: Vec<String> = env::args().collect();
 
-    let graph = TemporalGraph::parse("../data/transport/florence/edges.csv");
+    let p = 0.001_f64;
+
+    let graph_filename = &args[1];
+    let requests_filename = &args[2];
+    let epsilon = args[3].parse::<f64>().unwrap();
+    let repetitions = args[4].parse::<usize>().unwrap();
+    let time_step = args[5].parse::<usize>().unwrap();
+
+    let k = ((2.0 / p).ln() / (2.0 * epsilon.powi(2))).ceil() as usize;
+
+    let graph = TemporalGraph::parse(&graph_filename);
     let mut temporal_paths = HashMap::new();
 
-    let requests = RequestSample::parse(
-        "../data/transport/florence/requests_K10747_N30965.csv",
-        &graph,
-    );
+    let requests = RequestSample::parse(&requests_filename, &graph);
 
     println!(
-        "|V| = {}, |E| = {}, |Q| = {}, |P| = {}.",
+        "|V| = {}, |E| = {}, |Q| = {}, |P| = {}, k = {}.",
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
-        requests.total
+        requests.total,
+        k
     );
 
     // let at_true = 0.0;
@@ -402,7 +409,7 @@ fn main() {
     let mut om = HashMap::new();
 
     for _ in 0..repetitions {
-        let sampled = requests.sample(381);
+        let sampled = requests.sample(k);
         let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
 
         at += estimation.average_travelling_time;

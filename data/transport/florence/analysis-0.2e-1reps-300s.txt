@@ -1,0 +1,308 @@
+|V| = 3205, |E| = 1425406, |Q| = 10573, |P| = 30540, k = 96.
+Average travelling time: true 1758.256712508s, estimated 1770.114583333s over 1 repetitions.
+Average waiting time: true 621.73870334s, estimated 475s over 1 repetitions.
+Top 50 crowded edges:
+	CBI629_600 -> CBI924_600: 4.000 people at 1717395900s.
+	CBI055_600 -> CBI922_600: 4.000 people at 1717395660s.
+	CBI691_600 -> CBI055_600: 4.000 people at 1717395540s.
+	CBI922_600 -> CBI629_600: 4.000 people at 1717395840s.
+	CBI170_600 -> CBI691_600: 4.000 people at 1717395361s.
+	CBI001_600 -> CBI170_600: 4.000 people at 1717395360s.
+	CBI065_600 -> CBI066_600: 3.000 people at 1717396260s.
+	7@FM2172_600 -> CBI001_600: 3.000 people at 1717395300s.
+	SFN067_600 -> SFN068_600: 3.000 people at 1717396380s.
+	SFN069_600 -> SFN070_600: 3.000 people at 1717396560s.
+	7@FM1860_600 -> 7@FM2172_600: 3.000 people at 1717395060s.
+	SFN068_600 -> SFN069_600: 3.000 people at 1717396500s.
+	7@FM1936_600 -> CBI065_600: 3.000 people at 1717396140s.
+	CBI066_600 -> SFN067_600: 3.000 people at 1717396320s.
+	CBI924_600 -> 7@FM1936_600: 3.000 people at 1717396080s.
+	SFN070_600 -> SFN071_600: 3.000 people at 1717396561s.
+	7@FM7113_600 -> 7@FM1885_600: 2.000 people at 1717398900s.
+	SFN829_600 -> SFN830_600: 2.000 people at 1717393860s.
+	FI0573_600 -> FI0796_600: 2.000 people at 1717394520s.
+	FI2259_600 -> FI3005_600: 2.000 people at 1717398360s.
+	FI1669_600 -> FI1670_600: 2.000 people at 1717396620s.
+	FI2226_600 -> FI0572_600: 2.000 people at 1717394460s.
+	FI3005_600 -> FI3006_600: 2.000 people at 1717398361s.
+	7@FM2199_600 -> 7@FM2200_600: 2.000 people at 1717393800s.
+	CBI996_600 -> CBI167_600: 2.000 people at 1717397640s.
+	FI0058_600 -> FI0059_600: 2.000 people at 1717394521s.
+	SFN149_600 -> SFN150_600: 2.000 people at 1717396861s.
+	PO1860_600 -> CBI022_600: 2.000 people at 1717395060s.
+	7@FM1636_600 -> 7@FM1002_600: 2.000 people at 1717396141s.
+	CBI997_600 -> 7@FM2000_600: 2.000 people at 1717394040s.
+	CBI163_600 -> CBI164_600: 2.000 people at 1717397401s.
+	CBI165_600 -> CBI166_600: 2.000 people at 1717397521s.
+	FI0317_600 -> FI0188_600: 2.000 people at 1717394940s.
+	FI0063_600 -> FI0072_600: 2.000 people at 1717394760s.
+	CBI167_600 -> SIG220_600: 2.000 people at 1717399020s.
+	FI0291_600 -> FI0292_600: 2.000 people at 1717393740s.
+	FI1666_600 -> FI1667_600: 2.000 people at 1717396980s.
+	FI1671_600 -> 7@FM0520_600: 2.000 people at 1717396801s.
+	FI0057_600 -> FI0058_600: 2.000 people at 1717394520s.
+	7@FM1936_600 -> CBI930_600: 2.000 people at 1717398960s.
+	CBI161_600 -> CBI162_600: 2.000 people at 1717397340s.
+	FI2159_600 -> FI8811_600: 2.000 people at 1717393980s.
+	SIG171_600 -> SIG998_600: 2.000 people at 1717403700s.
+	SIG174_600 -> CBI175_600: 2.000 people at 1717395360s.
+	SFN148_600 -> SFN149_600: 2.000 people at 1717396860s.
+	FI1223_600 -> FI0586_600: 2.000 people at 1717393620s.
+	CBI058_600 -> CBI865_600: 2.000 people at 1717394521s.
+	FI1285_600 -> FI1286_600: 2.000 people at 1717394700s.
+	FI3010_600 -> FI3011_600: 2.000 people at 1717394160s.
+	FI2403_600 -> FI2258_600: 2.000 people at 1717393500s.
+Ordered crowded stops grouped by time step:
+	After 1717392900s:
+		7@FM2007_600: 1.000 people.
+	After 1717393200s:
+		7@FM2007_600: 1.000 people.
+	After 1717393500s:
+		7@FM2007_600: 1.000 people.
+	After 1717394100s:
+		SFN830_600: 1.000 people.
+		SCD020_600: 1.000 people.
+	After 1717394400s:
+		FI0500_600: 1.000 people.
+		SFN830_600: 1.000 people.
+		FI2022_600: 1.000 people.
+	After 1717394700s:
+		FI2022_600: 1.000 people.
+		SFN830_600: 1.000 people.
+	After 1717395000s:
+		SFN830_600: 1.000 people.
+	After 1717395300s:
+		SFN830_600: 1.000 people.
+	After 1717395600s:
+		SFN830_600: 1.000 people.
+		7@FM1313_600: 1.000 people.
+	After 1717396500s:
+		7@FM1533_600: 1.000 people.
+		CBI867_600: 1.000 people.
+	After 1717396800s:
+		7@FM1533_600: 1.000 people.
+		CBI867_600: 1.000 people.
+	After 1717397100s:
+		7@FM1533_600: 1.000 people.
+		FSL010_600: 1.000 people.
+		CBI867_600: 1.000 people.
+	After 1717397400s:
+		CBI867_600: 1.000 people.
+	After 1717397700s:
+		CBI867_600: 1.000 people.
+		BRP201_600: 1.000 people.
+	After 1717398000s:
+		CBI167_600: 2.000 people.
+		CBI867_600: 1.000 people.
+		BRP201_600: 1.000 people.
+	After 1717398300s:
+		CBI167_600: 2.000 people.
+	After 1717398600s:
+		CBI167_600: 2.000 people.
+	After 1717398900s:
+		SIG172_600: 1.000 people.
+	After 1717399200s:
+		SIG172_600: 1.000 people.
+	After 1717399500s:
+		SIG172_600: 1.000 people.
+	After 1717399800s:
+		SIG172_600: 1.000 people.
+		CBI013_600: 1.000 people.
+	After 1717400100s:
+		SIG172_600: 1.000 people.
+	After 1717400700s:
+		CBI001_600: 1.000 people.
+	After 1717401000s:
+		CBI001_600: 1.000 people.
+	After 1717401300s:
+		CBI001_600: 1.000 people.
+	After 1717401600s:
+		CBI001_600: 1.000 people.
+		CBI350_600: 1.000 people.
+	After 1717401900s:
+		CBI350_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717402200s:
+		CBI350_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717402500s:
+		SIG675_600: 1.000 people.
+		CBI350_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717402800s:
+		CBI001_600: 1.000 people.
+		CBI350_600: 1.000 people.
+		SIG675_600: 1.000 people.
+	After 1717403100s:
+		CBI350_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717403400s:
+		CBI001_600: 1.000 people.
+		CBI350_600: 1.000 people.
+	After 1717403700s:
+		CBI001_600: 1.000 people.
+		CBI350_600: 1.000 people.
+	After 1717404000s:
+		CBI001_600: 1.000 people.
+	After 1717404300s:
+		CBI001_600: 1.000 people.
+	After 1717404600s:
+		CBI001_600: 1.000 people.
+	After 1717404900s:
+		CBI001_600: 1.000 people.
+	After 1717405200s:
+		CBI001_600: 1.000 people.
+	After 1717405500s:
+		CBI001_600: 1.000 people.
+	After 1717405800s:
+		CBI001_600: 1.000 people.
+	After 1717406100s:
+		CBI001_600: 1.000 people.
+	After 1717406400s:
+		7@FM1483_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717406700s:
+		7@FM1483_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717407000s:
+		CBI018_600: 1.000 people.
+		CBI001_600: 1.000 people.
+		7@FM1483_600: 1.000 people.
+	After 1717407300s:
+		7@FM1483_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717407600s:
+		7@FM1483_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717407900s:
+		CBI001_600: 1.000 people.
+		7@FM1483_600: 1.000 people.
+	After 1717408200s:
+		CBI001_600: 1.000 people.
+		7@FM1483_600: 1.000 people.
+	After 1717408500s:
+		7@FM1483_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717408800s:
+		7@FM1483_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717409100s:
+		CBI001_600: 1.000 people.
+		7@FM1483_600: 1.000 people.
+	After 1717409400s:
+		CBI001_600: 1.000 people.
+	After 1717409700s:
+		CBI001_600: 1.000 people.
+	After 1717410000s:
+		CBI001_600: 1.000 people.
+	After 1717410300s:
+		CBI001_600: 1.000 people.
+	After 1717410600s:
+		CBI001_600: 1.000 people.
+	After 1717410900s:
+		CBI001_600: 1.000 people.
+	After 1717411200s:
+		CBI001_600: 1.000 people.
+	After 1717411500s:
+		CBI001_600: 1.000 people.
+	After 1717411800s:
+		CBI001_600: 1.000 people.
+	After 1717412100s:
+		CBI001_600: 1.000 people.
+	After 1717412400s:
+		CBI001_600: 1.000 people.
+	After 1717412700s:
+		CBI001_600: 1.000 people.
+	After 1717413000s:
+		CBI001_600: 1.000 people.
+	After 1717413300s:
+		CBI001_600: 1.000 people.
+	After 1717413600s:
+		CBI001_600: 1.000 people.
+	After 1717413900s:
+		CBI001_600: 1.000 people.
+	After 1717414200s:
+		CBI001_600: 1.000 people.
+	After 1717414500s:
+		CBI001_600: 1.000 people.
+	After 1717414800s:
+		CBI001_600: 1.000 people.
+	After 1717415100s:
+		CBI001_600: 1.000 people.
+	After 1717415400s:
+		CBI001_600: 1.000 people.
+	After 1717415700s:
+		CBI001_600: 1.000 people.
+	After 1717416000s:
+		CBI001_600: 1.000 people.
+	After 1717416300s:
+		CBI001_600: 1.000 people.
+	After 1717416600s:
+		CBI001_600: 1.000 people.
+	After 1717416900s:
+		CBI001_600: 1.000 people.
+	After 1717417200s:
+		CBI001_600: 1.000 people.
+	After 1717417500s:
+		CBI001_600: 1.000 people.
+	After 1717417800s:
+		CBI001_600: 1.000 people.
+	After 1717418100s:
+		CBI001_600: 1.000 people.
+	After 1717418400s:
+		CBI001_600: 1.000 people.
+	After 1717418700s:
+		CBI001_600: 1.000 people.
+	After 1717419000s:
+		CBI001_600: 1.000 people.
+	After 1717419300s:
+		CBI001_600: 1.000 people.
+	After 1717419600s:
+		CBI001_600: 1.000 people.
+	After 1717419900s:
+		CBI001_600: 1.000 people.
+	After 1717420200s:
+		CBI001_600: 1.000 people.
+	After 1717420500s:
+		CBI001_600: 1.000 people.
+	After 1717420800s:
+		7@FM1746_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717421100s:
+		7@FM1746_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717421400s:
+		7@FM1746_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717421700s:
+		CBI001_600: 1.000 people.
+		7@FM1746_600: 1.000 people.
+	After 1717422000s:
+		7@FM1746_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717422300s:
+		7@FM1746_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717422600s:
+		CBI001_600: 1.000 people.
+		7@FM1746_600: 1.000 people.
+	After 1717422900s:
+		7@FM1746_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717423200s:
+		7@FM1746_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717423500s:
+		CBI001_600: 1.000 people.
+	After 1717423800s:
+		CBI001_600: 1.000 people.
+	After 1717424100s:
+		7@FM0890_600: 1.000 people.
+		CBI001_600: 1.000 people.
+	After 1717424400s:
+		CBI001_600: 1.000 people.
+		7@FM0890_600: 1.000 people.
+	After 1717424700s:
+		7@FM0890_600: 1.000 people.
+	After 1717425000s:
+		7@FM0890_600: 1.000 people.
