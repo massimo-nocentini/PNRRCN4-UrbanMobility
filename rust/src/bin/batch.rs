@@ -32,12 +32,12 @@ fn main() {
         exact.average_travelling_time, exact.average_waiting_time,
     );
 
-    println!("Epsilon, k, repetitions, AT mean, AT std, AT CV, AW mean, AW std, AW CV",);
+    println!("Epsilon & k & repetitions & AT mean & |AT - true| & AT std & AT CV & AW mean & |AW - true| & AW std & AW CV \\\\",);
 
-    for epsilon in [0.8_f64, 0.4, 0.2, 0.15, 0.1, 0.05] {
+    for epsilon in [0.8_f64, 0.4, 0.2, 0.15, 0.1, 0.05, 0.025] {
         let k = (((2.0 / p).ln() / (2.0 * epsilon.powi(2))).ceil() as usize)
             .min(requests.requests.len());
-        for repetitions in [10, 50, 100] {
+        for repetitions in [5, 10, 50, 100] {
             let mut at = Vec::new();
             let mut aw = Vec::new();
 
@@ -61,14 +61,16 @@ fn main() {
             let aw_coeff_var = aw_var.sqrt() / aw_mean;
 
             println!(
-                "{}, {}, {}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}, {:.3}",
+                "{} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} \\\\",
                 epsilon,
                 k,
                 repetitions,
                 at_mean,
+                (at_mean - exact.average_travelling_time).abs(),
                 at_var.sqrt(),
                 at_coeff_var,
                 aw_mean,
+                (aw_mean - exact.average_waiting_time).abs(),
                 aw_var.sqrt(),
                 aw_coeff_var,
             );
