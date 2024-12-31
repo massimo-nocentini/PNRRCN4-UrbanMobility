@@ -22,7 +22,7 @@ fn main() {
     let epsilon = 0.1_f64;
 
     let k =
-        (((requests.total as f64).ln() / epsilon.powi(2)).ceil() as usize).min(requests.requests.len());
+        (((requests.requests.len() as f64).ln() / epsilon.powi(2)).ceil() as usize).min(requests.requests.len());
 
     let repetitions = 50;
     let mut at = Vec::new();
