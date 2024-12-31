@@ -32,5 +32,5 @@ single:
 	time cargo run --release --bin single -- ../data/transport/venice/edges.csv ../data/transport/venice/requests_K18740_N187400.csv 300 Venice >> ../data/transport/single.csv
 	time cargo run --release --bin single -- ../data/transport/winnipeg/edges.csv ../data/transport/winnipeg/requests_K50790_N507900.csv 300 Winnipeg >> ../data/transport/single.csv
 
-run:
-	time cargo run --release -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 0.1 50 300 > ../data/transport/florence/analysis-0.1e-50reps-300s.txt
+full:
+	time cargo run --release --bin rust -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 0.1 50 300 > ../data/transport/florence/analysis-0.1e-50reps-300s.txt

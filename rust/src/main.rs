@@ -23,12 +23,13 @@ fn main() {
         (((2.0 / p).ln() / (2.0 * epsilon.powi(2))).ceil() as usize).min(requests.requests.len());
 
     println!(
-        "|V| = {}, |E| = {}, |Q| = {}, |P| = {}, k = {}.",
+        "|V| = {}, |E| = {}, |Q| = {}, |P| = {}, k = {}, repetitions = {}.",
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
         requests.total,
-        k
+        k,
+        repetitions
     );
 
     // let at_true = 0.0;
@@ -39,8 +40,8 @@ fn main() {
     let at_true = exact.average_travelling_time;
     let aw_true = exact.average_waiting_time;
 
-    let mut at = 0.0;
-    let mut aw = 0.0;
+    let mut at = Vec::new();
+    let mut aw = Vec::new();
 
     let mut cw = HashMap::new();
     let mut om = HashMap::new();
@@ -49,8 +50,8 @@ fn main() {
         let sampled = requests.sample(k);
         let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
 
-        at += estimation.average_travelling_time;
-        aw += estimation.average_waiting_time;
+        at.push(estimation.average_travelling_time);
+        aw.push(estimation.average_waiting_time);
 
         for (edge, fmul) in estimation.crowding_vector {
             cw.entry(edge)
@@ -63,18 +64,31 @@ fn main() {
         }
     }
 
+    let freps = repetitions as f64;
+
+    let at_mean = at.iter().sum::<f64>() / freps;
+    let aw_mean = aw.iter().sum::<f64>() / freps;
+
+    let at_var = at.iter().map(|x| (x - at_mean).powi(2)).sum::<f64>() / freps;
+    let aw_var = aw.iter().map(|x| (x - aw_mean).powi(2)).sum::<f64>() / freps;
+
+    let at_coeff_var = at_var.sqrt() / at_mean;
+    let aw_coeff_var = aw_var.sqrt() / aw_mean;
+
     println!(
-        "Average travelling time: true {:?}, estimated {:?} over {} repetitions.",
+        "Average travelling time: true {:?}, estimated {:?} (std: {}, CoV: {}).",
         Duration::from_secs_f64(at_true),
-        Duration::from_secs_f64(at / (repetitions as f64)),
-        repetitions
+        Duration::from_secs_f64(at_mean),
+        at_var.sqrt(),
+        at_coeff_var
     );
 
     println!(
-        "Average waiting time: true {:?}, estimated {:?} over {} repetitions.",
+        "Average waiting time: true {:?}, estimated {:?} (std: {}, CoV: {}).",
         Duration::from_secs_f64(aw_true),
-        Duration::from_secs_f64(aw / (repetitions as f64)),
-        repetitions
+        Duration::from_secs_f64(aw_mean),
+        aw_var.sqrt(),
+        aw_coeff_var
     );
 
     let mut cw_named = Vec::new();
