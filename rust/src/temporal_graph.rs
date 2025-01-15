@@ -333,7 +333,7 @@ impl RequestSample {
                     .and_modify(|e| *e += mul)
                     .or_insert(mul);
 
-                at += mul * edge.duration;
+                let mut at_each = edge.duration;
 
                 if let Some(next_edge) = path.get(e + 1) {
                     if edge.trip_id != next_edge.trip_id {
@@ -348,8 +348,12 @@ impl RequestSample {
                                 .or_insert(mul);
                             aw += mul;
                         }
+                    } else {
+                        at_each += next_edge.departure_time - edge.arrival_time;
                     }
-                };
+                }
+
+                at += mul * at_each;
             }
         }
 
