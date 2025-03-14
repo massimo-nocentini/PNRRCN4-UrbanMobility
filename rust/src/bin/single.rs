@@ -19,12 +19,13 @@ fn main() {
     let exact = requests.estimate(time_step, &graph, &mut temporal_paths);
 
     //let k = (((requests.requests.len() as f64).ln() / (epsilon.powi(2) * 2.0)).ceil() as usize).min(requests.requests.len());
-    let epsilon = ((requests.requests.len() as f64).ln() / ((k as f64) * 2.0)).sqrt().ceil().min(requests.requests.len() as f64);
+    let epsilon = ((requests.requests.len() as f64).ln() / ((k as f64) * 2.0)).sqrt().ceil();
 
     let repetitions = 50;
     let mut at = Vec::new();
     let mut aw = Vec::new();
 
+    let elapsed = std::time::Instant::now();
     for _ in 0..repetitions {
         let sampled = requests.sample(k);
         let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
@@ -45,7 +46,7 @@ fn main() {
     let aw_coeff_var = aw_var.sqrt() / aw_mean;
 
     println!(
-        "{} & {} & {} & {} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} \\\\",
+        "{} & {} & {} & {} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:?} \\\\",
         city,
         graph.vertices.len(),
         graph.edges.len(),
@@ -62,5 +63,7 @@ fn main() {
         (aw_mean - exact.average_waiting_time).abs(),
         aw_var.sqrt(),
         aw_coeff_var,
+        exact.elapsed,
+        elapsed.elapsed(),
     );
 }

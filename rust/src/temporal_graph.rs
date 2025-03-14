@@ -2,6 +2,8 @@ use rand::thread_rng;
 use rand::Rng;
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::time::Duration;
+use std::time::Instant;
 
 // from_stop_I;to_stop_I;dep_time_ut;arr_time_ut;route_type;trip_I;seq;route_I
 type EdgeRecord = (String, String, usize, usize, usize, String, usize, usize);
@@ -43,6 +45,7 @@ pub struct Estimation<'a> {
     pub average_travelling_time: f64,
     pub average_waiting_time: f64,
     time_step: usize,
+    pub elapsed: Duration,
 }
 
 pub struct TemporalGraph {
@@ -309,6 +312,8 @@ impl RequestSample {
         let mut at = 0;
         let mut aw = 0;
 
+        let start_timestamp = Instant::now();
+
         for req in self.requests.iter() {
             let mul = req.multiplicity;
 
@@ -365,6 +370,7 @@ impl RequestSample {
             average_travelling_time: (at as f64) / total,
             average_waiting_time: ((aw * time_step) as f64) / total,
             time_step,
+            elapsed: start_timestamp.elapsed(),
         }
     }
 }
