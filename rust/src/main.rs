@@ -106,7 +106,7 @@ fn main() {
             "\t{} -> {}: {:.3} (exact {}) people at {:?}.",
             from,
             to,
-            (**fmul as f64) / (repetitions as f64),
+            **fmul,// as f64) / (repetitions as f64),
             exact.crowding_vector.get(*edge).unwrap(),
             Duration::from_secs(*d as u64)
         );
@@ -117,7 +117,7 @@ fn main() {
     for ((v, t), fmul) in om.iter() {
         let v_name = graph.vertices_rev.get(v).unwrap();
 
-        let exact = match om.get(&(*v, *t)) {
+        let exact = match exact.occupancy_matrix.get(&(*v, *t)) {
             None => 0,
             Some(e) => *e,
         };
@@ -180,10 +180,10 @@ fn main() {
         println!("\tAfter {:?}:", Duration::from_secs(t as u64));
         for (v, fmul) in m.iter() {
             println!(
-                "\t\t{}: {:.3} people (exact {}).",
+                "\t\t{}: {:.3} people (exact {:.3}).",
                 v,
-                (fmul.0 as f64) / (repetitions as f64),
-                fmul.1
+                fmul.0,// as f64 / (repetitions as f64),
+                fmul.1// as f64 / (requests.total as f64)
             );
         }
     }
