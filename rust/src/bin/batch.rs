@@ -40,6 +40,8 @@ fn main() {
             let mut at = Vec::new();
             let mut aw = Vec::new();
 
+            let elapsed = std::time::Instant::now();
+
             for _ in 0..repetitions {
                 let sampled = requests.sample(k);
                 let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
@@ -60,7 +62,7 @@ fn main() {
             let aw_coeff_var = aw_var.sqrt() / aw_mean;
 
             println!(
-                "{} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} \\\\",
+                "{} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:?} & {:.3} \\\\",
                 epsilon,
                 k,
                 repetitions,
@@ -72,6 +74,9 @@ fn main() {
                 (aw_mean - exact.average_waiting_time).abs(),
                 aw_var.sqrt(),
                 aw_coeff_var,
+                exact.elapsed,
+                elapsed.elapsed(),
+                exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
             );
         }
     }
