@@ -46,7 +46,7 @@ fn main() {
     let aw_coeff_var = aw_var.sqrt() / aw_mean;
 
     println!(
-        "{} & {} & {} & {} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:?} \\\\",
+        "{} & {} & {} & {} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:?} & {:.3} \\\\",
         city,
         graph.vertices.len(),
         graph.edges.len(),
@@ -65,5 +65,6 @@ fn main() {
         aw_coeff_var,
         exact.elapsed,
         elapsed.elapsed(),
+        exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
     );
 }
