@@ -28,8 +28,8 @@ fn main() {
     let exact = requests.estimate(time_step, &graph, &mut temporal_paths);
 
     println!(
-        "True averages: travelling time {:.3}, waiting time {:.3}.",
-        exact.average_travelling_time, exact.average_waiting_time,
+        "True averages: travelling time {:.3}, waiting time {:.3}; computed in {:?}.",
+        exact.average_travelling_time, exact.average_waiting_time, exact.elapsed
     );
 
     println!("Epsilon & k & repetitions & AT mean & |AT - true| & AT std & AT CV & AW mean & |AW - true| & AW std & AW CV \\\\",);
@@ -116,7 +116,7 @@ fn main() {
             let avg_om_error_coeff_var = var_om_error.sqrt() / avg_om_error;
 
             println!(
-                "{:.3} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:?} & {:.3} \\\\",
+                "{:.3} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:.3} \\\\",
                 epsilon,
                 k,
                 repetitions,
@@ -127,8 +127,7 @@ fn main() {
                 avg_crowding_error.abs(),
                 avg_crowding_error_coeff_var,
                 avg_om_error.abs(),
-                avg_om_error_coeff_var,
-                exact.elapsed,
+                avg_om_error_coeff_var,                
                 elapsed.elapsed(),
                 exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
             );
