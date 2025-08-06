@@ -8,7 +8,8 @@ fn main() {
     let graph_filename = &args[1];
     let requests_filename = &args[2];
     let time_step = args[3].parse::<usize>().unwrap();
-    let epsilon = args[4].parse::<f64>().unwrap();
+    // let epsilon = args[4].parse::<f64>().unwrap();
+    let k = args[4].parse::<usize>().unwrap();
     let city = &args[5];
 
     let graph = TemporalGraph::parse(&graph_filename);
@@ -18,8 +19,8 @@ fn main() {
 
     let exact = requests.estimate(time_step, &graph, &mut temporal_paths);
 
-    let k = (((requests.requests.len() as f64).ln() / (epsilon.powf(2.0) * 2.0)).ceil() as usize).min(requests.requests.len());
-    // let epsilon = ((requests.requests.len() as f64).ln() / ((k as f64) * 2.0)).sqrt().ceil();
+    // let k = (((requests.requests.len() as f64).ln() / (epsilon.powf(2.0) * 2.0)).ceil() as usize).min(requests.requests.len());
+    let epsilon = ((requests.requests.len() as f64).ln() / ((k as f64) * 2.0)).sqrt().ceil();
 
     let repetitions = 50;
     let mut at = Vec::new();
@@ -52,7 +53,7 @@ fn main() {
         graph.edges.len(),
         requests.requests.len(),
         requests.total,
-        k,
+        epsilon,
         exact.average_travelling_time, 
         at_mean,
         (at_mean - exact.average_travelling_time).abs(),
