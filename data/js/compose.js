@@ -31,7 +31,7 @@ let s500 = await parse_csv('single-500.csv');
 console.log('City,s1_at,s1_at_log,s1_aw,s1_aw_log,s1_eta,s1_eta_log,s100_at,s100_at_log,s100_aw,s100_aw_log,s100_eta,s100_eta_log,s300_at,s300_at_log,s300_aw,s300_aw_log,s300_eta,s300_eta_log,s500_at,s500_at_log,s500_aw,s500_aw_log,s500_eta,s500_eta_log');
 
 function checked_log(value) {
-    return Math.log(1 + value);
+    return Math.log10(1 + value);
 }
 
 for (let i = 0; i < s1.length; i++) {
