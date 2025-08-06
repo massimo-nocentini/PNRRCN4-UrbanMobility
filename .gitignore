@@ -4,3 +4,5 @@ lua/libluabag.so
 lua/average
 
 rust/target/
+data/js/package-lock.json
+data/js/node_modules/
