@@ -1,6 +1,5 @@
 use rust::temporal_graph::{RequestSample, TemporalGraph};
 use std::env;
-use std::hash::Hash;
 use std::{collections::HashMap, usize};
 
 fn main() {
@@ -61,8 +60,8 @@ fn main() {
                     avg_om.entry(edge).and_modify(|e| *e += om).or_insert(om);
                 }
 
-                at.push(estimation.average_travelling_time);
-                aw.push(estimation.average_waiting_time);
+                at.push(estimation.average_travelling_time_as_f64());
+                aw.push(estimation.average_waiting_time_as_f64());
             }
 
             let freps = repetitions as f64;
@@ -120,9 +119,9 @@ fn main() {
                 epsilon,
                 k,
                 repetitions,
-                (at_mean - exact.average_travelling_time).abs(),
+                (at_mean - exact.average_travelling_time_as_f64()).abs(),
                 at_coeff_var,
-                (aw_mean - exact.average_waiting_time).abs(),
+                (aw_mean - exact.average_waiting_time_as_f64()).abs(),
                 aw_coeff_var,
                 avg_crowding_error.abs(),
                 avg_crowding_error_coeff_var,

@@ -37,8 +37,8 @@ fn main() {
 
     let exact = requests.estimate(time_step, &graph, &mut temporal_paths);
 
-    let at_true = exact.average_travelling_time;
-    let aw_true = exact.average_waiting_time;
+    let at_true = exact.average_travelling_time_as_f64();
+    let aw_true = exact.average_waiting_time_as_f64();
 
     let mut at = Vec::new();
     let mut aw = Vec::new();
@@ -50,8 +50,8 @@ fn main() {
         let sampled = requests.sample(k);
         let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
 
-        at.push(estimation.average_travelling_time);
-        aw.push(estimation.average_waiting_time);
+        at.push(estimation.average_travelling_time_as_f64());
+        aw.push(estimation.average_waiting_time_as_f64());
 
         for (edge, fmul) in estimation.crowding_vector {
             cw.entry(edge)
@@ -106,7 +106,7 @@ fn main() {
             "\t{} -> {}: {:.3} (exact {}) people at {:?}.",
             from,
             to,
-            **fmul,// as f64) / (repetitions as f64),
+            **fmul, // as f64) / (repetitions as f64),
             exact.crowding_vector.get(*edge).unwrap(),
             Duration::from_secs(*d as u64)
         );
@@ -182,8 +182,8 @@ fn main() {
             println!(
                 "\t\t{}: {:.3} people (exact {:.3}).",
                 v,
-                fmul.0,// as f64 / (repetitions as f64),
-                fmul.1// as f64 / (requests.total as f64)
+                fmul.0, // as f64 / (repetitions as f64),
+                fmul.1  // as f64 / (requests.total as f64)
             );
         }
     }

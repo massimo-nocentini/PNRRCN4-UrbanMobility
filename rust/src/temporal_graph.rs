@@ -42,10 +42,21 @@ pub struct RequestSample {
 pub struct Estimation<'a> {
     pub occupancy_matrix: HashMap<(usize, usize), usize>,
     pub crowding_vector: HashMap<&'a Edge, usize>,
-    pub average_travelling_time: f64,
-    pub average_waiting_time: f64,
-    time_step: usize,
+    pub average_travelling_time: usize,
+    pub average_waiting_time: usize,
+
+    total: usize,
     pub elapsed: Duration,
+}
+
+impl Estimation<'_> {
+    pub fn average_travelling_time_as_f64(&self) -> f64 {
+        self.average_travelling_time as f64 / self.total as f64
+    }
+
+    pub fn average_waiting_time_as_f64(&self) -> f64 {
+        self.average_waiting_time as f64 / self.total as f64
+    }
 }
 
 pub struct TemporalGraph {
@@ -84,7 +95,7 @@ impl TemporalGraph {
                     vertices_count += 1;
                     v
                 }
-                Some(i) => *i,
+                Some(&i) => i,
             };
 
             let k_to = record.1;
@@ -96,7 +107,7 @@ impl TemporalGraph {
                     vertices_count += 1;
                     v
                 }
-                Some(i) => *i,
+                Some(&i) => i,
             };
 
             let trip_id = match trips.get(&record.5) {
@@ -106,7 +117,7 @@ impl TemporalGraph {
                     trips_count += 1;
                     v
                 }
-                Some(i) => *i,
+                Some(&i) => i,
             };
 
             let edge = Edge {
@@ -239,9 +250,9 @@ impl RequestSample {
         for result in rdr.into_deserialize() {
             let record: RequestRecord = result.unwrap();
 
-            if let Some(v) = graph.vertices.get(&record.0) {
-                if let Some(w) = graph.vertices.get(&record.1) {
-                    let req = Request::new(*v, *w, record.2, record.3);
+            if let Some(&v) = graph.vertices.get(&record.0) {
+                if let Some(&w) = graph.vertices.get(&record.1) {
+                    let req = Request::new(v, w, record.2, record.3);
                     total += req.multiplicity;
                     requests.push(req);
                 }
@@ -325,32 +336,21 @@ impl RequestSample {
                 temporal_paths,
             );
 
-            // println!("* {:?} in {} steps.", req, path.len());
             if path.is_empty() {
                 continue;
             }
 
             for e in 0..path.len() - 1 {
                 let edge = path[e];
-                // println!("*** {:?}", edge);
-                crowding_vector
-                    .entry(edge)
-                    .and_modify(|e| *e += mul)
-                    .or_insert(mul);
+
+                *crowding_vector.entry(edge).or_insert(0) += mul;
 
                 let mut at_each = edge.duration;
 
-                if let Some(next_edge) = path.get(e + 1) {
+                if let Some(&next_edge) = path.get(e + 1) {
                     if edge.trip_id != next_edge.trip_id {
-                        let time_window = (edge.arrival_time + time_step
-                            ..=next_edge.departure_time - time_step)
-                            .step_by(time_step);
-
-                        for t in time_window {
-                            occupancy
-                                .entry((edge.to_id, t))
-                                .and_modify(|e| *e += mul)
-                                .or_insert(mul);
+                        for t in (edge.arrival_time..=next_edge.departure_time).step_by(time_step) {
+                            *occupancy.entry((edge.to_id, t)).or_insert(0) += mul;
                             aw += mul;
                         }
                     } else {
@@ -362,14 +362,12 @@ impl RequestSample {
             }
         }
 
-        let total = self.total as f64;
-
         Estimation {
             occupancy_matrix: occupancy,
             crowding_vector,
-            average_travelling_time: (at as f64) / total,
-            average_waiting_time: ((aw * time_step) as f64) / total,
-            time_step,
+            average_travelling_time: at,
+            average_waiting_time: aw * time_step,
+            total: self.total,
             elapsed: start_timestamp.elapsed(),
         }
     }

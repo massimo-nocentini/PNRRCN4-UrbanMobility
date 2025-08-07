@@ -31,8 +31,8 @@ fn main() {
         let sampled = requests.sample(k);
         let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
 
-        at.push(estimation.average_travelling_time);
-        aw.push(estimation.average_waiting_time);
+        at.push(estimation.average_travelling_time_as_f64());
+        aw.push(estimation.average_waiting_time_as_f64());
     }
 
     let freps = repetitions as f64;
@@ -56,12 +56,12 @@ fn main() {
         epsilon,
         exact.average_travelling_time, 
         at_mean,
-        (at_mean - exact.average_travelling_time).abs(),
+        (at_mean - exact.average_travelling_time_as_f64()).abs(),
         at_var.sqrt(),
         at_coeff_var,
         exact.average_waiting_time,
         aw_mean,
-        (aw_mean - exact.average_waiting_time).abs(),
+        (aw_mean - exact.average_waiting_time_as_f64()).abs(),
         aw_var.sqrt(),
         aw_coeff_var,
         exact.elapsed,
