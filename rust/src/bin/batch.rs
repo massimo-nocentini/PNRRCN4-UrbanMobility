@@ -28,7 +28,7 @@ fn main() {
 
     println!(
         "True averages: travelling time {:.3}, waiting time {:.3}; computed in {:?}.",
-        exact.average_travelling_time, exact.average_waiting_time, exact.elapsed
+        exact.average_travelling_time_as_f64(), exact.average_waiting_time_as_f64(), exact.elapsed
     );
 
     println!("Epsilon & k & repetitions & AT mean & |AT - true| & AT std & AT CV & AW mean & |AW - true| & AW std & AW CV \\\\",);
