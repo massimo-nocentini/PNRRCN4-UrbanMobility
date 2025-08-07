@@ -209,19 +209,10 @@ impl TemporalGraph {
         to: usize,
         start_t: usize,
         stop_t: usize,
-        temporal_paths: &mut TemporalPaths<'a>,
     ) -> Vec<&'a Edge> {
-        match temporal_paths.get(&from) {
-            None => {
-                let paths = self.earliest_arrival_paths(from, start_t, stop_t);
-                let path = Self::reify_path(to, &paths);
-
-                temporal_paths.insert(from, paths);
-
-                path
-            }
-            Some(p) => Self::reify_path(to, p),
-        }
+        let paths = self.earliest_arrival_paths(from, start_t, stop_t);
+        let path = Self::reify_path(to, &paths);
+        path
     }
 }
 
@@ -333,7 +324,6 @@ impl RequestSample {
                 req.to_id,
                 req.departure_time,
                 graph.max_time,
-                temporal_paths,
             );
 
             if path.is_empty() {
