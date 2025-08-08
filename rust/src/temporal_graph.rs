@@ -164,22 +164,19 @@ impl TemporalGraph {
         for edge in self.edges.iter() {
             let td = edge.departure_time;
             let ta = edge.arrival_time;
-            if ta <= stop_t {
-                if let Some(td0) = t[edge.from_id] {
-                    if td >= td0 {
-                        t[edge.to_id] = if let Some(ta0) = t[edge.to_id] {
-                            if ta < ta0 {
-                                paths[edge.to_id] = Some(edge);
-                                Some(ta)
-                            } else {
-                                Some(ta0)
-                            }
-                        } else {
-                            paths[edge.to_id] = Some(edge);
-                            Some(ta)
-                        }
+
+            if ta <= stop_t && t[edge.from_id].is_some() && td >= t[edge.from_id].unwrap() {
+                t[edge.to_id] = if let Some(t_to) = t[edge.to_id] {
+                    if ta < t_to {
+                        paths[edge.to_id] = Some(edge);
+                        Some(ta)
+                    } else {
+                        Some(t_to)
                     }
-                };
+                } else {
+                    paths[edge.to_id] = Some(edge);
+                    Some(ta)
+                }
             } else if td >= stop_t {
                 break;
             }
