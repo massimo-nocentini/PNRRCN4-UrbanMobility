@@ -293,7 +293,7 @@ impl RequestSample {
 
     pub fn estimate<'a>(
         self: &RequestSample,
-        time_step: usize,
+        _time_step: usize,
         graph: &'a TemporalGraph,
         temporal_paths: &mut TemporalPaths<'a>,
     ) -> Estimation<'a> {
@@ -328,16 +328,18 @@ impl RequestSample {
 
                 *crowding_vector.entry(edge).or_insert(0) += mul;
 
-                let mut at_each = edge.duration;
+                let mut at_each = edge.duration - 1;
 
                 if let Some(&next_edge) = path.get(e + 1) {
                     if edge.trip_id != next_edge.trip_id {
-                        for t in (edge.arrival_time..=next_edge.departure_time).step_by(time_step) {
+                        for t in (edge.arrival_time..=next_edge.departure_time)
+                        //.step_by(time_step)
+                        {
                             *occupancy.entry((edge.to_id, t)).or_insert(0) += mul;
                             aw += mul;
                         }
                     } else {
-                        at_each += next_edge.departure_time - edge.arrival_time;
+                        at_each += next_edge.departure_time - edge.arrival_time + 1;
                     }
                 }
 
@@ -349,7 +351,7 @@ impl RequestSample {
             occupancy_matrix: occupancy,
             crowding_vector,
             average_travelling_time: at,
-            average_waiting_time: aw * time_step,
+            average_waiting_time: aw,
             total: self.total,
             elapsed: start_timestamp.elapsed(),
         }
