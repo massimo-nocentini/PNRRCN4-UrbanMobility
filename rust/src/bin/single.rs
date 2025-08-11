@@ -7,7 +7,7 @@ fn main() {
 
     let graph_filename = &args[1];
     let requests_filename = &args[2];
-    let time_step = args[3].parse::<usize>().unwrap();
+    let repetitions = args[3].parse::<usize>().unwrap();
     // let epsilon = args[4].parse::<f64>().unwrap();
     let k = args[4].parse::<usize>().unwrap();
     let city = &args[5];
@@ -17,19 +17,18 @@ fn main() {
 
     let requests = RequestSample::parse(&requests_filename, &graph);
 
-    let exact = requests.estimate(time_step, &graph, &mut temporal_paths);
+    let exact = requests.estimate( &graph, &mut temporal_paths);
 
     // let k = (((requests.requests.len() as f64).ln() / (epsilon.powf(2.0) * 2.0)).ceil() as usize).min(requests.requests.len());
     let epsilon = ((requests.requests.len() as f64).ln() / (k as f64 )).sqrt();
-
-    let repetitions = 50usize;
+    
     let mut at = Vec::new();
     let mut aw = Vec::new();
 
     let elapsed = std::time::Instant::now();
     for _ in 0..repetitions {
         let sampled = requests.sample(k);
-        let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
+        let estimation = sampled.estimate( &graph, &mut temporal_paths);
 
         at.push(estimation.average_travelling_time_as_f64());
         aw.push(estimation.average_waiting_time_as_f64());

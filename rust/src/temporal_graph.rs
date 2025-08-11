@@ -293,7 +293,6 @@ impl RequestSample {
 
     pub fn estimate<'a>(
         self: &RequestSample,
-        _time_step: usize,
         graph: &'a TemporalGraph,
         temporal_paths: &mut TemporalPaths<'a>,
     ) -> Estimation<'a> {
@@ -332,9 +331,7 @@ impl RequestSample {
 
                 if let Some(&next_edge) = path.get(e + 1) {
                     if edge.trip_id != next_edge.trip_id {
-                        for t in (edge.arrival_time..=next_edge.departure_time)
-                        //.step_by(time_step)
-                        {
+                        for t in edge.arrival_time..=next_edge.departure_time {
                             *occupancy.entry((edge.to_id, t)).or_insert(0) += mul;
                             aw += mul;
                         }

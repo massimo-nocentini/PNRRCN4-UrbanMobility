@@ -35,7 +35,7 @@ fn main() {
     // let at_true = 0.0;
     // let aw_true = 0.0;
 
-    let exact = requests.estimate(time_step, &graph, &mut temporal_paths);
+    let exact = requests.estimate(&graph, &mut temporal_paths);
 
     let at_true = exact.average_travelling_time_as_f64();
     let aw_true = exact.average_waiting_time_as_f64();
@@ -48,7 +48,7 @@ fn main() {
 
     for _ in 0..repetitions {
         let sampled = requests.sample(k);
-        let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
+        let estimation = sampled.estimate(&graph, &mut temporal_paths);
 
         at.push(estimation.average_travelling_time_as_f64());
         aw.push(estimation.average_waiting_time_as_f64());

@@ -24,7 +24,7 @@ fn main() {
         requests.total,
     );
 
-    let exact = requests.estimate(time_step, &graph, &mut temporal_paths);
+    let exact = requests.estimate( &graph, &mut temporal_paths);
 
     println!(
         "True averages: travelling time {:.3}, waiting time {:.3}; computed in {:?}.",
@@ -47,7 +47,7 @@ fn main() {
 
             for _ in 0..repetitions {
                 let sampled = requests.sample(k);
-                let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
+                let estimation = sampled.estimate( &graph, &mut temporal_paths);
 
                 for (&edge, &crowding) in estimation.crowding_vector.iter() {
                     avg_crowding
