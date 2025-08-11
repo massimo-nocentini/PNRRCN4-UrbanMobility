@@ -44,8 +44,7 @@ pub struct Estimation<'a> {
     pub crowding_vector: HashMap<&'a Edge, usize>,
     pub average_travelling_time: usize,
     pub average_waiting_time: usize,
-
-    total: usize,
+    pub total: usize,
     pub elapsed: Duration,
 }
 

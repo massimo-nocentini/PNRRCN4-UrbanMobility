@@ -168,7 +168,35 @@ single-1000:
 	time cargo run --release --bin single -- ../data/transport/venice/edges.csv ../data/transport/venice/requests_K18740_N187400.csv 300 1000 Venice >> ../data/transport/single-1000.csv
 	time cargo run --release --bin single -- ../data/transport/winnipeg/edges.csv ../data/transport/winnipeg/requests_K50790_N507900.csv 300 1000 Winnipeg >> ../data/transport/single-1000.csv
 
-single-all: single-1 single-100 single-300 single-500
+
+single-1124:
+	time cargo run --release --bin single -- ../data/transport/adelaide/edges.csv ../data/transport/adelaide/requests_K75480_N754800.csv 300 1124 Adelaide > ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/belfast/edges.csv ../data/transport/belfast/requests_K19170_N191700.csv 300 1124 Belfast >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/berlin/edges.csv ../data/transport/berlin/requests_K46010_N460100.csv 300 1124 Berlin >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/bordeaux/edges.csv ../data/transport/bordeaux/requests_K34350_N343500.csv 300 1124 Bordeaux >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/brisbane/edges.csv ../data/transport/brisbane/requests_K96450_N964500.csv 300 1124 Brisbane >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/canberra/edges.csv ../data/transport/canberra/requests_K27640_N276400.csv 300 1124 Canberra >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/detroit/edges.csv ../data/transport/detroit/requests_K56830_N568300.csv 300 1124 Detroit >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/dublin/edges.csv ../data/transport/dublin/requests_K45710_N457100.csv 300 1124 Dublin >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/grenoble/edges.csv ../data/transport/grenoble/requests_K15470_N154700.csv 300 1124 Grenoble >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/helsinki/edges.csv ../data/transport/helsinki/requests_K69860_N698600.csv 300 1124 Helsinki >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/kuopio/edges.csv ../data/transport/kuopio/requests_K5490_N54900.csv 300 1124 Kuopio >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/lisbon/edges.csv ../data/transport/lisbon/requests_K70730_N707300.csv 300 1124 Lisbon >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/luxembourg/edges.csv ../data/transport/luxembourg/requests_K13670_N136700.csv 300 1124 Luxembourg >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/melbourne/edges.csv ../data/transport/melbourne/requests_K194930_N1949300.csv 300 1124 Melbourne >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/nantes/edges.csv ../data/transport/nantes/requests_K23530_N235300.csv 300 1124 Nantes >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/palermo/edges.csv ../data/transport/palermo/requests_K21760_N217600.csv 300 1124 Palermo >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/paris/edges.csv ../data/transport/paris/requests_K11950_N1195000.csv 300 1124 Paris >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/prague/edges.csv ../data/transport/prague/requests_K51470_N514700.csv 300 1124 Prague >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/rennes/edges.csv ../data/transport/rennes/requests_K14070_N140700.csv 300 1124 Rennes >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/rome/edges.csv ../data/transport/rome/requests_K78690_N786900.csv 300 1124 Rome >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/sydney/edges.csv ../data/transport/sydney/requests_K240630_N2406300.csv 300 1124 Sydney >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/toulouse/edges.csv ../data/transport/toulouse/requests_K33290_N332900.csv 300 1124 Toulouse >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/turku/edges.csv ../data/transport/turku/requests_K18500_N185000.csv 300 1124 Turku >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/venice/edges.csv ../data/transport/venice/requests_K18740_N187400.csv 300 1124 Venice >> ../data/transport/single-1124.csv
+	time cargo run --release --bin single -- ../data/transport/winnipeg/edges.csv ../data/transport/winnipeg/requests_K50790_N507900.csv 300 1124 Winnipeg >> ../data/transport/single-1124.csv
+
+single-all: single-1 single-100 single-300 single-500 single-1000
 
 full:
 	time cargo run --release --bin rust -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 0.1 50 300 > ../data/transport/florence/analysis-0.1e-50reps-300s.txt
