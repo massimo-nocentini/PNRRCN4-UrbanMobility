@@ -157,25 +157,18 @@ impl TemporalGraph {
     ) -> Vec<Option<&Edge>> {
         let num_nodes = self.vertices.len();
         let mut paths = vec![None; num_nodes];
-        let mut t = vec![None; num_nodes];
+        let mut t = vec![usize::MAX; num_nodes];
 
-        t[v] = Some(start_t);
+        t[v] = start_t;
 
         for edge in self.edges.iter() {
             let td = edge.departure_time;
             let ta = edge.arrival_time;
 
-            if ta <= stop_t && t[edge.from_id].is_some() && td >= t[edge.from_id].unwrap() {
-                t[edge.to_id] = if let Some(t_to) = t[edge.to_id] {
-                    if ta < t_to {
-                        paths[edge.to_id] = Some(edge);
-                        Some(ta)
-                    } else {
-                        Some(t_to)
-                    }
-                } else {
+            if ta <= stop_t && td >= t[edge.from_id] {
+                if ta < t[edge.to_id] {
                     paths[edge.to_id] = Some(edge);
-                    Some(ta)
+                    t[edge.to_id] = ta;
                 }
             } else if td >= stop_t {
                 break;
