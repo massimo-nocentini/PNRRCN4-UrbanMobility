@@ -20,7 +20,7 @@ fn main() {
     let exact = requests.estimate(time_step, &graph, &mut temporal_paths);
 
     // let k = (((requests.requests.len() as f64).ln() / (epsilon.powf(2.0) * 2.0)).ceil() as usize).min(requests.requests.len());
-    let epsilon = ((requests.requests.len() as f64).ln() / ((k as f64) * 2.0)).sqrt();
+    let epsilon = ((requests.requests.len() as f64).ln() / (k as f64 )).sqrt();
 
     let repetitions = 50usize;
     let mut at = Vec::new();
