@@ -223,6 +223,18 @@ single-generic:
 	time cargo run --release --bin single -- ../data/transport/venice/edges.csv ../data/transport/venice/requests_K18740_N187400.csv  $(REPS) $(K) Venice >> ../data/transport/single-$(REPS)-$(K).csv
 	time cargo run --release --bin single -- ../data/transport/winnipeg/edges.csv ../data/transport/winnipeg/requests_K50790_N507900.csv  $(REPS) $(K) Winnipeg >> ../data/transport/single-$(REPS)-$(K).csv
 
+single-par:
+	REPS=1 K=1124 make single-generic &
+	REPS=10 K=1124 make single-generic &
+	REPS=100 K=1124 make single-generic &	
+	REPS=500 K=1124 make single-generic &
+	REPS=1000 K=1124 make single-generic &
+	REPS=5000 K=1124 make single-generic &
+	REPS=10000 K=1124 make single-generic &
+	REPS=50000 K=1124 make single-generic &
+	REPS=100000 K=1124 make single-generic &
+
+
 single-all: single-1 single-100 single-300 single-500 single-1000
 
 full:
