@@ -13,11 +13,11 @@ fn main() {
     let city = &args[5];
 
     let graph = TemporalGraph::parse(&graph_filename);
-    // let mut temporal_paths = HashMap::new();
+    let mut temporal_paths = HashMap::new();
 
     let requests = RequestSample::parse(&requests_filename, &graph);
 
-    let exact = requests.estimate(time_step, &graph, &mut HashMap::new());
+    let exact = requests.estimate(time_step, &graph, &mut temporal_paths);
 
     // let k = (((requests.requests.len() as f64).ln() / (epsilon.powf(2.0) * 2.0)).ceil() as usize).min(requests.requests.len());
     let epsilon = ((requests.requests.len() as f64).ln() / ((k as f64) * 2.0)).sqrt().ceil();
@@ -29,7 +29,7 @@ fn main() {
     let elapsed = std::time::Instant::now();
     for _ in 0..repetitions {
         let sampled = requests.sample(k);
-        let estimation = sampled.estimate(time_step, &graph, &mut HashMap::new());
+        let estimation = sampled.estimate(time_step, &graph, &mut temporal_paths);
 
         at.push(estimation.average_travelling_time_as_f64());
         aw.push(estimation.average_waiting_time_as_f64());

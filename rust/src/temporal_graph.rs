@@ -11,7 +11,7 @@ type EdgeRecord = (String, String, usize, usize, usize, String, usize, usize);
 // departure;arrival;starting_time;n_people
 type RequestRecord = (String, String, usize, usize);
 
-type TemporalPaths<'a> = HashMap<usize, Vec<Option<&'a Edge>>>;
+type TemporalPaths<'a> = HashMap<(usize, usize), Vec<&'a Edge>>;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Edge {
@@ -309,12 +309,16 @@ impl RequestSample {
         for req in self.requests.iter() {
             let mul = req.multiplicity;
 
-            let path = graph.earliest_arrival_path(
-                req.from_id,
-                req.to_id,
-                req.departure_time,
-                graph.max_time,
-            );
+            let path = temporal_paths
+                .entry((req.from_id, req.departure_time))
+                .or_insert_with(|| {
+                    graph.earliest_arrival_path(
+                        req.from_id,
+                        req.to_id,
+                        req.departure_time,
+                        graph.max_time,
+                    )
+                });
 
             if path.is_empty() {
                 continue;
