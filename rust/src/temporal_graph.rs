@@ -5,6 +5,11 @@ use std::hash::Hash;
 use std::time::Duration;
 use std::time::Instant;
 
+
+
+use std::{usize};
+
+
 // from_stop_I;to_stop_I;dep_time_ut;arr_time_ut;route_type;trip_I;seq;route_I
 type EdgeRecord = (String, String, usize, usize, usize, String, usize, usize);
 
@@ -353,4 +358,60 @@ impl RequestSample {
             elapsed: start_timestamp.elapsed(),
         }
     }
+}
+
+
+
+pub fn single(k: usize, epsilon: f64, repetitions: usize, city: &str, graph: &TemporalGraph, requests: &RequestSample) {
+    
+
+    let mut temporal_paths = HashMap::new();
+    let exact = requests.estimate( &graph, &mut temporal_paths);
+
+    let mut at = Vec::new();
+    let mut aw = Vec::new();
+
+    let elapsed = std::time::Instant::now();
+    for _ in 0..repetitions {
+        let sampled = requests.sample(k);
+        let estimation = sampled.estimate( &graph, &mut temporal_paths);
+
+        at.push(estimation.average_travelling_time_as_f64());
+        aw.push(estimation.average_waiting_time_as_f64());
+    }
+
+    let freps = repetitions as f64;
+
+    let at_mean = at.iter().sum::<f64>() / freps;
+    let aw_mean = aw.iter().sum::<f64>() / freps;
+
+    let at_var = at.iter().map(|x| (x - at_mean).powi(2)).sum::<f64>() / freps;
+    let aw_var = aw.iter().map(|x| (x - aw_mean).powi(2)).sum::<f64>() / freps;
+
+    let at_coeff_var = at_var.sqrt() / at_mean;
+    let aw_coeff_var = aw_var.sqrt() / aw_mean;
+
+    println!(
+        "{} & {} & {} & {} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:?} & {:.3} & {:.3} \\\\",
+        city,
+        graph.vertices.len(),
+        graph.edges.len(),
+        requests.requests.len(),
+        requests.total,
+        epsilon,
+        exact.average_travelling_time_as_f64(), 
+        at_mean,
+        (at_mean - exact.average_travelling_time_as_f64()).abs(),
+        at_var.sqrt(),
+        at_coeff_var,
+        exact.average_waiting_time_as_f64(),
+        aw_mean,
+        (aw_mean - exact.average_waiting_time_as_f64()).abs(),
+        aw_var.sqrt(),
+        aw_coeff_var,
+        exact.elapsed,
+        elapsed.elapsed(),
+        elapsed.elapsed().as_secs_f64() * 1000.0,
+        exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
+    );
 }
