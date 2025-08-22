@@ -6,8 +6,6 @@ use std::{collections::HashMap, usize};
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let p = 0.001_f64;
-
     let graph_filename = &args[1];
     let requests_filename = &args[2];
     let epsilon = args[3].parse::<f64>().unwrap();
@@ -31,9 +29,6 @@ fn main() {
         k,
         repetitions
     );
-
-    // let at_true = 0.0;
-    // let aw_true = 0.0;
 
     let exact = requests.estimate(&graph, &mut temporal_paths);
 
