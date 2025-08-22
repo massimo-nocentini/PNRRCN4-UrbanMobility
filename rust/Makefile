@@ -223,7 +223,7 @@ single-generic:
 	time cargo run --release --bin $(SINGLE_BIN) -- ../data/transport/venice/edges.csv ../data/transport/venice/requests_K18740_N187400.csv  $(REPS) $(K) Venice >> ../data/transport/$(SINGLE_BIN)-$(REPS)-$(K).csv
 	time cargo run --release --bin $(SINGLE_BIN) -- ../data/transport/winnipeg/edges.csv ../data/transport/winnipeg/requests_K50790_N507900.csv  $(REPS) $(K) Winnipeg >> ../data/transport/$(SINGLE_BIN)-$(REPS)-$(K).csv
 
-single-by-k:
+single-by-k-bench:
 	SINGLE_BIN=single-by-k REPS=1 K=1124 make single-generic &
 	SINGLE_BIN=single-by-k REPS=10 K=1124 make single-generic &
 	SINGLE_BIN=single-by-k REPS=100 K=1124 make single-generic &	
@@ -234,6 +234,13 @@ single-by-k:
 	SINGLE_BIN=single-by-k REPS=50000 K=1124 make single-generic &
 	SINGLE_BIN=single-by-k REPS=100000 K=1124 make single-generic &
 
+single-by-k:
+	SINGLE_BIN=single-by-k REPS=50 K=1 make single-generic &
+	SINGLE_BIN=single-by-k REPS=50 K=10 make single-generic &
+	SINGLE_BIN=single-by-k REPS=50 K=100 make single-generic &
+	SINGLE_BIN=single-by-k REPS=50 K=500 make single-generic &
+	SINGLE_BIN=single-by-k REPS=50 K=1000 make single-generic &
+	SINGLE_BIN=single-by-k REPS=50 K=5000 make single-generic &
 
 single-by-epsilon:
 	SINGLE_BIN=single-by-epsilon REPS=50 K=0.1 make single-generic
