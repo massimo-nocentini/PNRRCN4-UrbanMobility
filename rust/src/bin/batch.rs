@@ -115,7 +115,7 @@ fn main() {
             let avg_om_error_coeff_var = var_om_error.sqrt() / avg_om_error;
 
             println!(
-                "{:.3} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:.3} \\\\",
+                "{:.3} & {} & {} & {:.6} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} \\\\",
                 epsilon,
                 k,
                 repetitions,
@@ -128,7 +128,7 @@ fn main() {
                 avg_om_error.abs(),
                 avg_om_error_coeff_var,                
                 elapsed.elapsed(),
-                exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
+                // exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
             );
 
             // println!(
