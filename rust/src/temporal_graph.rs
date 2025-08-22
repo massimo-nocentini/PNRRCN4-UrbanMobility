@@ -392,13 +392,14 @@ pub fn single(k: usize, epsilon: f64, repetitions: usize, city: &str, graph: &Te
     let aw_coeff_var = aw_var.sqrt() / aw_mean;
 
     println!(
-        "{} & {} & {} & {} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:?} & {:.3} & {:.3} \\\\",
+        "{} & {} & {} & {} & {} & {:.3} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:?} & {:.3} & {:.3} \\\\",
         city,
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
         requests.total,
         epsilon,
+        k,
         exact.average_travelling_time_as_f64(), 
         at_mean,
         (at_mean - exact.average_travelling_time_as_f64()).abs(),
