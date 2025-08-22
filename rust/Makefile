@@ -238,4 +238,4 @@ single-par:
 single-all: single-1 single-100 single-300 single-500 single-1000
 
 full:
-	time cargo run --release --bin rust -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 0.1 50 1 > ../data/transport/florence/analysis-0.1e-50reps-300s.txt
+	time cargo run --release --bin rust -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 0.1 50 300 > ../data/transport/florence/analysis-0.1e-50reps-300s.txt

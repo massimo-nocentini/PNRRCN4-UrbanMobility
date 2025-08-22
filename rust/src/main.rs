@@ -19,8 +19,8 @@ fn main() {
 
     let requests = RequestSample::parse(&requests_filename, &graph);
 
-    let k =
-        (((2.0 / p).ln() / (2.0 * epsilon.powi(2))).ceil() as usize).min(requests.requests.len());
+    let k = (((requests.requests.len() as f64).ln() / epsilon.powi(2)).ceil() as usize)
+        .min(requests.requests.len());
 
     println!(
         "|V| = {}, |E| = {}, |Q| = {}, |P| = {}, k = {}, repetitions = {}.",
