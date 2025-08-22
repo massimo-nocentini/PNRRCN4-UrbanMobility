@@ -3,7 +3,7 @@ echo:
 	echo "Usage: make run"
 
 batch:
-	time cargo run --release --bin batch -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 1 > ../data/transport/florence/analysis.csv
+	time cargo run --release --bin batch -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv > ../data/transport/florence/analysis.csv
 	
 single:
 	time cargo run --release --bin single -- ../data/transport/adelaide/edges.csv ../data/transport/adelaide/requests_K75480_N754800.csv 1 0.1 Adelaide > ../data/transport/single.csv
