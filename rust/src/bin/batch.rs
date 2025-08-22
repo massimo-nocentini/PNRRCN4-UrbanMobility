@@ -32,7 +32,7 @@ fn main() {
 
     println!("Epsilon & k & repetitions & AT mean & |AT - true| & AT std & AT CV & AW mean & |AW - true| & AW std & AW CV \\\\",);
 
-    for k in [1, 6, 24, 96, 169, 381, 1521, 6081] {
+    for k in [1, 5, 10, 50, 100, 500, 1000, 5000] {
         
         let epsilon = ((requests.requests.len() as f64).ln() / (k as f64 )).sqrt();
 
