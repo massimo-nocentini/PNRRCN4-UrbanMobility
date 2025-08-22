@@ -1,15 +1,14 @@
 use rust::temporal_graph::{RequestSample, TemporalGraph};
 use std::env;
-use std::{collections::HashMap, usize};
+use std::{collections::HashMap};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let p = 0.001_f64;
+    
 
     let graph_filename = &args[1];
-    let requests_filename = &args[2];
-    let time_step = args[3].parse::<usize>().unwrap();
+    let requests_filename = &args[2];    
 
     let graph = TemporalGraph::parse(&graph_filename);
     let mut temporal_paths = HashMap::new();
@@ -34,7 +33,8 @@ fn main() {
     println!("Epsilon & k & repetitions & AT mean & |AT - true| & AT std & AT CV & AW mean & |AW - true| & AW std & AW CV \\\\",);
 
     for k in [1, 6, 24, 96, 169, 381, 1521, 6081] {
-        let epsilon = ((2.0 / p).ln() / (2.0 * (k as f64))).sqrt();
+        
+        let epsilon = ((requests.requests.len() as f64).ln() / (k as f64 )).sqrt();
 
         for repetitions in [1, 5, 10, 50, 100] {
             let mut at = Vec::new();
