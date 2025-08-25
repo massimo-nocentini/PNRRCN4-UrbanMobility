@@ -131,7 +131,7 @@ fn main() {
                 // exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
             );
 
-            println!("\\hline");
+            
             // println!(
             //     "{:.3} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:?} & {:.3} \\\\",
             //     epsilon,
@@ -150,5 +150,7 @@ fn main() {
             //     exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
             // );
         }
+
+        println!("\\hline");
     }
 }
