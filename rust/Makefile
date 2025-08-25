@@ -249,4 +249,4 @@ full:
 	time cargo run --release --bin rust -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 0.1 50 300 > ../data/transport/florence/analysis-0.1e-50reps-300s.txt
 
 csv:
-	cd ../data/js && node compose.js > single-all.csv && node batch.js batch.csv
+	cd ../data/js && node compose.js > single-all.csv && node batch.js > batch.csv
