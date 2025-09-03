@@ -298,6 +298,20 @@ impl RequestSample {
         }
     }
 
+    pub fn sample_each(self: &RequestSample, i: usize) -> RequestSample {
+        let mut sample = Vec::new();
+
+        sample.push(Request {
+            multiplicity: 1,
+            ..self.requests[i]
+        });
+
+        RequestSample {
+            requests: sample,
+            total: 1,
+        }
+    }
+
     pub fn estimate<'a>(
         self: &RequestSample,
         graph: &'a TemporalGraph,
@@ -338,10 +352,8 @@ impl RequestSample {
 
             //     let mut at_each = edge.duration - 1;
 
-
             //     at += mul * at_each;
             // }
-
 
             for e in 0..path.len() - 1 {
                 sono_entrato = true;
@@ -405,6 +417,65 @@ pub fn single(
     }
 
     let freps = repetitions as f64;
+
+    let at_mean = at.iter().sum::<f64>() / freps;
+    let aw_mean = aw.iter().sum::<f64>() / freps;
+
+    let at_var = at.iter().map(|x| (x - at_mean).powi(2)).sum::<f64>() / freps;
+    let aw_var = aw.iter().map(|x| (x - aw_mean).powi(2)).sum::<f64>() / freps;
+
+    let at_coeff_var = at_var.sqrt() / at_mean;
+    let aw_coeff_var = aw_var.sqrt() / aw_mean;
+
+    println!(
+        "{} & {} & {} & {} & {} & {:.3} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} & {:?} & {:.3} & {:.3} \\\\",
+        city,
+        graph.vertices.len(),
+        graph.edges.len(),
+        requests.requests.len(),
+        requests.total,
+        epsilon,
+        k,
+        0,//exact.average_travelling_time_as_f64(), 
+        at_mean,
+        0,//(at_mean - exact.average_travelling_time_as_f64()).abs(),
+        at_var.sqrt(),
+        at_coeff_var,
+        0,//exact.average_waiting_time_as_f64(),
+        aw_mean,
+        0,//(aw_mean - exact.average_waiting_time_as_f64()).abs(),
+        aw_var.sqrt(),
+        aw_coeff_var,
+        0,//exact.elapsed,
+        elapsed.elapsed(),
+        elapsed.elapsed().as_secs_f64() * 1000.0,
+        0//exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
+    );
+}
+
+pub fn single_each(
+    epsilon: f64,
+    repetitions: usize,
+    city: &str,
+    graph: &TemporalGraph,
+    requests: &RequestSample,
+) {
+    let mut temporal_paths = HashMap::new();
+    //let exact = requests.estimate( &graph, &mut temporal_paths);
+
+    let mut at = Vec::new();
+    let mut aw = Vec::new();
+    let k = requests.requests.len();
+    let elapsed = std::time::Instant::now();
+    for i in 0..k {
+        let sampled = requests.sample_each(i);
+        let estimation = sampled.estimate(&graph, &mut temporal_paths);
+
+        at.push(estimation.average_travelling_time_as_f64());
+        aw.push(estimation.average_waiting_time_as_f64());
+    }
+
+    let freps = k as f64;
 
     let at_mean = at.iter().sum::<f64>() / freps;
     let aw_mean = aw.iter().sum::<f64>() / freps;
