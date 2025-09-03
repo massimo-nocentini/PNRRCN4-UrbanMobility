@@ -406,8 +406,8 @@ pub fn single(
         let sampled = requests.sample(k);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
         let norm = (estimation.total as f64) / sampled.total as f64;
-        at.push(estimation.average_travelling_time_as_f64() / norm);
-        aw.push(estimation.average_waiting_time_as_f64() / norm);
+        at.push(estimation.average_travelling_time_as_f64() * norm);
+        aw.push(estimation.average_waiting_time_as_f64() * norm);
     }
 
     let freps = repetitions as f64;
