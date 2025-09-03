@@ -366,7 +366,7 @@ pub fn single(k: usize, epsilon: f64, repetitions: usize, city: &str, graph: &Te
     
 
     let mut temporal_paths = HashMap::new();
-    let exact = requests.estimate( &graph, &mut temporal_paths);
+    //let exact = requests.estimate( &graph, &mut temporal_paths);
 
     let mut at = Vec::new();
     let mut aw = Vec::new();
@@ -400,19 +400,19 @@ pub fn single(k: usize, epsilon: f64, repetitions: usize, city: &str, graph: &Te
         requests.total,
         epsilon,
         k,
-        exact.average_travelling_time_as_f64(), 
+        0,//exact.average_travelling_time_as_f64(), 
         at_mean,
-        (at_mean - exact.average_travelling_time_as_f64()).abs(),
+        0,//(at_mean - exact.average_travelling_time_as_f64()).abs(),
         at_var.sqrt(),
         at_coeff_var,
-        exact.average_waiting_time_as_f64(),
+        0,//exact.average_waiting_time_as_f64(),
         aw_mean,
-        (aw_mean - exact.average_waiting_time_as_f64()).abs(),
+        0,//(aw_mean - exact.average_waiting_time_as_f64()).abs(),
         aw_var.sqrt(),
         aw_coeff_var,
-        exact.elapsed,
+        0,//exact.elapsed,
         elapsed.elapsed(),
         elapsed.elapsed().as_secs_f64() * 1000.0,
-        exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
+        0//exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
     );
 }
