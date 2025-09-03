@@ -330,6 +330,7 @@ impl RequestSample {
 
             if path.len() == 1 {
                 let edge = path[0];
+                println!("one size path");
 
                 *crowding_vector.entry(edge).or_insert(0) += mul;
 
