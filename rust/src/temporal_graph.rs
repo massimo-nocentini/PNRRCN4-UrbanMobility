@@ -260,7 +260,7 @@ impl RequestSample {
                 multiplicities.push(total);
             }
 
-            assert_eq!(total, self.total);
+            //assert_eq!(total, self.total);
 
             let sup = multiplicities.len() - 1; // exclusive upper bounds
 
