@@ -461,14 +461,17 @@ pub fn single_each(
     let mut aw = Vec::new();
     let k = requests.requests.len();
     let elapsed = std::time::Instant::now();
+    let mut check = 0usize;
     for i in 0..k {
         let sampled = requests.sample_each(i);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
 
+        check += estimation.average_travelling_time;
         at.push(estimation.average_travelling_time_as_f64());
         aw.push(estimation.average_waiting_time_as_f64());
     }
 
+    println!("check: {}, exact: {}", (check as f64) / (requests.total as f64), exact.average_travelling_time);
     let freps = k as f64;
 
     let at_mean = at.iter().sum::<f64>() / freps;
