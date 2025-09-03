@@ -302,7 +302,7 @@ impl RequestSample {
         let mut sample = Vec::new();
 
         sample.push(Request {
-            multiplicity: 1,
+            //multiplicity: 1,
             ..self.requests[i]
         });
 
@@ -322,7 +322,6 @@ impl RequestSample {
 
         let mut at = 0;
         let mut aw = 0;
-        let mut sono_entrato = false;
 
         let start_timestamp = Instant::now();
 
@@ -356,7 +355,6 @@ impl RequestSample {
             // }
 
             for e in 0..path.len() - 1 {
-                sono_entrato = true;
                 let edge = path[e];
 
                 *crowding_vector.entry(edge).or_insert(0) += mul;
@@ -376,10 +374,6 @@ impl RequestSample {
 
                 at += mul * at_each;
             }
-        }
-
-        if at == 0 {
-            println!("Sono entrato: {}", sono_entrato);
         }
 
         Estimation {
