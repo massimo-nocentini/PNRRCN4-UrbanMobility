@@ -6,7 +6,7 @@ batch:
 	time cargo run --release --bin batch -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv > ../data/transport/florence/analysis.csv
 
 single-nantes:
-	time cargo run --release --bin $(SINGLE_BIN) -- ../data/transport/nantes/edges.csv ../data/transport/nantes/requests_K23530_N235300.csv  $(REPS) $(K) Nantes > ../data/transport/nantes-$(SINGLE_BIN)-$(REPS)-$(K).csv
+	time cargo run --release --bin $(SINGLE_BIN) -- ../data/transport/nantes/edges.csv ../data/transport/nantes/requests_K23530_N235300.csv  $(REPS) $(K) Nantes >> ../data/transport/nantes-$(SINGLE_BIN)-$(REPS)-$(K).csv
 
 single-generic:
 	time cargo run --release --bin $(SINGLE_BIN) -- ../data/transport/adelaide/edges.csv ../data/transport/adelaide/requests_K75480_N754800.csv  $(REPS) $(K) Adelaide > ../data/transport/$(SINGLE_BIN)-$(REPS)-$(K).csv
@@ -55,6 +55,11 @@ single-by-k:
 	SINGLE_BIN=single-by-k REPS=50 K=5000 make single-generic &
 
 single-by-k-nantes:
+	echo "" > ../data/transport/nantes-single-by-k-1-1.csv
+	SINGLE_BIN=single-by-k REPS=1 K=1 make single-nantes
+	SINGLE_BIN=single-by-k REPS=1 K=1 make single-nantes
+	SINGLE_BIN=single-by-k REPS=1 K=1 make single-nantes
+	SINGLE_BIN=single-by-k REPS=1 K=1 make single-nantes
 	SINGLE_BIN=single-by-k REPS=1 K=1 make single-nantes
 
 single-by-epsilon:
