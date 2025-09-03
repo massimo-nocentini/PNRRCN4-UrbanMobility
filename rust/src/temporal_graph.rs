@@ -307,8 +307,8 @@ impl RequestSample {
         });
 
         RequestSample {
+            total: sample[0].multiplicity,
             requests: sample,
-            total: self.requests[i].multiplicity,
         }
     }
 
@@ -455,7 +455,7 @@ pub fn single_each(
     requests: &RequestSample,
 ) {
     let mut temporal_paths = HashMap::new();
-    //let exact = requests.estimate( &graph, &mut temporal_paths);
+    let exact = requests.estimate( &graph, &mut temporal_paths);
 
     let mut at = Vec::new();
     let mut aw = Vec::new();
@@ -489,19 +489,19 @@ pub fn single_each(
         requests.total,
         epsilon,
         k,
-        0,//exact.average_travelling_time_as_f64(), 
+        exact.average_travelling_time_as_f64(), 
         at_mean,
-        0,//(at_mean - exact.average_travelling_time_as_f64()).abs(),
+        (at_mean - exact.average_travelling_time_as_f64()).abs(),
         at_var.sqrt(),
         at_coeff_var,
-        0,//exact.average_waiting_time_as_f64(),
+        exact.average_waiting_time_as_f64(),
         aw_mean,
-        0,//(aw_mean - exact.average_waiting_time_as_f64()).abs(),
+        (aw_mean - exact.average_waiting_time_as_f64()).abs(),
         aw_var.sqrt(),
         aw_coeff_var,
-        0,//exact.elapsed,
+        exact.elapsed,
         elapsed.elapsed(),
         elapsed.elapsed().as_secs_f64() * 1000.0,
-        0//exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
+        exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
     );
 }
