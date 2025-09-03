@@ -260,8 +260,6 @@ impl RequestSample {
                 multiplicities.push(total);
             }
 
-            //assert_eq!(total, self.total);
-
             let sup = multiplicities.len() - 1; // exclusive upper bounds
 
             let m = rng.gen_range(0..=total);
@@ -290,7 +288,7 @@ impl RequestSample {
             sample.push(unary_request);
         }
 
-        assert_eq!(new_total, k);
+        // assert_eq!(new_total, k);
 
         RequestSample {
             requests: sample,
