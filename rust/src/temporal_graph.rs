@@ -330,17 +330,17 @@ impl RequestSample {
                 continue;
             }
 
-            if path.len() == 1 {
-                let edge = path[0];
-                println!("one size path");
+            // if path.len() == 1 {
+            //     let edge = path[0];
+            //     println!("one size path");
 
-                *crowding_vector.entry(edge).or_insert(0) += mul;
+            //     *crowding_vector.entry(edge).or_insert(0) += mul;
 
-                let mut at_each = edge.duration - 1;
+            //     let mut at_each = edge.duration - 1;
 
 
-                at += mul * at_each;
-            }
+            //     at += mul * at_each;
+            // }
 
 
             for e in 0..path.len() - 1 {
