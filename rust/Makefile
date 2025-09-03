@@ -56,6 +56,7 @@ single-by-k:
 
 
 single-by-k-nantes-each:
+	echo "" > ../data/transport/nantes-single-by-k-each-1-1.csv
 	SINGLE_BIN=single-by-k-each REPS=1 K=1 make single-nantes
 
 single-by-k-nantes:
