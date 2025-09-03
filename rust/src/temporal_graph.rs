@@ -279,7 +279,7 @@ impl RequestSample {
             }
 
             let unary_request = Request {
-                multiplicity: 1,
+                //multiplicity: 1,
                 ..*requests[lo]
             };
 
