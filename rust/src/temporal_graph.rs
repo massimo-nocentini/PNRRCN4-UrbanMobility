@@ -308,7 +308,7 @@ impl RequestSample {
 
         RequestSample {
             requests: sample,
-            total: 1,
+            total: self.requests[i].multiplicity,
         }
     }
 
