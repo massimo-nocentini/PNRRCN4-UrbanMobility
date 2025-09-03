@@ -54,6 +54,10 @@ single-by-k:
 	SINGLE_BIN=single-by-k REPS=50 K=1000 make single-generic &
 	SINGLE_BIN=single-by-k REPS=50 K=5000 make single-generic &
 
+
+single-by-k-nantes-each:
+	SINGLE_BIN=single-by-k-each REPS=1 K=1 make single-nantes
+
 single-by-k-nantes:
 	echo "" > ../data/transport/nantes-single-by-k-1-1.csv
 	SINGLE_BIN=single-by-k REPS=1 K=1 make single-nantes
