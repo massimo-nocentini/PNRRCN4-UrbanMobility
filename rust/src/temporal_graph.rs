@@ -403,7 +403,7 @@ pub fn single(
     for _ in 0..repetitions {
         let sampled = requests.sample(k);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
-        let norm = (estimation.total as f64) / sampled.total as f64;
+        let norm = (estimation.total as f64) / requests.total as f64;
         at.push(estimation.average_travelling_time_as_f64() * norm);
         aw.push(estimation.average_waiting_time_as_f64() * norm);
     }
