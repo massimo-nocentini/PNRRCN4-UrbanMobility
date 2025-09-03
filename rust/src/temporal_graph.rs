@@ -465,10 +465,10 @@ pub fn single_each(
     for i in 0..k {
         let sampled = requests.sample_each(i);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
-
+        let norm = (estimation.total as f64) / requests.total as f64;
         check += estimation.average_travelling_time;
-        at.push(estimation.average_travelling_time_as_f64());
-        aw.push(estimation.average_waiting_time_as_f64());
+        at.push(estimation.average_travelling_time_as_f64() * norm);
+        aw.push(estimation.average_waiting_time_as_f64() * norm);
     }
 
     println!("check: {}, exact: {}", (check as f64) / (requests.total as f64), exact.average_travelling_time);
