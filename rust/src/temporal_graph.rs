@@ -5,10 +5,7 @@ use std::hash::Hash;
 use std::time::Duration;
 use std::time::Instant;
 
-
-
-use std::{usize};
-
+use std::usize;
 
 // from_stop_I;to_stop_I;dep_time_ut;arr_time_ut;route_type;trip_I;seq;route_I
 type EdgeRecord = (String, String, usize, usize, usize, String, usize, usize);
@@ -249,21 +246,24 @@ impl RequestSample {
 
     pub fn sample(self: &RequestSample, k: usize) -> RequestSample {
         let mut rng = thread_rng();
-        let mut multiplicities = Vec::new();
-        let mut total = 0usize;
+
         let mut new_total = 0usize;
         let mut sample = Vec::new();
 
-        for req in self.requests.iter() {
-            total += req.multiplicity;
-            multiplicities.push(total);
-        }
-
-        assert_eq!(total, self.total);
-
-        let sup = multiplicities.len() - 1; // exclusive upper bounds
+        let mut requests = self.requests.iter().clone().collect::<Vec<_>>();
 
         for _ in 0..k {
+            let mut multiplicities = Vec::new();
+            let mut total = 0usize;
+            for &req in requests.iter() {
+                total += req.multiplicity;
+                multiplicities.push(total);
+            }
+
+            assert_eq!(total, self.total);
+
+            let sup = multiplicities.len() - 1; // exclusive upper bounds
+
             let m = rng.gen_range(0..=total);
 
             let (mut lo, mut hi) = (0, sup);
@@ -280,8 +280,10 @@ impl RequestSample {
 
             let unary_request = Request {
                 multiplicity: 1,
-                ..self.requests[lo]
+                ..*requests[lo]
             };
+
+            requests.remove(lo);
 
             new_total += unary_request.multiplicity;
 
@@ -360,11 +362,14 @@ impl RequestSample {
     }
 }
 
-
-
-pub fn single(k: usize, epsilon: f64, repetitions: usize, city: &str, graph: &TemporalGraph, requests: &RequestSample) {
-    
-
+pub fn single(
+    k: usize,
+    epsilon: f64,
+    repetitions: usize,
+    city: &str,
+    graph: &TemporalGraph,
+    requests: &RequestSample,
+) {
     let mut temporal_paths = HashMap::new();
     //let exact = requests.estimate( &graph, &mut temporal_paths);
 
@@ -374,7 +379,7 @@ pub fn single(k: usize, epsilon: f64, repetitions: usize, city: &str, graph: &Te
     let elapsed = std::time::Instant::now();
     for _ in 0..repetitions {
         let sampled = requests.sample(k);
-        let estimation = sampled.estimate( &graph, &mut temporal_paths);
+        let estimation = sampled.estimate(&graph, &mut temporal_paths);
 
         at.push(estimation.average_travelling_time_as_f64());
         aw.push(estimation.average_waiting_time_as_f64());
