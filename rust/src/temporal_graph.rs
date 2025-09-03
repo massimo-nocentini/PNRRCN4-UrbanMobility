@@ -250,7 +250,7 @@ impl RequestSample {
         let mut new_total = 0usize;
         let mut sample = Vec::new();
 
-        let mut requests = self.requests.iter().clone().collect::<Vec<_>>();
+        let mut requests = self.requests.iter().collect::<Vec<_>>();
 
         for _ in 0..k {
             let mut multiplicities = Vec::new();
