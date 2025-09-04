@@ -257,7 +257,9 @@ impl RequestSample {
             for req in self.requests.iter() {
                 total += req.nq;
                 nqs.push(total);
-                requests.push(req);
+                requests.push(Request {
+                    ..*req
+                });
             }
         }
 
@@ -276,7 +278,14 @@ impl RequestSample {
                 }
             }
 
-            let chosen = requests[lo];
+            let chosen: &mut Request = &mut requests[lo];
+
+            chosen.nq -= 1;
+
+            let unary_request = Request {
+                nq: 1,
+                ..*chosen
+            };
 
             if with_replacement == false {
     
@@ -284,16 +293,11 @@ impl RequestSample {
                     nqs[i] -= 1;
                 }
 
-                if nqs[lo] == 0 {
+                if chosen.nq == 0 {
                     requests.remove(lo);
                     nqs.remove(lo);
                 }
             }
-
-            let unary_request = Request {
-                nq: 1,
-                ..*chosen
-            };
 
             n += unary_request.nq;
 
