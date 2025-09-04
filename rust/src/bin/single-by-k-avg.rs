@@ -10,12 +10,14 @@ fn main() {
 
     let graph = TemporalGraph::parse(&graph_filename);
     let requests = RequestSample::parse(&requests_filename, &graph);
-
+    let nrequests = requests.requests.len();
     let mut ats = Vec::new();
     let mut avgs = Vec::new();
-    for k in 1..=1_000 {
-        let epsilon = ((requests.requests.len() as f64).ln() / (k as f64)).sqrt();
-        let (at, _aw) = single(k, epsilon, 1, city, &graph, &requests);
+    //for _k in 1..=nrequests {
+    for _k in 1..=1_000_000 {
+        let k = 1;
+        let epsilon = ((nrequests as f64).ln() / (k as f64)).sqrt();
+        let (at, _aw) = single(1, epsilon, 1, city, &graph, &requests);
         ats.push(at);
         avgs.push(ats.iter().sum::<f64>() / (ats.len() as f64));
     }
