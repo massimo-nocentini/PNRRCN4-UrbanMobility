@@ -280,8 +280,6 @@ impl RequestSample {
 
             let chosen: &mut Request = &mut requests[lo];
 
-            chosen.nq -= 1;
-
             let unary_request = Request {
                 nq: 1,
                 ..*chosen
@@ -292,6 +290,8 @@ impl RequestSample {
                 for i in lo..nqs.len() {
                     nqs[i] -= 1;
                 }
+
+                chosen.nq -= 1;
 
                 if chosen.nq == 0 {
                     requests.remove(lo);
