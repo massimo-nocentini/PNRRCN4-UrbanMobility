@@ -56,15 +56,17 @@ single-by-k:
 
 
 single-by-k-nantes-each:
-	echo "" > ../data/transport/nantes-single-by-k-each-1-1.csv
+	touch ../data/transport/nantes-single-by-k-each-1-1.csv
+	truncate -s 0 ../data/transport/nantes-single-by-k-each-1-1.csv
 	SINGLE_BIN=single-by-k-each REPS=1 K=1 make single-nantes
 
-single-by-k-nantes-test:
-	echo "" > ../data/transport/nantes-single-by-k-1-100.csv
-	SINGLE_BIN=single-by-k REPS=23253 K=1 make single-nantes
-	#SINGLE_BIN=single-by-k REPS=1 K=1 make single-nantes
-	#SINGLE_BIN=single-by-k REPS=1 K=1 make single-nantes
-	#SINGLE_BIN=single-by-k REPS=1 K=1 make single-nantes
+single-by-k-nantes-swap:
+	touch ../data/transport/nantes-single-by-k-23530-1.csv
+	truncate -s 0 ../data/transport/nantes-single-by-k-23530-1.csv
+	SINGLE_BIN=single-by-k REPS=23530 K=1 make single-nantes
+	touch ../data/transport/nantes-single-by-k-1-23530.csv
+	truncate -s 0 ../data/transport/nantes-single-by-k-1-23530.csv
+	SINGLE_BIN=single-by-k REPS=1 K=23530 make single-nantes
 
 single-by-k-nantes-avg:
 	touch ../data/transport/nantes-single-by-k-avg-0-0.csv
