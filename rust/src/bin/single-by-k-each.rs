@@ -8,7 +8,7 @@ fn main() {
 
     let graph_filename = &args[1];
     let requests_filename = &args[2];
-    let repetitions = args[3].parse::<usize>().unwrap();
+    let _repetitions = args[3].parse::<usize>().unwrap();
     let k = args[4].parse::<usize>().unwrap();
     let city = &args[5];
 
@@ -16,5 +16,5 @@ fn main() {
     let requests = RequestSample::parse(&requests_filename, &graph);
     let epsilon = ((requests.requests.len() as f64).ln() / (k as f64)).sqrt();
 
-    single_each(epsilon, repetitions, city, &graph, &requests);
+    single_each(epsilon, city, &graph, &requests);
 }

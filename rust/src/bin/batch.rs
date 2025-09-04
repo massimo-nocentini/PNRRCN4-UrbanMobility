@@ -20,14 +20,14 @@ fn main() {
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
-        requests.total,
+        requests.n,
     );
 
     let exact = requests.estimate( &graph, &mut temporal_paths);
 
     println!(
         "True averages: travelling time {:.3}, waiting time {:.3}; computed in {:?}.",
-        exact.average_travelling_time_as_f64(), exact.average_waiting_time_as_f64(), exact.elapsed
+        exact.average_travelling_time_as_f64(requests.n as f64), exact.average_waiting_time_as_f64(requests.n as f64), exact.elapsed
     );
 
     println!("Epsilon & k & repetitions & AT mean & |AT - true| & AT std & AT CV & AW mean & |AW - true| & AW std & AW CV \\\\",);
@@ -60,8 +60,8 @@ fn main() {
                     avg_om.entry(edge).and_modify(|e| *e += om).or_insert(om);
                 }
 
-                at.push(estimation.average_travelling_time_as_f64());
-                aw.push(estimation.average_waiting_time_as_f64());
+                at.push(estimation.average_travelling_time_as_f64(sampled.n as f64));
+                aw.push(estimation.average_waiting_time_as_f64(sampled.n as f64));
             }
 
             let freps = repetitions as f64;
@@ -119,9 +119,9 @@ fn main() {
                 epsilon,
                 k,
                 repetitions,
-                (at_mean - exact.average_travelling_time_as_f64()).abs(),
+                (at_mean - exact.average_travelling_time_as_f64(requests.n as f64)).abs(),
                 at_coeff_var,
-                (aw_mean - exact.average_waiting_time_as_f64()).abs(),
+                (aw_mean - exact.average_waiting_time_as_f64(requests.n as f64)).abs(),
                 aw_coeff_var,
                 avg_crowding_error.abs(),
                 avg_crowding_error_coeff_var,

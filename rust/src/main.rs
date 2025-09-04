@@ -25,15 +25,15 @@ fn main() {
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
-        requests.total,
+        requests.n,
         k,
         repetitions
     );
 
     let exact = requests.estimate(&graph, &mut temporal_paths);
 
-    let at_true = exact.average_travelling_time_as_f64();
-    let aw_true = exact.average_waiting_time_as_f64();
+    let at_true = exact.average_travelling_time_as_f64(requests.n as f64);
+    let aw_true = exact.average_waiting_time_as_f64(requests.n as f64);
 
     let mut at = Vec::new();
     let mut aw = Vec::new();
@@ -45,8 +45,8 @@ fn main() {
         let sampled = requests.sample(k);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
 
-        at.push(estimation.average_travelling_time_as_f64());
-        aw.push(estimation.average_waiting_time_as_f64());
+        at.push(estimation.average_travelling_time_as_f64(sampled.n as f64));
+        aw.push(estimation.average_waiting_time_as_f64(sampled.n as f64));
 
         for (edge, fmul) in estimation.crowding_vector {
             cw.entry(edge)

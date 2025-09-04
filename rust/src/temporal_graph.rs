@@ -2,6 +2,7 @@ use rand::thread_rng;
 use rand::Rng;
 use std::collections::HashMap;
 use std::hash::Hash;
+
 use std::time::Duration;
 use std::time::Instant;
 
@@ -33,12 +34,12 @@ pub struct Request {
     from_id: usize,
     to_id: usize,
     departure_time: usize,
-    multiplicity: usize,
+    nq: usize,
 }
 
 pub struct RequestSample {
     pub requests: Vec<Request>,
-    pub total: usize,
+    pub n: usize,
 }
 
 pub struct Estimation<'a> {
@@ -46,17 +47,16 @@ pub struct Estimation<'a> {
     pub crowding_vector: HashMap<&'a Edge, usize>,
     pub average_travelling_time: usize,
     pub average_waiting_time: usize,
-    pub total: usize,
     pub elapsed: Duration,
 }
 
 impl Estimation<'_> {
-    pub fn average_travelling_time_as_f64(&self) -> f64 {
-        self.average_travelling_time as f64 / self.total as f64
+    pub fn average_travelling_time_as_f64(&self, total: f64) -> f64 {
+        (self.average_travelling_time as f64) / total
     }
 
-    pub fn average_waiting_time_as_f64(&self) -> f64 {
-        self.average_waiting_time as f64 / self.total as f64
+    pub fn average_waiting_time_as_f64(&self, total: f64) -> f64 {
+        (self.average_waiting_time as f64) / total
     }
 }
 
@@ -208,12 +208,12 @@ impl TemporalGraph {
 }
 
 impl Request {
-    fn new(from_id: usize, to_id: usize, departure_time: usize, multiplicity: usize) -> Request {
+    fn new(from_id: usize, to_id: usize, departure_time: usize, nq: usize) -> Request {
         Request {
             from_id,
             to_id,
             departure_time,
-            multiplicity,
+            nq,
         }
     }
 }
@@ -227,7 +227,7 @@ impl RequestSample {
             .unwrap();
 
         let mut requests = Vec::new();
-        let mut total = 0usize;
+        let mut n = 0usize;
 
         for result in rdr.into_deserialize() {
             let record: RequestRecord = result.unwrap();
@@ -235,64 +235,65 @@ impl RequestSample {
             if let Some(&v) = graph.vertices.get(&record.0) {
                 if let Some(&w) = graph.vertices.get(&record.1) {
                     let req = Request::new(v, w, record.2, record.3);
-                    total += req.multiplicity;
+                    n += req.nq;
                     requests.push(req);
                 }
             }
         }
 
-        RequestSample { requests, total }
+        RequestSample { requests, n }
     }
 
     pub fn sample(self: &RequestSample, k: usize) -> RequestSample {
         let mut rng = thread_rng();
 
-        let mut new_total = 0usize;
+        let mut n = 0usize;
         let mut sample = Vec::new();
 
         let mut requests = self.requests.iter().collect::<Vec<_>>();
 
         for _ in 0..k {
-            let mut multiplicities = Vec::new();
+            let mut nqs = Vec::new();
             let mut total = 0usize;
             for &req in requests.iter() {
-                total += req.multiplicity;
-                multiplicities.push(total);
+                total += req.nq;
+                nqs.push(total);
             }
 
-            let sup = multiplicities.len() - 1; // exclusive upper bounds
+            let sup = nqs.len() - 1; // exclusive upper bounds
 
             let m = rng.gen_range(0..=total);
 
             let (mut lo, mut hi) = (0, sup);
 
-            // Binary search: find the first index lo such that multiplicities[lo] >= m.
+            // Binary search: find the first index lo such that nqs[lo] >= m.
             while lo < hi {
                 let mid = (lo + hi) >> 1;
-                if multiplicities[mid] < m {
+                if nqs[mid] < m {
                     lo = mid + 1;
                 } else {
                     hi = mid;
                 }
             }
 
+            
+            let chosen = requests.remove(lo);
+
             let unary_request = Request {
-                multiplicity: 1,
-                ..*requests[lo]
+                nq: 1,
+                ..*chosen
             };
 
-            requests.remove(lo);
-
-            new_total += unary_request.multiplicity;
+            n += unary_request.nq;
 
             sample.push(unary_request);
         }
 
-        assert_eq!(new_total, k);
+        assert_eq!(n, k);
 
         RequestSample {
             requests: sample,
-            total: new_total,
+            n,
         }
     }
 
@@ -305,7 +306,7 @@ impl RequestSample {
         });
 
         RequestSample {
-            total: sample[0].multiplicity,
+            n: sample[0].nq,
             requests: sample,
         }
     }
@@ -324,8 +325,7 @@ impl RequestSample {
         let start_timestamp = Instant::now();
 
         for req in self.requests.iter() {
-            let mul = req.multiplicity;
-
+            
             let path = temporal_paths
                 .entry((req.from_id, req.departure_time))
                 .or_insert_with(|| {
@@ -355,22 +355,22 @@ impl RequestSample {
             for e in 0..path.len() - 1 {
                 let edge = path[e];
 
-                *crowding_vector.entry(edge).or_insert(0) += mul;
+                *crowding_vector.entry(edge).or_insert(0) += req.nq;
 
                 let mut at_each = edge.duration - 1;
 
                 if let Some(&next_edge) = path.get(e + 1) {
                     if edge.trip_id != next_edge.trip_id {
                         for t in edge.arrival_time..=next_edge.departure_time {
-                            *occupancy.entry((edge.to_id, t)).or_insert(0) += mul;
-                            aw += mul;
+                            *occupancy.entry((edge.to_id, t)).or_insert(0) += req.nq;
+                            aw += req.nq;
                         }
                     } else {
                         at_each += next_edge.departure_time - edge.arrival_time + 1;
                     }
                 }
 
-                at += mul * at_each;
+                at += req.nq * at_each;
             }
         }
 
@@ -379,7 +379,6 @@ impl RequestSample {
             crowding_vector,
             average_travelling_time: at,
             average_waiting_time: aw,
-            total: self.total,
             elapsed: start_timestamp.elapsed(),
         }
     }
@@ -403,9 +402,9 @@ pub fn single(
     for _ in 0..repetitions {
         let sampled = requests.sample(k);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
-        let norm = (estimation.total as f64) / sampled.total as f64;
-        at.push(estimation.average_travelling_time_as_f64() * norm);
-        aw.push(estimation.average_waiting_time_as_f64() * norm);
+        
+        at.push(estimation.average_travelling_time_as_f64(sampled.n as f64));
+        aw.push(estimation.average_waiting_time_as_f64(sampled.n as f64));
     }
 
     let freps = repetitions as f64;
@@ -425,7 +424,7 @@ pub fn single(
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
-        requests.total,
+        requests.n,
         epsilon,
         k,
         0,//exact.average_travelling_time_as_f64(), 
@@ -447,7 +446,6 @@ pub fn single(
 
 pub fn single_each(
     epsilon: f64,
-    repetitions: usize,
     city: &str,
     graph: &TemporalGraph,
     requests: &RequestSample,
@@ -459,17 +457,18 @@ pub fn single_each(
     let mut aw = Vec::new();
     let k = requests.requests.len();
     let elapsed = std::time::Instant::now();
+
     let mut check = 0usize;
     for i in 0..k {
         let sampled = requests.sample_each(i);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
-        let norm = (estimation.total as f64) / requests.total as f64;
+        let norm = (sampled.n as f64) / (requests.n as f64);
         check += estimation.average_travelling_time;
-        at.push(estimation.average_travelling_time_as_f64() * norm);
-        aw.push(estimation.average_waiting_time_as_f64() * norm);
+        at.push(estimation.average_travelling_time_as_f64(sampled.n as f64) * norm);
+        aw.push(estimation.average_waiting_time_as_f64(sampled.n as f64) * norm);
     }
 
-    println!("check: {}, exact: {}", (check as f64) / (requests.total as f64), exact.average_travelling_time);
+    println!("check: {}, exact: {}", (check as f64) / (requests.n as f64), exact.average_travelling_time);
     let freps = k as f64;
 
     let at_mean = at.iter().sum::<f64>() / freps;
@@ -487,17 +486,17 @@ pub fn single_each(
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
-        requests.total,
+        requests.n,
         epsilon,
         k,
-        exact.average_travelling_time_as_f64(), 
+        exact.average_travelling_time_as_f64(requests.n as f64), 
         at_mean,
-        (at_mean - exact.average_travelling_time_as_f64()).abs(),
+        (at_mean - exact.average_travelling_time_as_f64(requests.n as f64 )).abs(),
         at_var.sqrt(),
         at_coeff_var,
-        exact.average_waiting_time_as_f64(),
+        exact.average_waiting_time_as_f64(requests.n as f64),
         aw_mean,
-        (aw_mean - exact.average_waiting_time_as_f64()).abs(),
+        (aw_mean - exact.average_waiting_time_as_f64(requests.n as f64)).abs(),
         aw_var.sqrt(),
         aw_coeff_var,
         exact.elapsed,
