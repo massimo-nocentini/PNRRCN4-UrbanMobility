@@ -244,29 +244,29 @@ impl RequestSample {
         RequestSample { requests, n }
     }
 
-    pub fn sample(self: &RequestSample, k: usize) -> RequestSample {
+    pub fn sample(self: &RequestSample, k: usize, with_replacement: bool) -> RequestSample {
         let mut rng = thread_rng();
 
         let mut n = 0usize;
         let mut sample = Vec::new();
 
-        let mut requests = self.requests.iter().collect::<Vec<_>>();
-
-        for _ in 0..k {
-            let mut nqs = Vec::new();
+        let mut requests = Vec::new();
+        let mut nqs = Vec::new();
+        {
             let mut total = 0usize;
-            for &req in requests.iter() {
+            for req in self.requests.iter() {
                 total += req.nq;
                 nqs.push(total);
+                requests.push(req);
             }
+        }
 
-            let sup = nqs.len() - 1; // exclusive upper bounds
+        for _ in 0..k {
+            
+            let (mut lo, mut hi) = (0, nqs.len() - 1);
 
-            let m = rng.gen_range(0..=total);
+            let m = rng.gen_range(0..=nqs[hi]);
 
-            let (mut lo, mut hi) = (0, sup);
-
-            // Binary search: find the first index lo such that nqs[lo] >= m.
             while lo < hi {
                 let mid = (lo + hi) >> 1;
                 if nqs[mid] < m {
@@ -276,8 +276,17 @@ impl RequestSample {
                 }
             }
 
-            
-            let chosen = requests.remove(lo);
+            let chosen = requests[lo];
+
+            if with_replacement == false {
+    
+                for i in lo..nqs.len() {
+                    nqs[i] -= chosen.nq;
+                }
+
+                requests.remove(lo);
+                nqs.remove(lo);
+            }
 
             let unary_request = Request {
                 nq: 1,
@@ -400,7 +409,7 @@ pub fn single(
 
     let elapsed = std::time::Instant::now();
     for _ in 0..repetitions {
-        let sampled = requests.sample(k);
+        let sampled = requests.sample(k, false);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
         
         at.push(estimation.average_travelling_time_as_f64(sampled.n as f64));

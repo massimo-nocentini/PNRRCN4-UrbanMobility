@@ -46,7 +46,7 @@ fn main() {
             let mut avg_om = HashMap::new();
 
             for _ in 0..repetitions {
-                let sampled = requests.sample(k);
+                let sampled = requests.sample(k, false);
                 let estimation = sampled.estimate( &graph, &mut temporal_paths);
 
                 for (&edge, &crowding) in estimation.crowding_vector.iter() {

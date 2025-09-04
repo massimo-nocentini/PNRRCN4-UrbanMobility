@@ -42,7 +42,7 @@ fn main() {
     let mut om = HashMap::new();
 
     for _ in 0..repetitions {
-        let sampled = requests.sample(k);
+        let sampled = requests.sample(k, false);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
 
         at.push(estimation.average_travelling_time_as_f64(sampled.n as f64));
