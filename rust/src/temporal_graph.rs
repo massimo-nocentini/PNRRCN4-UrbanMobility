@@ -400,7 +400,7 @@ pub fn single(
     city: &str,
     graph: &TemporalGraph,
     requests: &RequestSample,
-) {
+) -> (f64, f64) {
     let mut temporal_paths = HashMap::new();
     //let exact = requests.estimate( &graph, &mut temporal_paths);
 
@@ -451,6 +451,8 @@ pub fn single(
         elapsed.elapsed().as_secs_f64() * 1000.0,
         0//exact.elapsed.as_secs_f64() / elapsed.elapsed().as_secs_f64(),
     );
+
+    (at_mean, aw_mean)
 }
 
 pub fn single_each(
