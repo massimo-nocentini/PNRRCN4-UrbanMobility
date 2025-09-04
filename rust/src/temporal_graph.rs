@@ -281,11 +281,13 @@ impl RequestSample {
             if with_replacement == false {
     
                 for i in lo..nqs.len() {
-                    nqs[i] -= chosen.nq;
+                    nqs[i] -= 1;
                 }
 
-                requests.remove(lo);
-                nqs.remove(lo);
+                if nqs[lo] == 0 {
+                    requests.remove(lo);
+                    nqs.remove(lo);
+                }
             }
 
             let unary_request = Request {
