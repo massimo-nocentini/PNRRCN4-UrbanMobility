@@ -477,7 +477,7 @@ pub fn single_each(
         aw.push(estimation.average_waiting_time_as_f64(sampled.n as f64) * norm);
     }
 
-    println!("check {} wrt exact {}", ((check as f64) / (requests.n as f64)), exact.average_waiting_time_as_f64(requests.n as f64));
+    println!("check {} wrt exact {}", ((check as f64) / (requests.n as f64)), exact.average_travelling_time_as_f64(requests.n as f64));
     let freps = k as f64;
 
     let at_mean = at.iter().sum::<f64>() / freps;
