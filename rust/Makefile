@@ -73,6 +73,9 @@ single-by-k-nantes-avg:
 	truncate -s 0 ../data/transport/nantes-single-by-k-avg-0-0.csv
 	SINGLE_BIN=single-by-k-avg REPS=0 K=0 make single-nantes
 
+single-by-k-avg:
+	SINGLE_BIN=single-by-k-avg REPS=0 K=0 make single-generic
+
 single-by-k-nantes:
 	echo "" > ../data/transport/nantes-single-by-k-1-1.csv
 	SINGLE_BIN=single-by-k REPS=1 K=1 make single-nantes
