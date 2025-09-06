@@ -22,5 +22,5 @@ fn main() {
         avgs.push(ats.iter().sum::<f64>() / (ats.len() as f64));
     }
 
-    avgs.iter().for_each(|x| println!("{}", x));
+    println!("{}: {:?}", city, avgs);
 }
