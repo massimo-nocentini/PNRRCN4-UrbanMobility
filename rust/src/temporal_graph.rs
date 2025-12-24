@@ -1,4 +1,6 @@
-use rand::thread_rng;
+
+use rand::SeedableRng;
+use rand::rngs;
 use rand::Rng;
 use std::collections::HashMap;
 use std::hash::Hash;
@@ -62,62 +64,44 @@ impl Estimation<'_> {
 
 pub struct TemporalGraph {
     pub vertices: HashMap<String, usize>,
-    pub vertices_rev: HashMap<usize, String>,
+    pub vertices_rev: Vec<String>,
     pub edges: Vec<Edge>,
     max_time: usize,
+    min_time: usize,
 }
 
 impl TemporalGraph {
     pub fn parse(filename: &str) -> TemporalGraph {
         let mut vertices = HashMap::new();
-        let mut vertices_rev = HashMap::new();
         let mut edges = Vec::new();
 
         let mut trips = HashMap::new();
-        let mut vertices_count = 0usize;
-        let mut trips_count = 0usize;
         let mut max_time = 0usize;
+        let mut min_time = usize::MAX;
 
         let rdr = csv::ReaderBuilder::new()
             .has_headers(true)
             .delimiter(b';')
             .from_path(filename)
-            .unwrap();
+            .expect("Failed to open graph file");
 
         for result in rdr.into_deserialize() {
-            let record: EdgeRecord = result.unwrap();
+            let record: EdgeRecord = result.expect("Failed to deserialize edge record");
 
             let k_from = record.0;
             let from_id = match vertices.get(&k_from) {
-                None => {
-                    let v = vertices_count;
-                    vertices_rev.insert(v, k_from.clone());
-                    vertices.insert(k_from, v);
-                    vertices_count += 1;
-                    v
-                }
+                None => vertices.insert(k_from, vertices.len()).expect("Insertion failed of from vertex"),
                 Some(&i) => i,
             };
 
             let k_to = record.1;
             let to_id = match vertices.get(&k_to) {
-                None => {
-                    let v = vertices_count;
-                    vertices_rev.insert(v, k_to.clone());
-                    vertices.insert(k_to, v);
-                    vertices_count += 1;
-                    v
-                }
+                None => vertices.insert(k_to, vertices.len()).expect("Insertion failed of to vertex"),
                 Some(&i) => i,
             };
 
             let trip_id = match trips.get(&record.5) {
-                None => {
-                    let v = trips_count;
-                    trips.insert(record.5, v);
-                    trips_count += 1;
-                    v
-                }
+                None => trips.insert(record.5, trips.len()).expect("Insertion failed of trip id"),
                 Some(&i) => i,
             };
 
@@ -134,19 +118,24 @@ impl TemporalGraph {
             };
 
             max_time = max_time.max(edge.arrival_time);
+            min_time = min_time.min(edge.departure_time);
+
             edges.push(edge);
         }
 
         edges.sort_by(|a, b| a.departure_time.cmp(&b.departure_time));
 
-        assert_eq!(vertices.len(), vertices_count);
-        assert_eq!(trips.len(), trips_count);
+        let mut vertices_rev = Vec::with_capacity(vertices.len());
+        for (v, &i) in vertices.iter() {
+            vertices_rev[i] = v.clone();
+        }
 
         TemporalGraph {
             vertices,
             vertices_rev,
             edges,
             max_time,
+            min_time,
         }
     }
 
@@ -179,7 +168,15 @@ impl TemporalGraph {
         paths
     }
 
-    fn reify_path<'a>(to: usize, paths: &Vec<Option<&'a Edge>>) -> Vec<&'a Edge> {
+    fn earliest_arrival_path(
+        self: & TemporalGraph,
+        from: usize,
+        to: usize,
+        start_t: usize,
+        stop_t: usize,
+    ) -> Vec<& Edge> {
+        let paths = self.earliest_arrival_paths(from, start_t, stop_t);
+
         let mut path = Vec::new();
         let mut w = to;
 
@@ -193,29 +190,6 @@ impl TemporalGraph {
 
         path
     }
-
-    fn earliest_arrival_path<'a>(
-        self: &'a TemporalGraph,
-        from: usize,
-        to: usize,
-        start_t: usize,
-        stop_t: usize,
-    ) -> Vec<&'a Edge> {
-        let paths = self.earliest_arrival_paths(from, start_t, stop_t);
-        let path = Self::reify_path(to, &paths);
-        path
-    }
-}
-
-impl Request {
-    fn new(from_id: usize, to_id: usize, departure_time: usize, nq: usize) -> Request {
-        Request {
-            from_id,
-            to_id,
-            departure_time,
-            nq,
-        }
-    }
 }
 
 impl RequestSample {
@@ -224,20 +198,29 @@ impl RequestSample {
             .has_headers(true)
             .delimiter(b';')
             .from_path(filename)
-            .unwrap();
+            .expect("Failed to open requests file");
 
         let mut requests = Vec::new();
         let mut n = 0usize;
 
         for result in rdr.into_deserialize() {
-            let record: RequestRecord = result.unwrap();
+            let record: RequestRecord = result.expect("Failed to deserialize request record");
 
             if let Some(&v) = graph.vertices.get(&record.0) {
                 if let Some(&w) = graph.vertices.get(&record.1) {
-                    let req = Request::new(v, w, record.2, record.3);
+                    let req = Request {
+                        from_id: v,
+                        to_id: w,
+                        departure_time: record.2,
+                        nq: record.3,
+                    };
                     n += req.nq;
                     requests.push(req);
+                } else {
+                    eprintln!("Warning: to_stop {} not found in graph.", record.1);
                 }
+            } else {
+                eprintln!("Warning: from_stop {} not found in graph.", record.0);
             }
         }
 
@@ -245,32 +228,30 @@ impl RequestSample {
     }
 
     pub fn sample(self: &RequestSample, k: usize, with_replacement: bool) -> RequestSample {
-        let mut rng = thread_rng();
+        
+        let mut rng = rngs::StdRng::seed_from_u64(42);
+        
+        let mut sample = Vec::with_capacity(k);
 
-        let mut n = 0usize;
-        let mut sample = Vec::new();
-
-        let mut requests = Vec::new();
-        let mut nqs = Vec::new();
-        {
-            let mut total = 0usize;
-            for req in self.requests.iter() {
-                total += req.nq;
-                nqs.push(total);
-                requests.push(Request {
-                    ..*req
-                });
-            }
+        let mut nqs = Vec::with_capacity(self.requests.len());
+        
+        let mut total = 0usize;
+        for req in self.requests.iter() {
+            total += req.nq;
+            nqs.push(total);
         }
 
+        let n = nqs.len() - 1;
+    
         for _ in 0..k {
             
-            let (mut lo, mut hi) = (0, nqs.len() - 1);
+            let (mut lo, mut hi) = (0, n);
 
-            let m = rng.gen_range(0..=nqs[hi]);
+            let m = rng.gen_range(nqs[lo]..=nqs[hi]);
 
             while lo < hi {
                 let mid = (lo + hi) >> 1;
+
                 if nqs[mid] < m {
                     lo = mid + 1;
                 } else {
@@ -278,11 +259,9 @@ impl RequestSample {
                 }
             }
 
-            let chosen: &mut Request = &mut requests[lo];
-
             let unary_request = Request {
                 nq: 1,
-                ..*chosen
+                ..self.requests[lo]
             };
 
             if with_replacement == false {
@@ -290,25 +269,15 @@ impl RequestSample {
                 for i in lo..nqs.len() {
                     nqs[i] -= 1;
                 }
-
-                chosen.nq -= 1;
-
-                if chosen.nq == 0 {
-                    requests.remove(lo);
-                    nqs.remove(lo);
-                }
+                
             }
-
-            n += unary_request.nq;
 
             sample.push(unary_request);
         }
 
-        assert_eq!(n, k);
-
         RequestSample {
             requests: sample,
-            n,
+            n: k,
         }
     }
 

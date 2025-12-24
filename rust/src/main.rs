@@ -88,8 +88,8 @@ fn main() {
 
     let mut cw_named = Vec::new();
     for (edge, fmul) in cw.iter() {
-        let from_name = graph.vertices_rev.get(&edge.from_id).unwrap();
-        let to_name = graph.vertices_rev.get(&edge.to_id).unwrap();
+        let from_name = &graph.vertices_rev[edge.from_id];
+        let to_name = &graph.vertices_rev[edge.to_id];
         cw_named.push((from_name, to_name, edge.departure_time, fmul, edge));
     }
 
@@ -109,27 +109,27 @@ fn main() {
 
     let mut om_named = HashMap::new();
 
-    for ((v, t), fmul) in om.iter() {
-        let v_name = graph.vertices_rev.get(v).unwrap();
+    for (&(v, t), &fmul) in om.iter() {
+        let v_name = &graph.vertices_rev[v];
 
-        let exact = match exact.occupancy_matrix.get(&(*v, *t)) {
+        let exact = match exact.occupancy_matrix.get(&(v, t)) {
             None => 0,
             Some(e) => *e,
         };
 
-        match om_named.get_mut(t) {
+        match om_named.get_mut(&t) {
             None => {
                 let mut m = HashMap::new();
-                m.insert(v_name, (*fmul, exact));
+                m.insert(v_name, (fmul, exact));
                 om_named.insert(t, m);
             }
             Some(m) => {
                 m.entry(v_name)
                     .and_modify(|e| {
-                        e.0 += *fmul;
+                        e.0 += fmul;
                         e.1 += exact
                     })
-                    .or_insert((*fmul, exact));
+                    .or_insert((fmul, exact));
             }
         }
     }
