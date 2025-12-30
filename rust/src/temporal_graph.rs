@@ -63,11 +63,11 @@ pub struct Estimation<'a> {
 
 impl Estimation<'_> {
     pub fn average_travelling_time_as_f64(&self) -> f64 {
-        (self.average_travelling_time as f64) / (self.total_people as f64)
+        (self.average_travelling_time as f64) / (self.total_people.max(1) as f64)
     }
 
     pub fn average_waiting_time_as_f64(&self) -> f64 {
-        (self.average_waiting_time as f64) / (self.total_people as f64)
+        (self.average_waiting_time as f64) / (self.total_people.max(1) as f64)
     }
 }
 

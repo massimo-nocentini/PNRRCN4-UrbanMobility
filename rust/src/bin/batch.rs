@@ -6,8 +6,6 @@ use std::{collections::HashMap};
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    
-
     let graph_filename = &args[1];
     let requests_filename = &args[2];    
 
@@ -37,16 +35,17 @@ fn main() {
         
         let epsilon = ((requests.requests.len() as f64).ln() / (k as f64 )).sqrt();
 
-        let mut rng = rngs::StdRng::seed_from_u64(561);
-
         for repetitions in [1, 5, 10, 50, 100] {
+
+            let mut rng = rngs::StdRng::seed_from_u64(561);
+            
             let mut at = Vec::new();
             let mut aw = Vec::new();
 
-            let elapsed = std::time::Instant::now();
-
             let mut avg_crowding = HashMap::new();
             let mut avg_om = HashMap::new();
+
+            let elapsed = std::time::Instant::now();
 
             for _ in 0..repetitions {
                 let sampled = requests.sample(k, false, &mut rng);
@@ -118,7 +117,7 @@ fn main() {
             let avg_om_error_coeff_var = var_om_error.sqrt() / avg_om_error;
 
             println!(
-                "{:.3} & {} & {} & {:.6} & {:.6} & {:.6} & {:.6} & {:.6} & {:.6} & {:.6} & {:.6} & {:?} \\\\",
+                "{:.3} & {} & {} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:.3} & {:?} \\\\",
                 epsilon,
                 k,
                 repetitions,

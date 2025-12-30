@@ -180,8 +180,8 @@ fn main() {
             println!(
                 "\t\t{}: {:.3} people (exact {:.3}).",
                 v,
-                fmul.0, // as f64 / (repetitions as f64),
-                fmul.1  // as f64 / (requests.total as f64)
+                fmul.0 as f64 / (repetitions as f64),
+                fmul.1 / repetitions
             );
         }
     }
