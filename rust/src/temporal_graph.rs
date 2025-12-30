@@ -9,6 +9,7 @@ use std::time::Duration;
 use std::time::Instant;
 
 use std::usize;
+use std::vec;
 
 // from_stop_I;to_stop_I;dep_time_ut;arr_time_ut;route_type;trip_I;seq;route_I
 type EdgeRecord = (String, String, usize, usize, usize, String, usize, usize);
@@ -24,11 +25,17 @@ pub struct Edge {
     pub to_id: usize,
     pub departure_time: usize,
     arrival_time: usize,
-    duration: usize,
     route_type: usize,
     trip_id: usize,
     seq: usize,
     route_id: usize,
+}
+
+impl Edge {
+    pub fn duration(&self) -> usize
+    {
+        self.arrival_time.strict_sub(self.departure_time)
+    }
 }
 
 #[derive(Debug)]
@@ -36,12 +43,12 @@ pub struct Request {
     from_id: usize,
     to_id: usize,
     departure_time: usize,
-    nq: usize,
+    people: usize,
 }
 
 pub struct RequestSample {
     pub requests: Vec<Request>,
-    pub n: usize,
+    pub tot_people: usize,
 }
 
 pub struct Estimation<'a> {
@@ -50,15 +57,17 @@ pub struct Estimation<'a> {
     pub average_travelling_time: usize,
     pub average_waiting_time: usize,
     pub elapsed: Duration,
+    pub empty_paths: usize,
+    pub total_people: usize,
 }
 
 impl Estimation<'_> {
-    pub fn average_travelling_time_as_f64(&self, total: f64) -> f64 {
-        (self.average_travelling_time as f64) / total
+    pub fn average_travelling_time_as_f64(&self) -> f64 {
+        (self.average_travelling_time as f64) / (self.total_people as f64)
     }
 
-    pub fn average_waiting_time_as_f64(&self, total: f64) -> f64 {
-        (self.average_waiting_time as f64) / total
+    pub fn average_waiting_time_as_f64(&self) -> f64 {
+        (self.average_waiting_time as f64) / (self.total_people as f64)
     }
 }
 
@@ -73,9 +82,13 @@ pub struct TemporalGraph {
 impl TemporalGraph {
     pub fn parse(filename: &str) -> TemporalGraph {
         let mut vertices = HashMap::new();
+        let mut vertices_len = vertices.len();
+
         let mut edges = Vec::new();
 
         let mut trips = HashMap::new();
+        let mut trips_len = trips.len();
+
         let mut max_time = 0usize;
         let mut min_time = usize::MAX;
 
@@ -88,22 +101,14 @@ impl TemporalGraph {
         for result in rdr.into_deserialize() {
             let record: EdgeRecord = result.expect("Failed to deserialize edge record");
 
-            let k_from = record.0;
-            let from_id = match vertices.get(&k_from) {
-                None => vertices.insert(k_from, vertices.len()).expect("Insertion failed of from vertex"),
-                Some(&i) => i,
-            };
+            let from_id = *vertices.entry(record.0).or_insert(vertices_len);
+            vertices_len = vertices.len();
+            
+            let to_id = *vertices.entry(record.1).or_insert(vertices_len);
+            vertices_len = vertices.len();
 
-            let k_to = record.1;
-            let to_id = match vertices.get(&k_to) {
-                None => vertices.insert(k_to, vertices.len()).expect("Insertion failed of to vertex"),
-                Some(&i) => i,
-            };
-
-            let trip_id = match trips.get(&record.5) {
-                None => trips.insert(record.5, trips.len()).expect("Insertion failed of trip id"),
-                Some(&i) => i,
-            };
+            let trip_id = *trips.entry(record.5).or_insert(trips_len);
+            trips_len = trips.len();
 
             let edge = Edge {
                 from_id,
@@ -114,7 +119,6 @@ impl TemporalGraph {
                 trip_id,
                 seq: record.6,
                 route_id: record.7,
-                duration: record.3 - record.2,
             };
 
             max_time = max_time.max(edge.arrival_time);
@@ -125,7 +129,7 @@ impl TemporalGraph {
 
         edges.sort_by(|a, b| a.departure_time.cmp(&b.departure_time));
 
-        let mut vertices_rev = Vec::with_capacity(vertices.len());
+        let mut vertices_rev = vec![String::new(); vertices_len];
         for (v, &i) in vertices.iter() {
             vertices_rev[i] = v.clone();
         }
@@ -193,6 +197,7 @@ impl TemporalGraph {
 }
 
 impl RequestSample {
+
     pub fn parse(filename: &str, graph: &TemporalGraph) -> RequestSample {
         let rdr = csv::ReaderBuilder::new()
             .has_headers(true)
@@ -201,7 +206,7 @@ impl RequestSample {
             .expect("Failed to open requests file");
 
         let mut requests = Vec::new();
-        let mut n = 0usize;
+        let mut tot_people = 0usize;
 
         for result in rdr.into_deserialize() {
             let record: RequestRecord = result.expect("Failed to deserialize request record");
@@ -212,9 +217,9 @@ impl RequestSample {
                         from_id: v,
                         to_id: w,
                         departure_time: record.2,
-                        nq: record.3,
+                        people: record.3,
                     };
-                    n += req.nq;
+                    tot_people += req.people;
                     requests.push(req);
                 } else {
                     eprintln!("Warning: to_stop {} not found in graph.", record.1);
@@ -224,20 +229,18 @@ impl RequestSample {
             }
         }
 
-        RequestSample { requests, n }
+        RequestSample { requests, tot_people }
     }
 
-    pub fn sample(self: &RequestSample, k: usize, with_replacement: bool) -> RequestSample {
-        
-        let mut rng = rngs::StdRng::seed_from_u64(42);
-        
+    pub fn sample(self: &RequestSample, k: usize, with_replacement: bool, rng: &mut impl Rng) -> RequestSample 
+    {
         let mut sample = Vec::with_capacity(k);
 
         let mut nqs = Vec::with_capacity(self.requests.len());
         
         let mut total = 0usize;
         for req in self.requests.iter() {
-            total += req.nq;
+            total += req.people;
             nqs.push(total);
         }
 
@@ -260,7 +263,7 @@ impl RequestSample {
             }
 
             let unary_request = Request {
-                nq: 1,
+                people: 1,
                 ..self.requests[lo]
             };
 
@@ -277,7 +280,7 @@ impl RequestSample {
 
         RequestSample {
             requests: sample,
-            n: k,
+            tot_people: k,
         }
     }
 
@@ -290,7 +293,7 @@ impl RequestSample {
         });
 
         RequestSample {
-            n: sample[0].nq,
+            tot_people: sample[0].people,
             requests: sample,
         }
     }
@@ -305,6 +308,9 @@ impl RequestSample {
 
         let mut at = 0;
         let mut aw = 0;
+
+        let mut empty_paths = 0usize;
+        let mut effective_people = 0usize;
 
         let start_timestamp = Instant::now();
 
@@ -322,8 +328,17 @@ impl RequestSample {
                 });
 
             if path.is_empty() {
+                empty_paths += 1;
+                // eprintln!(
+                //     "Warning: no path found from {} to {} at time {}.",
+                //     graph.vertices_rev[req.from_id],
+                //     graph.vertices_rev[req.to_id],
+                //     req.departure_time
+                // );
                 continue;
             }
+
+            effective_people += req.people;
 
             // if path.len() == 1 {
             //     let edge = path[0];
@@ -339,31 +354,40 @@ impl RequestSample {
             for e in 0..path.len() - 1 {
                 let edge = path[e];
 
-                *crowding_vector.entry(edge).or_insert(0) += req.nq;
+                *crowding_vector.entry(edge).or_insert(0) += req.people;
 
-                let mut at_each = edge.duration - 1;
+                let mut at_each = edge.duration() - 1;
 
                 if let Some(&next_edge) = path.get(e + 1) {
                     if edge.trip_id != next_edge.trip_id {
                         for t in edge.arrival_time..=next_edge.departure_time {
-                            *occupancy.entry((edge.to_id, t)).or_insert(0) += req.nq;
-                            aw += req.nq;
+                            *occupancy.entry((edge.to_id, t)).or_insert(0) += req.people;
+                            aw += req.people;
                         }
                     } else {
                         at_each += next_edge.departure_time - edge.arrival_time + 1;
                     }
                 }
 
-                at += req.nq * at_each;
+                at += req.people * at_each;
             }
         }
 
+        eprintln!(
+            "Estimated {} empty paths out of {} requests (ratio {:.3}%).",
+            empty_paths,
+            self.requests.len(),
+            (empty_paths as f64) / (self.requests.len() as f64) * 100.0
+        );
+        
         Estimation {
             occupancy_matrix: occupancy,
             crowding_vector,
             average_travelling_time: at,
             average_waiting_time: aw,
             elapsed: start_timestamp.elapsed(),
+            empty_paths,
+            total_people: effective_people,
         }
     }
 }
@@ -377,18 +401,19 @@ pub fn single(
     requests: &RequestSample,
 ) -> (f64, f64) {
     let mut temporal_paths = HashMap::new();
-    //let exact = requests.estimate( &graph, &mut temporal_paths);
-
+    
     let mut at = Vec::new();
     let mut aw = Vec::new();
 
+    let mut rng = rngs::StdRng::seed_from_u64(561);
+
     let elapsed = std::time::Instant::now();
     for _ in 0..repetitions {
-        let sampled = requests.sample(k, false);
+        let sampled = requests.sample(k, false, &mut rng);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
         
-        at.push(estimation.average_travelling_time_as_f64(sampled.n as f64));
-        aw.push(estimation.average_waiting_time_as_f64(sampled.n as f64));
+        at.push(estimation.average_travelling_time_as_f64());
+        aw.push(estimation.average_waiting_time_as_f64());
     }
 
     let freps = repetitions as f64;
@@ -408,7 +433,7 @@ pub fn single(
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
-        requests.n,
+        requests.tot_people,
         epsilon,
         k,
         0,//exact.average_travelling_time_as_f64(), 
@@ -448,13 +473,13 @@ pub fn single_each(
     for i in 0..k {
         let sampled = requests.sample_each(i);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
-        let norm = (sampled.n as f64) / (requests.n as f64);
+        let norm = (sampled.tot_people as f64) / (requests.tot_people as f64);
         check += estimation.average_travelling_time;
-        at.push(estimation.average_travelling_time_as_f64(sampled.n as f64) * norm);
-        aw.push(estimation.average_waiting_time_as_f64(sampled.n as f64) * norm);
+        at.push(estimation.average_travelling_time_as_f64() * norm);
+        aw.push(estimation.average_waiting_time_as_f64() * norm);
     }
 
-    println!("check {} wrt exact {}", ((check as f64) / (requests.n as f64)), exact.average_travelling_time_as_f64(requests.n as f64));
+    println!("check {} wrt exact {}", ((check as f64) / (requests.tot_people as f64)), exact.average_travelling_time_as_f64());
     let freps = k as f64;
 
     let at_mean = at.iter().sum::<f64>() / freps;
@@ -472,17 +497,17 @@ pub fn single_each(
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
-        requests.n,
+        requests.tot_people,
         epsilon,
         k,
-        exact.average_travelling_time_as_f64(requests.n as f64), 
+        exact.average_travelling_time_as_f64(), 
         at_mean,
-        (at_mean - exact.average_travelling_time_as_f64(requests.n as f64 )).abs(),
+        (at_mean - exact.average_travelling_time_as_f64()).abs(),
         at_var.sqrt(),
         at_coeff_var,
-        exact.average_waiting_time_as_f64(requests.n as f64),
+        exact.average_waiting_time_as_f64(),
         aw_mean,
-        (aw_mean - exact.average_waiting_time_as_f64(requests.n as f64)).abs(),
+        (aw_mean - exact.average_waiting_time_as_f64()).abs(),
         aw_var.sqrt(),
         aw_coeff_var,
         exact.elapsed,

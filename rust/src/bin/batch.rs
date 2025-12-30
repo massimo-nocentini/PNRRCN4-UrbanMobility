@@ -1,3 +1,4 @@
+use rand::{SeedableRng, rngs};
 use rust::temporal_graph::{RequestSample, TemporalGraph};
 use std::env;
 use std::{collections::HashMap};
@@ -20,14 +21,14 @@ fn main() {
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
-        requests.n,
+        requests.tot_people,
     );
 
     let exact = requests.estimate( &graph, &mut temporal_paths);
 
     println!(
         "True averages: travelling time {:.3}, waiting time {:.3}; computed in {:?}.",
-        exact.average_travelling_time_as_f64(requests.n as f64), exact.average_waiting_time_as_f64(requests.n as f64), exact.elapsed
+        exact.average_travelling_time_as_f64(), exact.average_waiting_time_as_f64(), exact.elapsed
     );
 
     println!("Epsilon & k & repetitions & AT mean & |AT - true| & AT std & AT CV & AW mean & |AW - true| & AW std & AW CV \\\\",);
@@ -35,6 +36,8 @@ fn main() {
     for k in [1, 5, 10, 50, 100, 500, 1000, 5000] {
         
         let epsilon = ((requests.requests.len() as f64).ln() / (k as f64 )).sqrt();
+
+        let mut rng = rngs::StdRng::seed_from_u64(561);
 
         for repetitions in [1, 5, 10, 50, 100] {
             let mut at = Vec::new();
@@ -46,7 +49,7 @@ fn main() {
             let mut avg_om = HashMap::new();
 
             for _ in 0..repetitions {
-                let sampled = requests.sample(k, false);
+                let sampled = requests.sample(k, false, &mut rng);
                 let estimation = sampled.estimate( &graph, &mut temporal_paths);
 
                 for (&edge, &crowding) in estimation.crowding_vector.iter() {
@@ -60,8 +63,8 @@ fn main() {
                     avg_om.entry(edge).and_modify(|e| *e += om).or_insert(om);
                 }
 
-                at.push(estimation.average_travelling_time_as_f64(sampled.n as f64));
-                aw.push(estimation.average_waiting_time_as_f64(sampled.n as f64));
+                at.push(estimation.average_travelling_time_as_f64());
+                aw.push(estimation.average_waiting_time_as_f64());
             }
 
             let freps = repetitions as f64;
@@ -119,9 +122,9 @@ fn main() {
                 epsilon,
                 k,
                 repetitions,
-                (at_mean - exact.average_travelling_time_as_f64(requests.n as f64)).abs(),
+                (at_mean - exact.average_travelling_time_as_f64()).abs(),
                 at_coeff_var,
-                (aw_mean - exact.average_waiting_time_as_f64(requests.n as f64)).abs(),
+                (aw_mean - exact.average_waiting_time_as_f64()).abs(),
                 aw_coeff_var,
                 avg_crowding_error.abs(),
                 avg_crowding_error_coeff_var,

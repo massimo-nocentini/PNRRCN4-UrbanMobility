@@ -1,3 +1,4 @@
+use rand::{rngs, SeedableRng};
 use rust::temporal_graph::{RequestSample, TemporalGraph};
 use std::env;
 use std::time::Duration;
@@ -25,15 +26,15 @@ fn main() {
         graph.vertices.len(),
         graph.edges.len(),
         requests.requests.len(),
-        requests.n,
+        requests.tot_people,
         k,
         repetitions
     );
 
     let exact = requests.estimate(&graph, &mut temporal_paths);
 
-    let at_true = exact.average_travelling_time_as_f64(requests.n as f64);
-    let aw_true = exact.average_waiting_time_as_f64(requests.n as f64);
+    let at_true = exact.average_travelling_time_as_f64();
+    let aw_true = exact.average_waiting_time_as_f64();
 
     let mut at = Vec::new();
     let mut aw = Vec::new();
@@ -41,12 +42,14 @@ fn main() {
     let mut cw = HashMap::new();
     let mut om = HashMap::new();
 
+    let mut rng = rngs::StdRng::seed_from_u64(561);
+
     for _ in 0..repetitions {
-        let sampled = requests.sample(k, false);
+        let sampled = requests.sample(k, false, &mut rng);
         let estimation = sampled.estimate(&graph, &mut temporal_paths);
 
-        at.push(estimation.average_travelling_time_as_f64(sampled.n as f64));
-        aw.push(estimation.average_waiting_time_as_f64(sampled.n as f64));
+        at.push(estimation.average_travelling_time_as_f64());
+        aw.push(estimation.average_waiting_time_as_f64());
 
         for (edge, fmul) in estimation.crowding_vector {
             cw.entry(edge)
