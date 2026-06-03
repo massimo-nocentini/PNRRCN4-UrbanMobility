@@ -87,5 +87,11 @@ single-by-epsilon:
 full:
 	#time cargo run --release --bin rust -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K10747_N30965.csv 0.1 50 300 > ../data/transport/florence/analysis-0.1e-50reps-300s.txt
 	time cargo run --release --bin rust -- ../data/transport/florence/edges.csv ../data/transport/florence/requests_K9853_N28185_withOnlyNodesConnected.csv 0.1 50 300 > ../data/transport/florence/analysis-0.1e-50reps-300s.txt
+
+full-top-3-cities:
+	time cargo run --release --bin rust -- ../data/transport/sydney/edges.csv ../data/transport/sydney/requests_K24063_N2406300.csv 0.1 50 300 > ../data/transport/sydney/analysis-0.1e-50reps-300s.txt
+	time cargo run --release --bin rust -- ../data/transport/melbourne/edges.csv ../data/transport/melbourne/requests_K19493_N1949300.csv 0.1 50 300 > ../data/transport/melbourne/analysis-0.1e-50reps-300s.txt
+	time cargo run --release --bin rust -- ../data/transport/paris/edges.csv ../data/transport/paris/requests_K11950_N1195000.csv 0.1 50 300 > ../data/transport/paris/analysis-0.1e-50reps-300s.txt
+
 csv:
 	cd ../data/js && node compose.js > single-all.csv && node batch.js > batch.csv
