@@ -83,6 +83,9 @@ PNRRCN4FruitTestCase >> testExportCompiledMethods [
 				, texFile parent fullName , ' ' , texFile fullName
 			writeStream: Smalltalk tools transcript ].
 
+	#( 'tex' 'aux' 'log' ) do: [ :each |
+		(texFile withExtension: each) ensureDelete ].
+
 	(texFile withExtension: 'pdf') exists ifFalse: [
 		^ self skip: 'xelatex did not typeset ' , texFile fullName ].
 
