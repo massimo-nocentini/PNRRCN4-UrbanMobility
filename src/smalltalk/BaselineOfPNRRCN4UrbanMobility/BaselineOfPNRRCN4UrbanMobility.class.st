@@ -12,9 +12,28 @@ BaselineOfPNRRCN4UrbanMobility >> baseline: spec [
 	spec for: #common do: [
 		spec
 			baseline: 'NeoCSV'
-			with: [ spec repository: 'github://svenvc/NeoCSV' ].
+			with: [ spec repository: 'github://svenvc/NeoCSV:master/repository' ].
 
 		spec
-			package: 'PNRRCN4-UrbanMobility';
-			package: 'PNRRCN4-UrbanMobility-Tests' ]
+			baseline: 'ContainersEssentials'
+			with: [
+			spec repository: 'github://massimo-nocentini/Containers-Essentials:master' ].
+
+		spec
+			baseline: 'TimSort'
+			with: [
+				spec
+					repository: 'github://massimo-nocentini/timsort.st:master/src';
+					loads: #( 'Core' ) ].
+
+		spec
+			baseline: 'LibPoppler'
+			with: [
+			spec repository: 'github://massimo-nocentini/libpoppler.st:master/src' ].
+
+		spec
+			package: 'PNRRCN4-UrbanMobility'
+			with: [ spec requires: #( 'NeoCSV' 'ContainersEssentials' 'TimSort' ) ];
+			package: 'PNRRCN4-UrbanMobility-Tests'
+			with: [ spec requires: #( 'PNRRCN4-UrbanMobility' 'LibPoppler' ) ] ]
 ]

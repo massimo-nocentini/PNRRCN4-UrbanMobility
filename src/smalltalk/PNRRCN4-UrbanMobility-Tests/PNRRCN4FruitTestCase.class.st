@@ -52,9 +52,9 @@ PNRRCN4FruitTestCase >> exampleFor01p [
 { #category : 'tests' }
 PNRRCN4FruitTestCase >> testExportCompiledMethods [
 
-	| pdf |
+	| texFile pdf |
 	self
-		exportSlotsGraphOf: PNRRFruitMBitCoinGraph >> #verticesSample:
+		exportSlotsGraphOf: PNRRFruitMBitCoinSample >> #sample:
 		pathSuffix: 'sampling'.
 
 	self
@@ -69,13 +69,24 @@ PNRRCN4FruitTestCase >> testExportCompiledMethods [
 
 
 	self
-		exportSlotsGraphOf: PNRRFruitMBitCoinSample >> #diameter
+		exportSlotsGraphOf: PNRRFruitMBitCoinGraph >> #diameter
 		pathSuffix: 'diameter'.
 
-	pdf := PopplerPdf
-		       compileTeX:
-		       PNRRFruitMBitCoinGraph estimatingDiameterTeXString
-		       times: 2.
+	texFile := FileReference newTempFilePrefix: 'PNRRCN4-' suffix: '.tex'.
+	texFile writeStreamDo: [ :aStream |
+		aStream
+		<< PNRRFruitMBitCoinGraph estimatingDiameterTeXString withUnixLineEndings ].
 
-	self exportSlotsGraphOf: pdf pages pathSuffix: 'pdf'
+	2 timesRepeat: [
+		LibC uniqueInstance
+			pipe: 'xelatex -halt-on-error -output-directory='
+				, texFile parent fullName , ' ' , texFile fullName
+			writeStream: Smalltalk tools transcript ].
+
+	(texFile withExtension: 'pdf') exists ifFalse: [
+		^ self skip: 'xelatex did not typeset ' , texFile fullName ].
+
+	pdf := PopplerDocument fromFile: (texFile withExtension: 'pdf').
+
+	self exportSlotsGraphOf: pdf asRoassalShapes pathSuffix: 'pdf'
 ]

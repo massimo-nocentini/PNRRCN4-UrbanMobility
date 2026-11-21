@@ -147,9 +147,11 @@ PNRRCN4Stop >> printOn: aStream [
 { #category : 'neighborhoods' }
 PNRRCN4Stop >> sortTemporalNeighborhoods [
 
-	temporalOutgoingNeighborhood := temporalOutgoingNeighborhood timsort.
+	temporalOutgoingNeighborhood := temporalOutgoingNeighborhood asArray
+		                                timSortBy: [ :each | each timsortSortKey ].
 
-	temporalIncomingNeighborhood := temporalIncomingNeighborhood timsort
+	temporalIncomingNeighborhood := temporalIncomingNeighborhood asArray
+		                                timSortBy: [ :each | each timsortSortKey ]
 ]
 
 { #category : 'neighborhoods' }

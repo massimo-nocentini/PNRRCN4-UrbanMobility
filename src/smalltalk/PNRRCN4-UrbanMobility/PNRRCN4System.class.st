@@ -178,7 +178,7 @@ PNRRCN4System class >> routes: routes stops: stops times: times trips: trips [
 		temporalEdges addAll: stop temporalOutgoingNeighborhood ].
 
 	^ graph
-		  temporalEdges: temporalEdges timsort;
+		  temporalEdges: (temporalEdges asArray timSortBy: [ :each | each timsortSortKey ]);
 		  routes: routes;
 		  stops: stopsMap;
 		  times: stoptimes;

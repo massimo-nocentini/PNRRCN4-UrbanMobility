@@ -32,7 +32,7 @@ PNRRCN4RequestsSample class >> requests: aCollection onSystem: aSystem [
 				       yourself ].
 
 	^ self new
-		  requests: col timsort;
+		  requests: (col asArray timSortBy: [ :each | each timsortSortKey ]);
 		  totalCount: count;
 		  yourself
 ]
@@ -115,16 +115,17 @@ PNRRCN4RequestsSample >> occupancyAndCrowding [
 	oMatrix keysAndValuesDo: [ :t :dict |
 		res
 			at: (DateAndTime fromUnixTime: t)
-			put: (dict associations timsort: #value reverse: true) ].
+			put: (dict associations asArray timSortDescendingBy: #value) ].
 
 	^ PNRRCN4OccupancyAndCrowding new
 		  requestsSample: self;
 		  averageTime: pair first;
 		  averageWaiting: pair second;
 		  occupancyMatrix:
-			  (res associations timsort: [ :assoc | assoc key asUnixTime ]);
+			  (res associations asArray timSortBy: [ :assoc |
+				   assoc key asUnixTime ]);
 		  crowdingVector:
-			  (cVector associations timsort: #value reverse: true);
+			  (cVector associations asArray timSortDescendingBy: #value);
 		  yourself
 ]
 
